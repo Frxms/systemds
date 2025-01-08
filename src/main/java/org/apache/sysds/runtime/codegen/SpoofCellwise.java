@@ -1027,6 +1027,7 @@ public abstract class SpoofCellwise extends SpoofOperator {
 				}
 			}
 			if(!sparseSafe)
+				//todo: overthink this for loop
 				for(int j=lastj+1; j<n; j++)
 					c[i] *= genexec(0, b, scalars, m, n, rix+i, i, j);
 			//todo: do I need to call it with genexec instead of just calling it with 0
@@ -1038,7 +1039,32 @@ public abstract class SpoofCellwise extends SpoofOperator {
 	private long executeSparseColProd(SparseBlock sblock, SideInput[] b, double[] scalars,
 		MatrixBlock out, int m, int n, boolean sparseSafe, int rl, int ru, long rix)
 	{
-		return 1;
+		double[] c = out.getDenseBlockValues();
+		for(int i = rl; i < ru; i++) {
+			int lastj = -1;
+			if(sblock != null && !sblock.isEmpty(i)) {
+				int apos = sblock.pos(i);
+				int alen = sblock.size(i);
+				int[] aix = sblock.indexes(i);
+				double[] avals = sblock.values(i);
+				for(int j = apos; j < apos + alen; j++) {
+					if(!sparseSafe) {
+						if(aix[j] - (lastj+1) > 1) {
+							c[j] *= genexec(0, b, scalars, m, n, rix+i, i, j);
+							break;
+						}
+					}
+					lastj = aix[j];
+					c[j] *= genexec(avals[j], b, scalars, m, n, rix+i, i, lastj);
+				}
+			}
+			if(!sparseSafe)
+				//todo: overthink this for loop
+				for(int j = lastj + 1; j < n; j++) {
+					c[j] *= genexec(0, b, scalars, m, n, rix+i, i, j);
+				}
+		}
+		return -1;
 	}
 
 	//local execution where grix==rix
