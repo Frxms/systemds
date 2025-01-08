@@ -84,6 +84,8 @@ public abstract class SpoofCellwise extends SpoofOperator {
 		SUM_SQ,
 		MIN,
 		MAX,
+		COL_PROD,
+		ROW_PROD
 	}
 	
 	protected final CellType _type;
@@ -928,7 +930,117 @@ public abstract class SpoofCellwise extends SpoofOperator {
 		}
 		return ret;
 	}
-	
+
+	private long executeDenseRowProd(DenseBlock a, SideInput[] b, double[] scalars,
+		DenseBlock c, int m, int n, boolean sparseSafe, int rl, int ru, long rix)
+	{
+		// single block output
+		double[] lc = c.valuesAt(0);
+		long lnnz = 0;
+		if(a == null && !sparseSafe) {
+			for(int i = rl; i < ru; i++) {
+				for(int j = 0; j < n; j++) {
+					lc[i] *= genexec(0, b, scalars, m, n, rix+i, i, j);
+				}
+				//todo: why compute all the 0's in executeDenseRowAggSum
+				lnnz += (lc[i]!=0) ? 1 : 0;
+			}
+		}
+		else if(a != null) {
+			for(int i = rl; i < ru; i++) {
+				double[] avals = a.values(i);
+				int aix = a.pos(i);
+				for(int j = 0; j < n; j++) {
+					double aval = avals[aix + j];
+					if(aval != 0 || !sparseSafe)
+						lc[i] *= genexec(aval, b, scalars, m, n, rix+i, i, j);
+					else {
+						lc[i] *= 0;
+						break;
+					}
+					lnnz += (lc[i] != 0) ? 1 : 0;
+				}
+			}
+		}
+		return lnnz;
+	}
+
+	private long executeDenseColProd(DenseBlock a, SideInput[] b, double[] scalars,
+		DenseBlock c, int m, int n, boolean sparseSafe, int rl, int ru, long rix)
+	{
+		double[] lc = c.valuesAt(0);
+		//track the cols that have a zero
+		boolean[] zeroFlag = new boolean[n];
+		if(a == null && !sparseSafe) {
+			for(int i = rl; i < ru; i++) {
+				for(int j = 0; j < n; j++) {
+					if(!zeroFlag[j])
+						lc[j] *= genexec(0, b, scalars, m, n, rix+i, i, j);
+					if(lc[j] == 0 && !zeroFlag[j])
+						zeroFlag[j] = true;
+				}
+			}
+		}
+		else if(a != null) {
+			for(int i = rl; i < ru; i++) {
+				double[] avals = a.values(i);
+				int aix = a.pos(i);
+				for(int j = 0; j < n; j++) {
+					if(zeroFlag[j]) {
+						double aval = avals[aix + j];
+						if(aval != 0 || !sparseSafe)
+							lc[j] *= genexec(aval, b, scalars, m, n, rix + i, i, j);
+						else
+							lc[j] *= genexec(0, b, scalars, m, n, rix + i, i, j);
+					}
+					if(lc[j] == 0 && !zeroFlag[j])
+						zeroFlag[j] = true;
+				}
+			}
+		}
+
+		return 1;
+	}
+
+	private long executeSparseRowProd(SparseBlock sblock, SideInput[] b, double[] scalars,
+		MatrixBlock out, int m, int n, boolean sparseSafe, int rl, int ru, long rix)
+	{
+		double[] c = out.getDenseBlockValues();
+		long lnnz = 0;
+		for(int i = rl; i < ru; i++) {
+			int lastj = -1;
+			if(sblock != null && !sblock.isEmpty(i)) {
+				int apos = sblock.pos(i);
+				int alen = sblock.size(i);
+				int[] aix = sblock.indexes(i);
+				double[] avals = sblock.values(i);
+				for(int j = apos; j < apos+alen; j++) {
+					// if there is a zero, no need to compute anymore
+					if(!sparseSafe) {
+						if(aix[j] - (lastj+1) > 1) {
+							c[i] *= genexec(0, b, scalars, m, n, rix+i, i, j);
+							break;
+						}
+					}
+					lastj = aix[j];
+					c[i] *= genexec(avals[j], b, scalars, m, n, rix+i, i, j);
+				}
+			}
+			if(!sparseSafe)
+				for(int j=lastj+1; j<n; j++)
+					c[i] *= genexec(0, b, scalars, m, n, rix+i, i, j);
+			//todo: do I need to call it with genexec instead of just calling it with 0
+			lnnz += (c[i] != 0) ? 1 : 0;
+		}
+		return lnnz;
+	}
+
+	private long executeSparseColProd(SparseBlock sblock, SideInput[] b, double[] scalars,
+		MatrixBlock out, int m, int n, boolean sparseSafe, int rl, int ru, long rix)
+	{
+		return 1;
+	}
+
 	//local execution where grix==rix
 	protected final double genexec( double a, SideInput[] b,
 		double[] scalars, int m, int n, int rix, int cix) {
