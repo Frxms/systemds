@@ -7,9 +7,9 @@
 # to you under the Apache License, Version 2.0 (the
 # "License"); you may not use this file except in compliance
 # with the License.  You may obtain a copy of the License at
-# 
+#
 #   http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing,
 # software distributed under the License is distributed on an
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -19,10 +19,15 @@
 #
 #-------------------------------------------------------------
 
-X= matrix( "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15", rows=5, cols=3)
-Z= matrix(seq(1,10), 1, 10)
+args<-commandArgs(TRUE)
+options(digits=22)
+library("Matrix")
+library("matrixStats")
+
+Z= matrix(seq(1,10), 1, 10, byrow=TRUE)
 Y = matrix(0, 10, 10)
 X = rbind(Y, Z, Y)
-S=colSums(X/rowSums(X))
-write(S,$1)
 
+R = as.matrix(min(rowSums(X)))
+
+writeMM(as(R, "CsparseMatrix"), paste(args[2], "S", sep=""));
