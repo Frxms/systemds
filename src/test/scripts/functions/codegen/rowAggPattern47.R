@@ -22,12 +22,14 @@
 args<-commandArgs(TRUE)
 options(digits=22)
 library("Matrix")
-library("matrixStats")
 
-Z= matrix(seq(1,10), 1, 10, byrow=TRUE)
+W = matrix(seq(4,5), 1, 2)
+J = matrix(0, 1, 4)
+Z= cbind(J, W, J)
 Y = matrix(0, 10, 10)
-X = rbind(Y, Z, Y)
+X = rbind(Y, Y, Y, Y, Z, Y, Y, Y, Y)
+v = seq(1,81)
 
-R = as.matrix(min(rowSums(X)))
+S= (X*v)/rowSums(X*v)
 
-writeMM(as(R, "CsparseMatrix"), paste(args[2], "S", sep=""));
+writeMM(as(S, "CsparseMatrix"), paste(args[2], "S", sep=""));
