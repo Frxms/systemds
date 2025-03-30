@@ -199,13 +199,6 @@ public class LibSpoofPrimitives
 		return c;
 	}
 
-//	public static double[] vectMultWrite(double[] a, double bval, int[] aix, int ai, int alen, int len) {
-//		double[] c = allocVector(len, true);
-//		if( a == null ) return c;
-//		LibMatrixMult.vectMultiplyAdd(bval, a, c, aix, ai, 0, alen);
-//		return c;
-//	}
-
 	public static double[] vectMultWrite(double[] a, double bval, int[] aix, int ai, int alen, int len) {
 		double[] c = allocVector(len, alen, true);
 		if( a == null ) return c;
