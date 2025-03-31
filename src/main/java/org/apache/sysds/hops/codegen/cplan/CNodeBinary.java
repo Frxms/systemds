@@ -20,6 +20,7 @@
 package org.apache.sysds.hops.codegen.cplan;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sysds.common.Opcodes;
@@ -159,10 +160,10 @@ public class CNodeBinary extends CNode {
 		sb.append(_inputs.get(1).codegen(sparse, api));
 		
 		//generate binary operation (use sparse template, if data input)
-		boolean lsparseLhs = sparse && _inputs.get(0) instanceof CNodeData 
-			&& _inputs.get(0).getVarname().startsWith("a");
-		boolean lsparseRhs = sparse && _inputs.get(1) instanceof CNodeData 
-			&& _inputs.get(1).getVarname().startsWith("a");
+		boolean lsparseLhs = sparse ? _inputs.get(0) instanceof CNodeData
+                && _inputs.get(0).getVarname().startsWith("a") || _inputs.get(0).getVarname().startsWith("TMP") && _inputs.get(0).getDataType().isMatrix() : false;
+		boolean lsparseRhs = sparse ? _inputs.get(1) instanceof CNodeData
+			&& _inputs.get(1).getVarname().startsWith("a") || _inputs.get(1).getVarname().startsWith("TMP") && _inputs.get(1).getDataType().isMatrix() : false;
 		boolean scalarInput = _inputs.get(0).getDataType().isScalar();
 		boolean scalarVector = (_inputs.get(0).getDataType().isScalar()
 			&& _inputs.get(1).getDataType().isMatrix());
@@ -179,8 +180,10 @@ public class CNodeBinary extends CNode {
 			String varj = _inputs.get(j).getVarname(api);
 			
 			//replace sparse and dense inputs
-			tmp = tmp.replace("%IN"+(j+1)+"v%", varj+"vals");
-			tmp = tmp.replace("%IN"+(j+1)+"i%", varj+"ix");
+			tmp = tmp.replace("%IN"+(j+1)+"v%", (lsparseLhs && varj.startsWith("TMP") && varj.equals(_inputs.get(0).getVarname()))
+					|| lsparseRhs && varj.startsWith("TMP") && varj.equals(_inputs.get(0).getVarname()) ? varj+".values()" : varj+"vals");
+			tmp = tmp.replace("%IN"+(j+1)+"i%", (lsparseLhs && varj.startsWith("TMP") && varj.equals(_inputs.get(0).getVarname()))
+					|| lsparseRhs && varj.startsWith("TMP") && varj.equals(_inputs.get(0).getVarname()) ? varj+".indexes()" : varj+"ix");
 			tmp = tmp.replace("%IN"+(j+1)+"%",
 					varj.startsWith("a") ? (api == GeneratorAPI.JAVA ? varj : 
 						(_inputs.get(j).getDataType() == DataType.MATRIX ? varj + ".vals(0)" : varj)) :
@@ -203,7 +206,7 @@ public class CNodeBinary extends CNode {
 		else { //general case 
 			CNode mInput = getIntermediateInputVector();
 			if( mInput != null )
-				tmp = tmp.replace("%LEN%", mInput.getVectorLength(api));
+				tmp = tmp.replace("%LEN%", mInput.getVectorLength(api, sparse));
 		}
 		
 		sb.append(tmp);

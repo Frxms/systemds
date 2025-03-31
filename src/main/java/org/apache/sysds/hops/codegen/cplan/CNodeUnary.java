@@ -25,6 +25,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sysds.common.Opcodes;
 import org.apache.sysds.common.Types.DataType;
+import org.apache.sysds.hops.codegen.template.TemplateUtils;
 import org.apache.sysds.runtime.util.UtilFunctions;
 import org.apache.sysds.hops.codegen.SpoofCompiler.GeneratorAPI;
 
@@ -111,9 +112,12 @@ public class CNodeUnary extends CNode
 		sb.append(_inputs.get(0).codegen(sparse, api));
 		
 		//generate unary operation
-		boolean lsparse = sparse && (_inputs.get(0) instanceof CNodeData
-			&& _inputs.get(0).getVarname().startsWith("a")
-			&& !_inputs.get(0).isLiteral());
+		boolean lsparse = sparse &&
+				((_inputs.get(0) instanceof CNodeData
+						&& _inputs.get(0).getVarname().startsWith("a")
+						&& !_inputs.get(0).isLiteral())
+				|| (_inputs.get(0).getVarname().startsWith("TMP")
+				&& TemplateUtils.isMatrix(_inputs.get(0))));
 		String var = createVarname();
 		String tmp = getLanguageTemplateClass(this, api).getTemplate(_type, lsparse);
 		tmp = tmp.replaceAll("%TMP%", var);
