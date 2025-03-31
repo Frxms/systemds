@@ -434,12 +434,18 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectDivWrite(double[] a, double bval, int[] aix, int ai, int alen, int len) {
-		double init = (bval != 0) ? 0 : Double.NaN;
-		double[] c = allocVector(len, true, init);
-		for( int j = ai; j < ai+alen; j++ )
-			c[aix[j]] = a[j] / bval;
-		SparseRowVector d = new SparseRowVector(c);
-		return d;
+			double init = 0;
+		if (bval != 0) {
+			for( int j = ai; j < ai+alen; j++ )
+				a[j] = a[j] / bval;
+			return new SparseRowVector(a, aix);
+		} else {
+			init = Double.NaN;
+			double[] c = allocVector(len, true, init);
+			for( int j = ai; j < ai+alen; j++ )
+				c[aix[j]] = a[j] / bval;
+			return new SparseRowVector(c);
+		}
 	}
 
 	public static double[] vectDivWrite(double bval, double[] a, int[] aix, int ai, int alen, int len) {
