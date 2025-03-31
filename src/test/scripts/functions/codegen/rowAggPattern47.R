@@ -31,7 +31,7 @@ Y = matrix(0, 10, 18)
 X = rbind(Z, Y, Y, Y, Y, Y, Y, Y, Y)
 v = seq(1,81)
 
-# S= (X*v)/rowSums(X*v)
-S = (X*v)/rowMins(X*v)
+S= (X*v)/rowSums(X*v)
+# S = (X*v)/rowMins(X*v)
 
 writeMM(as(S, "CsparseMatrix"), paste(args[2], "S", sep=""));
