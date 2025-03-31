@@ -23,6 +23,7 @@ import java.util.Arrays;
 
 import org.apache.commons.math3.util.FastMath;
 import org.apache.sysds.runtime.data.DenseBlockFP64;
+import org.apache.sysds.runtime.data.SparseRow;
 import org.apache.sysds.runtime.data.SparseRowVector;
 import org.apache.sysds.runtime.functionobjects.BitwAnd;
 import org.apache.sysds.runtime.functionobjects.IntegerDivide;
@@ -199,14 +200,14 @@ public class LibSpoofPrimitives
 		return c;
 	}
 
-	public static double[] vectMultWrite(double[] a, double bval, int[] aix, int ai, int alen, int len) {
-		double[] c = allocVector(len, alen, true);
+	public static SparseRowVector vectMultWrite(double[] a, double bval, int[] aix, int ai, int alen, int len) {
+		SparseRowVector c = new SparseRowVector(a, aix);
 		if( a == null ) return c;
-		LibMatrixMult.vectMultiplyAdd(bval, a, c, aix, ai, 0, alen);
+		LibMatrixMult.vectMultiplyAdd(bval, a, c.values(), ai, 0, alen);
 		return c;
 	}
 
-	public static double[] vectMultWrite(double bval, double[] a, int[] aix, int ai, int alen, int len) {
+	public static SparseRowVector vectMultWrite(double bval, double[] a, int[] aix, int ai, int alen, int len) {
 		return vectMultWrite(a, bval, aix, ai, alen, len);
 	}
 
@@ -226,6 +227,13 @@ public class LibSpoofPrimitives
 	public static void vectWrite(double[] a, double[] c, int ci, int len) {
 		if( a == null ) return;
 		System.arraycopy(a, 0, c, ci, len);
+	}
+
+	public static void vectWrite(SparseRowVector a, double[] c, int ci, int len) {
+		if( a == null ) return;
+		int[] aix = a.indexes();
+		for( int i=0; i<0+a.size(); i++ )
+			c[ci+aix[i]] = a.get(aix[i]);
 	}
 
 	public static void vectWrite(double[] a, double[] c, int ai, int ci, int len) {
@@ -425,12 +433,13 @@ public class LibSpoofPrimitives
 		return c;
 	}
 
-	public static double[] vectDivWrite(double[] a, double bval, int[] aix, int ai, int alen, int len) {
+	public static SparseRowVector vectDivWrite(double[] a, double bval, int[] aix, int ai, int alen, int len) {
 		double init = (bval != 0) ? 0 : Double.NaN;
 		double[] c = allocVector(len, true, init);
 		for( int j = ai; j < ai+alen; j++ )
 			c[aix[j]] = a[j] / bval;
-		return c;
+		SparseRowVector d = new SparseRowVector(c);
+		return d;
 	}
 
 	public static double[] vectDivWrite(double bval, double[] a, int[] aix, int ai, int alen, int len) {
@@ -2190,16 +2199,6 @@ public class LibSpoofPrimitives
 
 	public static double[] allocVector(int len, boolean reset) {
 		return allocVector(len, reset, 0);
-	}
-
-
-	protected static double[] allocVector(int len, int alen, boolean reset) {
-		double sparsity = 0.12;
-		if((double) alen /len < sparsity && reset) {
-			SparseRowVector v = new SparseRowVector(alen);
-			return v.values();
-		}
-		return new double[len];
 	}
 
 	protected static double[] allocVector(int len, boolean reset, double resetVal) {
