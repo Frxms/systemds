@@ -203,7 +203,7 @@ public class LibSpoofPrimitives
 	public static SparseRowVector vectMultWrite(double[] a, double bval, int[] aix, int ai, int alen, int len) {
 		SparseRowVector c = new SparseRowVector(a, aix);
 		if( a == null ) return c;
-		LibMatrixMult.vectMultiplyAdd(bval, a, c.values(), ai, 0, alen);
+		LibMatrixMult.vectMultiplyWrite(bval, a, c.values(), ai, 0, alen);
 		return c;
 	}
 
