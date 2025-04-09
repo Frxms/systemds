@@ -85,7 +85,7 @@ public class Binary extends CodeTemplate {
 			case VECT_GREATEREQUAL_SCALAR: {
 				String vectName = type.getVectorPrimitiveName();
 				if( scalarVector )
-					return sparseRhs ? "    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1%, %IN2v%, %IN2i%, %POS2%, alen, %LEN%);\n" :
+					return sparseRhs ? "    SparseRowVector %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1%, %IN2v%, %IN2i%, %POS2%, alen, %LEN%);\n" :
 							"    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1%, %IN2%, %POS2%, %LEN%);\n";
 				else
 					return sparseLhs ? "    SparseRowVector %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1v%, %IN2%, %IN1i%, %POS1%, alen, %LEN%);\n" :
