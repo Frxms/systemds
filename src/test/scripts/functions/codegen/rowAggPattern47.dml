@@ -26,7 +26,7 @@ Y = matrix(0, 10, 18)
 X = rbind(Z, Y, Y, Y, Y, Y, Y, Y, Y)
 v = seq(1,81)
 
-S= (X*v)/rowSums(X*v)
-#S = (X)/rowMins(X)
+#S= (X*v)+rowSums(X*v)
+S = (X*v)/rowSums(X*v)
 
 write(S,$1)
