@@ -86,11 +86,11 @@ public class Binary extends CodeTemplate {
 			case VECT_GREATEREQUAL_SCALAR: {
 				String vectName = type.getVectorPrimitiveName();
 				if( scalarVector )
-					return sparseRhs ? DMLScript.SPARSE_INTERMEDIATE ? "    SparseRowVector %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1%, %IN2v%, %IN2i%, %POS2%, alen, %LEN%);\n" :
+					return sparseRhs ? DMLScript.SPARSE_INTERMEDIATE ? "    SparseRowVector %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%LEN%, %IN1%, %IN2v%, %IN2i%, %POS2%, alen);\n" :
 							"    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1%, %IN2v%, %IN2i%, %POS2%, alen, %LEN%);\n" :
 							"    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1%, %IN2%, %POS2%, %LEN%);\n";
 				else
-					return sparseLhs ? DMLScript.SPARSE_INTERMEDIATE ? "    SparseRowVector %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1v%, %IN2%, %IN1i%, %POS1%, alen, %LEN%);\n" :
+					return sparseLhs ? DMLScript.SPARSE_INTERMEDIATE ? "    SparseRowVector %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%LEN%, %IN1v%, %IN2%, %IN1i%, %POS1%, alen);\n" :
 							"    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1v%, %IN2%, %IN1i%, %POS1%, alen, %LEN%);\n" :
 							"    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1%, %IN2%, %POS1%, %LEN%);\n";
 			}
