@@ -19,6 +19,7 @@
 
 package org.apache.sysds.hops.codegen.cplan;
 
+import org.apache.sysds.api.DMLScript;
 import org.apache.sysds.common.Types.DataType;
 import org.apache.sysds.hops.codegen.SpoofCompiler.GeneratorAPI;
 import org.apache.sysds.hops.codegen.template.TemplateUtils;
@@ -230,8 +231,13 @@ public abstract class CNode
 	
 	protected String replaceUnaryPlaceholders(String tmp, String varj, boolean vectIn, GeneratorAPI api) {
 		//replace sparse and dense inputs
-		tmp = tmp.replace("%IN1v%", (TemplateUtils.isMatrix(_inputs.get(0)) && varj.startsWith("TMP")) ? varj+".values()" : varj+"vals");
-		tmp = tmp.replace("%IN1i%", (TemplateUtils.isMatrix(_inputs.get(0)) && varj.startsWith("TMP")) ? varj+".indexes()" :varj+"ix");
+		if(DMLScript.SPARSE_INTERMEDIATE) {
+			tmp = tmp.replace("%IN1v%", (TemplateUtils.isMatrix(_inputs.get(0)) && varj.startsWith("TMP")) ? varj+".values()" : varj+"vals");
+			tmp = tmp.replace("%IN1i%", (TemplateUtils.isMatrix(_inputs.get(0)) && varj.startsWith("TMP")) ? varj+".indexes()" :varj+"ix");
+		} else {
+			tmp = tmp.replace("%IN1v%", varj+"vals");
+			tmp = tmp.replace("%IN1i%", varj+"ix");
+		}
 		tmp = tmp.replace("%IN1%", 
 			(vectIn && TemplateUtils.isMatrix(_inputs.get(0))) ? 
 				((api == GeneratorAPI.JAVA) ? varj + ".values(rix)" : varj + ".vals(0)" ) :

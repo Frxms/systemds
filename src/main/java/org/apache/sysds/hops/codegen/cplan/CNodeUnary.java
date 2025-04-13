@@ -23,6 +23,7 @@ import java.util.Arrays;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.sysds.api.DMLScript;
 import org.apache.sysds.common.Opcodes;
 import org.apache.sysds.common.Types.DataType;
 import org.apache.sysds.hops.codegen.template.TemplateUtils;
@@ -116,7 +117,7 @@ public class CNodeUnary extends CNode
 				((_inputs.get(0) instanceof CNodeData
 						&& _inputs.get(0).getVarname().startsWith("a")
 						&& !_inputs.get(0).isLiteral())
-				|| (_inputs.get(0).getVarname().startsWith("TMP")
+				|| (DMLScript.SPARSE_INTERMEDIATE && _inputs.get(0).getVarname().startsWith("TMP")
 				&& TemplateUtils.isMatrix(_inputs.get(0))));
 		String var = createVarname();
 		String tmp = getLanguageTemplateClass(this, api).getTemplate(_type, lsparse);
