@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.sysds.api.DMLScript;
 import org.apache.sysds.common.Opcodes;
 import org.apache.sysds.hops.codegen.template.TemplateUtils;
 import org.apache.sysds.common.Types.DataType;
@@ -158,63 +159,120 @@ public class CNodeBinary extends CNode {
 		//generate children
 		sb.append(_inputs.get(0).codegen(sparse, api));
 		sb.append(_inputs.get(1).codegen(sparse, api));
-		
-		//generate binary operation (use sparse template, if data input)
-		boolean lsparseLhs = sparse ? _inputs.get(0) instanceof CNodeData
-                && _inputs.get(0).getVarname().startsWith("a") || _inputs.get(0).getVarname().startsWith("TMP") && _inputs.get(0).getDataType().isMatrix() : false;
-		boolean lsparseRhs = sparse ? _inputs.get(1) instanceof CNodeData
-			&& _inputs.get(1).getVarname().startsWith("a") || _inputs.get(1).getVarname().startsWith("TMP") && _inputs.get(1).getDataType().isMatrix() : false;
-		boolean scalarInput = _inputs.get(0).getDataType().isScalar();
-		boolean scalarVector = (_inputs.get(0).getDataType().isScalar()
-			&& _inputs.get(1).getDataType().isMatrix());
-		boolean vectorVector = _inputs.get(0).getDataType().isMatrix()
-			&& _inputs.get(1).getDataType().isMatrix();
-		String var = createVarname();
-		String tmp = getLanguageTemplateClass(this, api)
-			.getTemplate(_type, lsparseLhs, lsparseRhs, scalarVector, scalarInput, vectorVector);
 
-		tmp = tmp.replace("%TMP%", var);
-		
-		//replace input references and start indexes
-		for( int j=0; j<2; j++ ) {
-			String varj = _inputs.get(j).getVarname(api);
-			
-			//replace sparse and dense inputs
-			tmp = tmp.replace("%IN"+(j+1)+"v%", (lsparseLhs && varj.startsWith("TMP") && varj.equals(_inputs.get(0).getVarname()))
-					|| lsparseRhs && varj.startsWith("TMP") && varj.equals(_inputs.get(0).getVarname()) ? varj+".values()" : varj+"vals");
-			tmp = tmp.replace("%IN"+(j+1)+"i%", (lsparseLhs && varj.startsWith("TMP") && varj.equals(_inputs.get(0).getVarname()))
-					|| lsparseRhs && varj.startsWith("TMP") && varj.equals(_inputs.get(0).getVarname()) ? varj+".indexes()" : varj+"ix");
-			tmp = tmp.replace("%IN"+(j+1)+"%",
-					varj.startsWith("a") ? (api == GeneratorAPI.JAVA ? varj : 
-						(_inputs.get(j).getDataType() == DataType.MATRIX ? varj + ".vals(0)" : varj)) :
-						varj.startsWith("b") ? (api == GeneratorAPI.JAVA ? varj + ".values(rix)" : 
-								(_type == BinType.VECT_MATRIXMULT ? varj : varj + ".vals(0)")) :
-							_inputs.get(j).getDataType() == DataType.MATRIX ? (api == GeneratorAPI.JAVA ? varj : varj + ".vals(0)") : varj);
-			
-			//replace start position of main input
-			tmp = tmp.replace("%POS"+(j+1)+"%", (_inputs.get(j) instanceof CNodeData 
-					&& _inputs.get(j).getDataType().isMatrix()) ? (!varj.startsWith("b")) ? varj+"i" : 
-					((TemplateUtils.isMatrix(_inputs.get(j)) || (_type.isElementwise()
-						&& TemplateUtils.isColVector(_inputs.get(j)))) && _type!=BinType.VECT_MATRIXMULT) ?
-					varj + ".pos(rix)" : "0" : "0");
+		if(DMLScript.SPARSE_INTERMEDIATE) {
+			//generate binary operation (use sparse template, if data input)
+			boolean lsparseLhs = sparse ? _inputs.get(0) instanceof CNodeData
+					&& _inputs.get(0).getVarname().startsWith("a") || _inputs.get(0).getVarname().startsWith("TMP") && _inputs.get(0).getDataType().isMatrix() : false;
+			boolean lsparseRhs = sparse ? _inputs.get(1) instanceof CNodeData
+					&& _inputs.get(1).getVarname().startsWith("a") || _inputs.get(1).getVarname().startsWith("TMP") && _inputs.get(1).getDataType().isMatrix() : false;
+			boolean scalarInput = _inputs.get(0).getDataType().isScalar();
+			boolean scalarVector = (_inputs.get(0).getDataType().isScalar()
+					&& _inputs.get(1).getDataType().isMatrix());
+			boolean vectorVector = _inputs.get(0).getDataType().isMatrix()
+					&& _inputs.get(1).getDataType().isMatrix();
+			String var = createVarname();
+			String tmp = getLanguageTemplateClass(this, api)
+					.getTemplate(_type, lsparseLhs, lsparseRhs, scalarVector, scalarInput, vectorVector);
+
+			tmp = tmp.replace("%TMP%", var);
+
+			//replace input references and start indexes
+			for( int j=0; j<2; j++ ) {
+				String varj = _inputs.get(j).getVarname(api);
+
+				//replace sparse and dense inputs
+				tmp = tmp.replace("%IN"+(j+1)+"v%", (lsparseLhs && varj.startsWith("TMP") && varj.equals(_inputs.get(0).getVarname()))
+						|| lsparseRhs && varj.startsWith("TMP") && varj.equals(_inputs.get(0).getVarname()) ? varj+".values()" : varj+"vals");
+				tmp = tmp.replace("%IN"+(j+1)+"i%", (lsparseLhs && varj.startsWith("TMP") && varj.equals(_inputs.get(0).getVarname()))
+						|| lsparseRhs && varj.startsWith("TMP") && varj.equals(_inputs.get(0).getVarname()) ? varj+".indexes()" : varj+"ix");
+				tmp = tmp.replace("%IN"+(j+1)+"%",
+						varj.startsWith("a") ? (api == GeneratorAPI.JAVA ? varj :
+								(_inputs.get(j).getDataType() == DataType.MATRIX ? varj + ".vals(0)" : varj)) :
+								varj.startsWith("b") ? (api == GeneratorAPI.JAVA ? varj + ".values(rix)" :
+										(_type == BinType.VECT_MATRIXMULT ? varj : varj + ".vals(0)")) :
+										_inputs.get(j).getDataType() == DataType.MATRIX ? (api == GeneratorAPI.JAVA ? varj : varj + ".vals(0)") : varj);
+
+				//replace start position of main input
+				tmp = tmp.replace("%POS"+(j+1)+"%", (_inputs.get(j) instanceof CNodeData
+						&& _inputs.get(j).getDataType().isMatrix()) ? (!varj.startsWith("b")) ? varj+"i" :
+						((TemplateUtils.isMatrix(_inputs.get(j)) || (_type.isElementwise()
+								&& TemplateUtils.isColVector(_inputs.get(j)))) && _type!=BinType.VECT_MATRIXMULT) ?
+								varj + ".pos(rix)" : "0" : "0");
+			}
+			//replace length information (e.g., after matrix mult)
+			if( _type == BinType.VECT_OUTERMULT_ADD || (_type == BinType.VECT_CBIND && vectorVector) ) {
+				for( int j=0; j<2; j++ )
+					tmp = tmp.replace("%LEN"+(j+1)+"%", _inputs.get(j).getVectorLength(api));
+			}
+			else { //general case
+				CNode mInput = getIntermediateInputVector();
+				if( mInput != null )
+					tmp = tmp.replace("%LEN%", mInput.getVectorLength(api, sparse));
+			}
+
+			sb.append(tmp);
+
+			//mark as generated
+			_generated = true;
+
+			return sb.toString();
+		} else {
+			//generate binary operation (use sparse template, if data input)
+			boolean lsparseLhs = sparse && _inputs.get(0) instanceof CNodeData
+					&& _inputs.get(0).getVarname().startsWith("a");
+			boolean lsparseRhs = sparse && _inputs.get(1) instanceof CNodeData
+					&& _inputs.get(1).getVarname().startsWith("a");
+			boolean scalarInput = _inputs.get(0).getDataType().isScalar();
+			boolean scalarVector = (_inputs.get(0).getDataType().isScalar()
+					&& _inputs.get(1).getDataType().isMatrix());
+			boolean vectorVector = _inputs.get(0).getDataType().isMatrix()
+					&& _inputs.get(1).getDataType().isMatrix();
+			String var = createVarname();
+			String tmp = getLanguageTemplateClass(this, api)
+					.getTemplate(_type, lsparseLhs, lsparseRhs, scalarVector, scalarInput, vectorVector);
+
+			tmp = tmp.replace("%TMP%", var);
+
+			//replace input references and start indexes
+			for( int j=0; j<2; j++ ) {
+				String varj = _inputs.get(j).getVarname(api);
+
+				//replace sparse and dense inputs
+				tmp = tmp.replace("%IN"+(j+1)+"v%", varj+"vals");
+				tmp = tmp.replace("%IN"+(j+1)+"i%", varj+"ix");
+				tmp = tmp.replace("%IN"+(j+1)+"%",
+						varj.startsWith("a") ? (api == GeneratorAPI.JAVA ? varj :
+								(_inputs.get(j).getDataType() == DataType.MATRIX ? varj + ".vals(0)" : varj)) :
+								varj.startsWith("b") ? (api == GeneratorAPI.JAVA ? varj + ".values(rix)" :
+										(_type == BinType.VECT_MATRIXMULT ? varj : varj + ".vals(0)")) :
+										_inputs.get(j).getDataType() == DataType.MATRIX ? (api == GeneratorAPI.JAVA ? varj : varj + ".vals(0)") : varj);
+
+				//replace start position of main input
+				tmp = tmp.replace("%POS"+(j+1)+"%", (_inputs.get(j) instanceof CNodeData
+						&& _inputs.get(j).getDataType().isMatrix()) ? (!varj.startsWith("b")) ? varj+"i" :
+						((TemplateUtils.isMatrix(_inputs.get(j)) || (_type.isElementwise()
+								&& TemplateUtils.isColVector(_inputs.get(j)))) && _type!=BinType.VECT_MATRIXMULT) ?
+								varj + ".pos(rix)" : "0" : "0");
+			}
+			//replace length information (e.g., after matrix mult)
+			if( _type == BinType.VECT_OUTERMULT_ADD || (_type == BinType.VECT_CBIND && vectorVector) ) {
+				for( int j=0; j<2; j++ )
+					tmp = tmp.replace("%LEN"+(j+1)+"%", _inputs.get(j).getVectorLength(api));
+			}
+			else { //general case
+				CNode mInput = getIntermediateInputVector();
+				if( mInput != null )
+					tmp = tmp.replace("%LEN%", mInput.getVectorLength(api));
+			}
+
+			sb.append(tmp);
+
+			//mark as generated
+			_generated = true;
+
+			return sb.toString();
 		}
-		//replace length information (e.g., after matrix mult)
-		if( _type == BinType.VECT_OUTERMULT_ADD || (_type == BinType.VECT_CBIND && vectorVector) ) {
-			for( int j=0; j<2; j++ )
-				tmp = tmp.replace("%LEN"+(j+1)+"%", _inputs.get(j).getVectorLength(api));
-		}
-		else { //general case 
-			CNode mInput = getIntermediateInputVector();
-			if( mInput != null )
-				tmp = tmp.replace("%LEN%", mInput.getVectorLength(api, sparse));
-		}
-		
-		sb.append(tmp);
-		
-		//mark as generated
-		_generated = true;
-		
-		return sb.toString();
 	}
 	
 	private CNode getIntermediateInputVector() {

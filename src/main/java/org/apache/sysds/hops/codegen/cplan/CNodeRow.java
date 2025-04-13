@@ -19,6 +19,7 @@
 
 package org.apache.sysds.hops.codegen.cplan;
 
+import org.apache.sysds.api.DMLScript;
 import org.apache.sysds.hops.codegen.SpoofCompiler;
 import org.apache.sysds.hops.codegen.SpoofCompiler.GeneratorAPI;
 import org.apache.sysds.hops.codegen.SpoofFusedOp.SpoofOutputDimsType;
@@ -117,7 +118,9 @@ private static final String TEMPLATE_ROWAGG_OUT_CUDA  = "\t\tif(threadIdx.x == 0
 		//generate dense/sparse bodies
 		String tmpDense = _output.codegen(false, api) + getOutputStatement(_output.getVarname(), false);
 		_output.resetGenerated();
-		String tmpSparse = _output.codegen(true, api) + getOutputStatement(_output.getVarname(), true);
+		String tmpSparse = DMLScript.SPARSE_INTERMEDIATE ?
+				_output.codegen(true, api) + getOutputStatement(_output.getVarname(), true) :
+				_output.codegen(true, api) + getOutputStatement(_output.getVarname(), false);
 		_output.resetGenerated();
 		String varName = createVarname();
 		tmp = tmp.replace(api.isJava()?"%TMP%":"//%TMP%", varName);
