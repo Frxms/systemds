@@ -200,14 +200,14 @@ public class LibSpoofPrimitives
 		return c;
 	}
 
-	public static SparseRowVector vectMultWrite(double[] a, double bval, int[] aix, int ai, int alen, int len) {
-		SparseRowVector c = new SparseRowVector(a, aix);
+	public static double[] vectMultWrite(double[] a, double bval, int[] aix, int ai, int alen, int len) {
+		double[] c = allocVector(len, true);
 		if( a == null ) return c;
-		LibMatrixMult.vectMultiplyWrite(bval, a, c.values(), ai, 0, alen);
+		LibMatrixMult.vectMultiplyAdd(bval, a, c, aix, ai, 0, alen);
 		return c;
 	}
 
-	public static SparseRowVector vectMultWrite(double bval, double[] a, int[] aix, int ai, int alen, int len) {
+	public static double[] vectMultWrite(double bval, double[] a, int[] aix, int ai, int alen, int len) {
 		return vectMultWrite(a, bval, aix, ai, alen, len);
 	}
 
@@ -227,13 +227,6 @@ public class LibSpoofPrimitives
 	public static void vectWrite(double[] a, double[] c, int ci, int len) {
 		if( a == null ) return;
 		System.arraycopy(a, 0, c, ci, len);
-	}
-
-	public static void vectWrite(SparseRowVector a, double[] c, int ci, int len) {
-		if( a == null ) return;
-		int[] aix = a.indexes();
-		for( int i=0; i<0+a.size(); i++ )
-			c[ci+aix[i]] = a.get(aix[i]);
 	}
 
 	public static void vectWrite(double[] a, double[] c, int ai, int ci, int len) {
@@ -326,7 +319,7 @@ public class LibSpoofPrimitives
 		for( int i = ai+bn; i < ai+len; i+=8 ) {
 			//read 64B cacheline of a, compute cval' = sum(a) + cval
 			val += a[ i+0 ] + a[ i+1 ] + a[ i+2 ] + a[ i+3 ]
-			     + a[ i+4 ] + a[ i+5 ] + a[ i+6 ] + a[ i+7 ];
+					+ a[ i+4 ] + a[ i+5 ] + a[ i+6 ] + a[ i+7 ];
 		}
 
 		//scalar result
@@ -433,19 +426,12 @@ public class LibSpoofPrimitives
 		return c;
 	}
 
-	public static SparseRowVector vectDivWrite(double[] a, double bval, int[] aix, int ai, int alen, int len) {
-			double init = 0;
-		if (bval != 0) {
-			for( int j = ai; j < ai+alen; j++ )
-				a[j] = a[j] / bval;
-			return new SparseRowVector(a, aix);
-		} else {
-			init = Double.NaN;
-			double[] c = allocVector(len, true, init);
-			for( int j = ai; j < ai+alen; j++ )
-				c[aix[j]] = a[j] / bval;
-			return new SparseRowVector(c);
-		}
+	public static double[] vectDivWrite(double[] a, double bval, int[] aix, int ai, int alen, int len) {
+		double init = (bval != 0) ? 0 : Double.NaN;
+		double[] c = allocVector(len, true, init);
+		for( int j = ai; j < ai+alen; j++ )
+			c[aix[j]] = a[j] / bval;
+		return c;
 	}
 
 	public static double[] vectDivWrite(double bval, double[] a, int[] aix, int ai, int alen, int len) {
@@ -471,7 +457,7 @@ public class LibSpoofPrimitives
 		for( int j = 0; j < len; j++ ) {
 			double aval = a[bi + j];
 			c[j] = (aval==0) ? Double.NaN : (aval>0) ?
-				Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
+					Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
 		}
 		for( int j = bi; j < bi+blen; j++ )
 			c[bix[j]] = a[ai+bix[j]] / b[j];
@@ -2107,7 +2093,7 @@ public class LibSpoofPrimitives
 	public static double[] vectMaxpoolWrite(double[] a, int ai, int len, int rix, int C, int P, int Q, int K, int R, int S, int H, int W) {
 		double[] c = allocVector(C*P*Q, true);
 		LibMatrixDNNPooling.poolingDenseStride1Pad0(PoolingType.MAX,
-			-Double.MAX_VALUE, 1, a, c, rix, rix+1, ai, 0, C, P, Q, R, S, H, W);
+				-Double.MAX_VALUE, 1, a, c, rix, rix+1, ai, 0, C, P, Q, R, S, H, W);
 		return c;
 	}
 
@@ -2117,7 +2103,7 @@ public class LibSpoofPrimitives
 		for(int k=ai; k<ai+alen; k++)
 			a[aix[k]] = avals[k];
 		LibMatrixDNNPooling.poolingDenseStride1Pad0(PoolingType.MAX,
-			-Double.MAX_VALUE, 1, a, c, rix, rix+1, 0, 0, C, P, Q, R, S, H, W);
+				-Double.MAX_VALUE, 1, a, c, rix, rix+1, 0, 0, C, P, Q, R, S, H, W);
 		return c;
 	}
 
@@ -2126,7 +2112,7 @@ public class LibSpoofPrimitives
 	public static double[] vectAvgpoolWrite(double[] a, int ai, int len, int rix, int C, int P, int Q, int K, int R, int S, int H, int W) {
 		double[] c = allocVector(C*P*Q, true);
 		LibMatrixDNNPooling.poolingDenseStride1Pad0(PoolingType.AVG,
-			0, 1/(R*S), a, c, rix, rix+1, ai, 0, C, P, Q, R, S, H, W);
+				0, 1/(R*S), a, c, rix, rix+1, ai, 0, C, P, Q, R, S, H, W);
 		return c;
 	}
 
@@ -2136,7 +2122,7 @@ public class LibSpoofPrimitives
 		for(int k=ai; k<ai+alen; k++)
 			a[aix[k]] = avals[k];
 		LibMatrixDNNPooling.poolingDenseStride1Pad0(PoolingType.AVG,
-			0, 1/(R*S), a, c, rix, rix+1, 0, 0, C, P, Q, R, S, H, W);
+				0, 1/(R*S), a, c, rix, rix+1, 0, 0, C, P, Q, R, S, H, W);
 		return c;
 	}
 
@@ -2166,6 +2152,41 @@ public class LibSpoofPrimitives
 			new DenseBlockFP64(new int[]{K, CRS}, a), new DenseBlockFP64(new int[]{CRS, PQ}, b),
 			new DenseBlockFP64(new int[]{K, PQ}, c), PQ, CRS, 0, K, 0, PQ);
 		return c;
+	}
+
+	//todo insert SparseRowVector implementations
+
+	public static SparseRowVector vectMultWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
+		SparseRowVector c = new SparseRowVector(a, aix);
+		if( a == null ) return c;
+		LibMatrixMult.vectMultiplyWrite(bval, a, c.values(), ai, 0, alen);
+		return c;
+	}
+
+	public static SparseRowVector vectMultWrite(int len, double bval, double[] a, int[] aix, int ai, int alen) {
+		return vectMultWrite(len, a, bval, aix, ai, alen);
+	}
+
+	public static SparseRowVector vectDivWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
+		double init = 0;
+		if (bval != 0) {
+			for( int j = ai; j < ai+alen; j++ )
+				a[j] = a[j] / bval;
+			return new SparseRowVector(a, aix);
+		} else {
+			init = Double.NaN;
+			double[] c = allocVector(len, true, init);
+			for( int j = ai; j < ai+alen; j++ )
+				c[aix[j]] = a[j] / bval;
+			return new SparseRowVector(c);
+		}
+	}
+
+	public static void vectWrite(SparseRowVector a, double[] c, int ci, int len) {
+		if( a == null ) return;
+		int[] aix = a.indexes();
+		for( int i=0; i<0+a.size(); i++ )
+			c[ci+aix[i]] = a.get(aix[i]);
 	}
 
 	//complex builtin functions that are not directly generated
