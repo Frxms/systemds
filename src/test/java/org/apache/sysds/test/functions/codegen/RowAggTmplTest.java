@@ -87,7 +87,7 @@ public class RowAggTmplTest extends AutomatedTestBase
 	private static final String TEST_NAME44 = TEST_NAME+"44"; //maxpool(X - mean(X)) + 7;
 	private static final String TEST_NAME45 = TEST_NAME+"45"; //vector allocation;
 	private static final String TEST_NAME46 = TEST_NAME+"46"; //conv2d(X - mean(X), F1) + conv2d(X - mean(X), F2);
-	private static final String TEST_NAME47 = TEST_NAME+"47";
+	private static final String TEST_NAME47 = TEST_NAME+"47"; //(X*v)/rowSums(X*v)
 	
 	private static final String TEST_DIR = "functions/codegen/";
 	private static final String TEST_CLASS_DIR = TEST_DIR + RowAggTmplTest.class.getSimpleName() + "/";
