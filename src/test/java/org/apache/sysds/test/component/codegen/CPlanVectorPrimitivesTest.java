@@ -20,7 +20,9 @@
 package org.apache.sysds.test.component.codegen;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
+import org.apache.sysds.runtime.data.SparseRowVector;
 import org.junit.Test;
 import org.apache.sysds.common.Types.OpOp2;
 import org.apache.sysds.hops.codegen.cplan.CNodeBinary.BinType;
@@ -716,6 +718,18 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 		testVectorBinaryPrimitive(BinType.VECT_BITWAND, InputType.VECTOR_SPARSE, InputType.VECTOR_DENSE);
 	}
 
+	//test sparseRowVector implementation
+
+	@Test
+	public void testVectorScalarMultSparseToSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_MULT_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR);
+	}
+
+	@Test
+	public void testVectorScalarDivSparseToSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_DIV_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR);
+	}
+
 	@SuppressWarnings("incomplete-switch")
 	private static void testVectorAggPrimitive(UnaryType aggtype, InputType type1)
 	{
@@ -864,6 +878,80 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 				TestUtils.compareMatrices(ret1, ret2, eps);
 			}
 		} 
+		catch( Exception ex ) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	private static void testVectorBinarySparsePrimitive(BinType bintype, InputType type1, InputType type2) {
+		try {
+			//generate input data (scalar later derived if needed)
+			double sparsityA = (type1 == InputType.VECTOR_DENSE) ? sparsity1 : sparsity2;
+			MatrixBlock inA = MatrixBlock.randOperations(m, n, sparsityA, -5, 5, "uniform", 3);
+			double sparsityB = (type2 == InputType.VECTOR_DENSE) ? sparsity1 : sparsity2;
+			MatrixBlock inB = MatrixBlock.randOperations(m, n, sparsityB, -5, 5, "uniform", 7);
+
+			//get vector primitive via reflection
+			String meName = "vect"+StringUtils.camelize(bintype.name().split("_")[1])+"Write";
+			final Method me ;
+			if( type1==InputType.VECTOR_SPARSE && type2==InputType.SCALAR )
+				me = LibSpoofPrimitives.class.getMethod(meName, new Class[]{int.class, double[].class, double.class, int[].class, int.class, int.class});
+			else if( type1==InputType.SCALAR && type2==InputType.VECTOR_SPARSE )
+				me = LibSpoofPrimitives.class.getMethod(meName, new Class[]{int.class, double.class, double[].class, int[].class, int.class, int.class});
+			else // if( type1==InputType.VECTOR_SPARSE && type2==InputType.VECTOR_DENSE )
+				me = LibSpoofPrimitives.class.getMethod(meName, new Class[]{int.class, double[].class, double[].class, int[].class, int.class, int.class, int.class});
+
+			for( int i=0; i<m; i++ ) {
+				//execute vector primitive via reflection
+				double[] ret1 = new double[n-1];
+				SparseRowVector retX = null;
+				double[] aValuesCopy = Arrays.copyOf(inA.getSparseBlock().values(i), inA.getSparseBlock().size(i));
+				int[] aIndexesCopy = Arrays.copyOf(inA.getSparseBlock().indexes(i), inA.getSparseBlock().size(i));
+				double[] bValuesCopy = Arrays.copyOf(inB.getSparseBlock().values(i), inB.getSparseBlock().size(i));
+				int[] bIndexesCopy = Arrays.copyOf(inB.getSparseBlock().indexes(i), inB.getSparseBlock().size(i));
+
+				if( type1==InputType.VECTOR_SPARSE && type2==InputType.SCALAR )
+					retX = (SparseRowVector) me.invoke(null, n, aValuesCopy, inB.max(), aIndexesCopy,
+							inA.getSparseBlock().pos(i), inA.getSparseBlock().size(i));
+				else if( type1==InputType.SCALAR && type2==InputType.VECTOR_SPARSE )
+					retX = (SparseRowVector) me.invoke(null, n, inA.max(), bValuesCopy,
+							bIndexesCopy, inB.getSparseBlock().pos(i), inB.getSparseBlock().size(i));
+				else if( type1==InputType.VECTOR_SPARSE && type2==InputType.VECTOR_DENSE )
+					retX = (SparseRowVector) me.invoke(null, n, aValuesCopy, inB.getDenseBlockValues(),
+							aIndexesCopy, inA.getSparseBlock().pos(i), i*n, inA.getSparseBlock().size(i));
+
+				for (int j = 0; j < retX.size(); j++) {
+					int[] indexes = retX.indexes();
+					ret1[indexes[j]] = retX.values()[j];
+				}
+
+				//execute comparison operation
+				String opcode = OpOp2.valueOf(bintype.name().split("_")[1]).toString();
+				MatrixBlock in1 = inA.slice(i, i, 0, n-1, new MatrixBlock());
+				MatrixBlock in2 = inB.slice(i, i, 0, n-1, new MatrixBlock());
+				double[] ret2 = null;
+				if( type1 == InputType.SCALAR ) {
+					ScalarOperator bop = InstructionUtils.parseScalarBinaryOperator(opcode, true);
+					bop = bop.setConstant(inA.max());
+					ret2 = DataConverter.convertToDoubleVector(
+							in2.scalarOperations(bop, new MatrixBlock()), false);
+				}
+				else if( type2 == InputType.SCALAR ) {
+					ScalarOperator bop = InstructionUtils.parseScalarBinaryOperator(opcode, false);
+					bop = bop.setConstant(inB.max());
+					ret2 = DataConverter.convertToDoubleVector(
+							in1.scalarOperations(bop, new MatrixBlock()), false);
+				}
+				else { //vector-vector
+					BinaryOperator bop = InstructionUtils.parseBinaryOperator(opcode);
+					ret2 = DataConverter.convertToDoubleVector(
+							in1.binaryOperations(bop, in2, new MatrixBlock()), false);
+				}
+
+				//compare results
+				TestUtils.compareMatrices(ret1, ret2, eps);
+			}
+		}
 		catch( Exception ex ) {
 			throw new RuntimeException(ex);
 		}
