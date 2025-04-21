@@ -164,19 +164,24 @@ public class CNodeBinary extends CNode {
 			//generate binary operation (use sparse template, if data input)
 			boolean lsparseLhs = sparse ? _inputs.get(0) instanceof CNodeData
 					&& _inputs.get(0).getVarname().startsWith("a") ||
-					(_inputs.get(0).getVarname().startsWith("TMP") || _inputs.get(0).getVarname().startsWith("b"))
+					(_inputs.get(0).getVarname().startsWith("STMP"))
 							&& _inputs.get(0).getDataType().isMatrix() : false;
 			boolean lsparseRhs = sparse ? _inputs.get(1) instanceof CNodeData
 					&& _inputs.get(1).getVarname().startsWith("a") ||
-					(_inputs.get(1).getVarname().startsWith("TMP") || _inputs.get(1).getVarname().startsWith("b"))
+					(_inputs.get(1).getVarname().startsWith("STMP"))
 							&& _inputs.get(1).getDataType().isMatrix() : false;
 			boolean scalarInput = _inputs.get(0).getDataType().isScalar();
 			boolean scalarVector = (_inputs.get(0).getDataType().isScalar()
 					&& _inputs.get(1).getDataType().isMatrix());
 			boolean vectorVector = _inputs.get(0).getDataType().isMatrix()
 					&& _inputs.get(1).getDataType().isMatrix();
-			boolean sparseOutput = sparse ? !_type.name().contains("VECT_DIV") : false;
-			String var = createVarname();
+			boolean sparseOutput = lsparseLhs && !lsparseRhs ?
+					!(_type.name().contains("VECT_MINUS_SCALAR") || _type.name().contains("VECT_PLUS_SCALAR")) :
+			!lsparseLhs && lsparseRhs ?
+					!(_type.name().contains("VECT_MINUS_SCALAR") || _type.name().contains("VECT_PLUS_SCALAR")
+							|| _type.name().contains("VECT_DIV") || _type.name().contains("VECT_MULT")) : false;
+			//todo this evaluates to true even though it should be sparse when using b
+			String var = createVarname(sparseOutput);
 			String tmp = getLanguageTemplateClass(this, api)
 					.getTemplate(_type, lsparseLhs, lsparseRhs, scalarVector, scalarInput, vectorVector);
 
@@ -188,17 +193,11 @@ public class CNodeBinary extends CNode {
 
 				//replace sparse and dense inputs
 				tmp = tmp.replace("%IN"+(j+1)+"v%",
-						varj.startsWith("TMP") && (lsparseLhs && j == 0 || lsparseRhs && j == 1) ?
-										varj+".values()" :
-								varj.startsWith("b") ?
-										varj+".values(rix)" :
-										varj+"vals");
+						varj.startsWith("STMP") && (lsparseLhs && j == 0 || lsparseRhs && j == 1) ?
+										varj+".values()" : varj+"vals");
 				tmp = tmp.replace("%IN"+(j+1)+"i%",
-						varj.startsWith("TMP") && (lsparseLhs && j == 0 || lsparseRhs && j == 1) ?
-									varj+".indexes()" :
-								varj.startsWith("b") ?
-										varj+".indexes(rix)" :
-								varj+"ix");
+						varj.startsWith("STMP") && (lsparseLhs && j == 0 || lsparseRhs && j == 1) ?
+									varj+".indexes()" : varj+"ix");
 				tmp = tmp.replace("%IN"+(j+1)+"%",
 						varj.startsWith("a") ? (api == GeneratorAPI.JAVA ? varj :
 								(_inputs.get(j).getDataType() == DataType.MATRIX ? varj + ".vals(0)" : varj)) :
