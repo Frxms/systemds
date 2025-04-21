@@ -78,6 +78,15 @@ public abstract class CNode
 			_genVar = "TMP"+_seqVar.getNextID();
 		return _genVar; 
 	}
+
+	public String createVarname(boolean sparse) {
+		if(!sparse) {
+			return createVarname();
+		} else {
+			_genVar = "STMP"+_seqID.getNextID();
+			return _genVar;
+		}
+	}
 	
 	public String getVarname() {
 		return _genVar;
@@ -106,7 +115,7 @@ public abstract class CNode
 	}
 
 	public String getVectorLength(GeneratorAPI api, boolean sparse) {
-		if(sparse && getVarname().startsWith("TMP")) {
+		if(sparse && getVarname().startsWith("STMP")) {
 			return "len";
 		} else {
 			return getVectorLength(api);
@@ -232,8 +241,8 @@ public abstract class CNode
 	protected String replaceUnaryPlaceholders(String tmp, String varj, boolean vectIn, GeneratorAPI api) {
 		//replace sparse and dense inputs
 		if(DMLScript.SPARSE_INTERMEDIATE) {
-			tmp = tmp.replace("%IN1v%", (TemplateUtils.isMatrix(_inputs.get(0)) && varj.startsWith("TMP")) ? varj+".values()" : varj+"vals");
-			tmp = tmp.replace("%IN1i%", (TemplateUtils.isMatrix(_inputs.get(0)) && varj.startsWith("TMP")) ? varj+".indexes()" :varj+"ix");
+			tmp = tmp.replace("%IN1v%", (TemplateUtils.isMatrix(_inputs.get(0)) && varj.startsWith("STMP")) ? varj+".values()" : varj+"vals");
+			tmp = tmp.replace("%IN1i%", (TemplateUtils.isMatrix(_inputs.get(0)) && varj.startsWith("STMP")) ? varj+".indexes()" :varj+"ix");
 		} else {
 			tmp = tmp.replace("%IN1v%", varj+"vals");
 			tmp = tmp.replace("%IN1i%", varj+"ix");
