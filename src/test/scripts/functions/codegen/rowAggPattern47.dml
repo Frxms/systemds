@@ -19,14 +19,28 @@
 #
 #-------------------------------------------------------------
 
-W = matrix(seq(4,5), 1, 2)
+W = matrix(seq(28,29), 1, 2)
 J = matrix(0, 1, 8)
 Z= cbind(J, W, J)
 Y = matrix(0, 10, 18)
 X = rbind(Z, Y, Y, Y, Y, Y, Y, Y, Y)
 v = seq(1,81)
+v1 = seq(20, 37)
+W = matrix(seq(13,14), 1, 2)
+J = matrix(0, 1, 8)
+Z= cbind(J, W, J)
+Y = matrix(0, 10, 18)
+K = rbind(Z, Y, Y, Y, Y, Y, Y, Y, Y)
 
-#S= (X*v)+rowSums(X*v)
-S = (X*v)/rowSums(X*v)
+#S = X*rowSums(K*v)*X
+#S = (X*v)/rowSums(X*v)
+#S = (X/v)+rowMeans(X-v)
+S = (X*rowSums(X*v))/(X*v)
+#S = (X*v)+rowSums(X*v)
+
+#S = X*rowSums(X*K)
+#S = rowSums((X*v)/K)*v
+#S = (K*v)/(rowSums(X*v))
+#S = X*rowSums(X/Z)
 
 write(S,$1)
