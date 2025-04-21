@@ -2182,11 +2182,54 @@ public class LibSpoofPrimitives
 		}
 	}
 
+	public static SparseRowVector vectDivWrite(int len, double[] a, double[] b, int[] aix, int ai, int bi, int alen, int blen) {
+		SparseRowVector aSparse = new SparseRowVector(a, aix);
+		SparseRowVector bSparse = new SparseRowVector(b, aix);
+
+		return new SparseRowVector(a, aix);
+//		double[] c = allocVector(len, false);
+//		for( int j = 0; j < len; j++ )
+//			if( b[bi + j] == 0 ) //prep 0/0=NaN
+//				c[j] = Double.NaN;
+//		for( int j = ai; j < ai+alen; j++ )
+//			c[aix[j]] = a[j] / b[bi+aix[j]];
+//		return c;
+
+//		double[] c = allocVector(len, false);
+//		for( int j = 0; j < len; j++ ) {
+//			double aval = a[bi + j];
+//			c[j] = (aval==0) ? Double.NaN : (aval>0) ?
+//					Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
+//		}
+//		for( int j = bi; j < bi+blen; j++ )
+//			c[bix[j]] = a[ai+bix[j]] / b[j];
+//		return c;
+	}
+
+	public static SparseRowVector vectDivWrite(int len, double[] a, double[] b, int ai, int[] bix, int bi, int alen) {
+		return new SparseRowVector(a, bix);
+	}
+
 	public static void vectWrite(SparseRowVector a, double[] c, int ci, int len) {
 		if( a == null ) return;
 		int[] aix = a.indexes();
 		for( int i=0; i<0+a.size(); i++ )
 			c[ci+aix[i]] = a.get(aix[i]);
+	}
+
+	public static SparseRowVector vectMultWrite(int len, double[] a, double[] b, int[] aix, int ai, int bi, int alen) {
+		SparseRowVector c = new SparseRowVector(a, aix);
+		//create ring buffer SparseRowVec access
+		if( a == null || b == null ) return c;
+		for( int j = ai; j < ai+alen; j++ ) {
+			c.set(aix[j], a[j] * b[bi+aix[j]]);
+		}
+		return c;
+	}
+
+	public static SparseRowVector vectMultWrite(int len, double[] a, double[] b, int ai, int[] bix, int bi, int blen) {
+		//invariant to the ordering of inputs
+		return vectMultWrite(len, b, a, bix, ai, bi, blen);
 	}
 
 	//complex builtin functions that are not directly generated
