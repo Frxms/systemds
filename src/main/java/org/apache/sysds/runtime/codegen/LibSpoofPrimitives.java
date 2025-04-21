@@ -2182,7 +2182,7 @@ public class LibSpoofPrimitives
 		}
 	}
 
-	public static SparseRowVector vectDivWrite(int len, double[] a, double[] b, int[] aix, int ai, int bi, int alen, int blen) {
+	public static SparseRowVector vectDivWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen) {
 		SparseRowVector aSparse = new SparseRowVector(a, aix);
 		SparseRowVector bSparse = new SparseRowVector(b, aix);
 
