@@ -23,7 +23,6 @@ import java.util.Arrays;
 
 import org.apache.commons.math3.util.FastMath;
 import org.apache.sysds.runtime.data.DenseBlockFP64;
-import org.apache.sysds.runtime.data.SparseRow;
 import org.apache.sysds.runtime.data.SparseRowVector;
 import org.apache.sysds.runtime.functionobjects.BitwAnd;
 import org.apache.sysds.runtime.functionobjects.IntegerDivide;
@@ -51,6 +50,10 @@ public class LibSpoofPrimitives
 	//ring buffers of reusable vectors with specific number of vectors and vector sizes
 	private static ThreadLocal<VectorBuffer> memPool = new ThreadLocal<>() {
 		@Override protected VectorBuffer initialValue() { return new VectorBuffer(0,0,0); }
+	};
+
+	private static ThreadLocal<SparseVectorBuffer> sparseMemPool = new ThreadLocal<>() {
+		@Override protected SparseVectorBuffer initialValue() { return new SparseVectorBuffer(0,0,0); }
 	};
 
 	public static double rowMaxsVectMult(double[] a, double[] b, int ai, int bi, int len) {
@@ -2183,27 +2186,45 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectDivWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen) {
-		SparseRowVector aSparse = new SparseRowVector(a, aix);
-		SparseRowVector bSparse = new SparseRowVector(b, aix);
-
-		return new SparseRowVector(a, aix);
-//		double[] c = allocVector(len, false);
-//		for( int j = 0; j < len; j++ )
-//			if( b[bi + j] == 0 ) //prep 0/0=NaN
-//				c[j] = Double.NaN;
-//		for( int j = ai; j < ai+alen; j++ )
-//			c[aix[j]] = a[j] / b[bi+aix[j]];
-//		return c;
-
-//		double[] c = allocVector(len, false);
-//		for( int j = 0; j < len; j++ ) {
-//			double aval = a[bi + j];
-//			c[j] = (aval==0) ? Double.NaN : (aval>0) ?
-//					Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
-//		}
-//		for( int j = bi; j < bi+blen; j++ )
-//			c[bix[j]] = a[ai+bix[j]] / b[j];
-//		return c;
+		SparseRowVector c = allocSparseVector(alen, false);
+		if(a.length < b.length) {
+			SparseRowVector bSparse = new SparseRowVector(b, aix);
+			for (int i = bi; i < b.length; i++) {
+				if(b[i] == 0) {
+					c.set(bix[i], Double.NaN);
+				}
+			}
+			for (int i = ai; i < a.length; i++) {
+				c.set(aix[i], a[i] / bSparse.get(aix[i]));
+			}
+			//		double[] c = allocVector(len, false);
+			//		for( int j = 0; j < len; j++ )
+			//			if( b[bi + j] == 0 ) //prep 0/0=NaN
+			//				c[j] = Double.NaN;
+			//		for( int j = ai; j < ai+alen; j++ )
+			//			c[aix[j]] = a[j] / b[bi+aix[j]];
+			//		return c;
+		} else {
+			SparseRowVector aSparse = new SparseRowVector(a, aix);
+			for (int i = ai; i < a.length; i++) {
+				double aval = a[i];
+				c.set(aix[i], (aval==0) ? Double.NaN : (aval>0) ?
+						Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY);
+			}
+			for (int i = bi; i < b.length; i++) {
+				c.set(bix[i], aSparse.get(bix[i]) / b[i]);
+			}
+//			double[] c = allocVector(len, false);
+	//		for( int j = 0; j < len; j++ ) {
+	//			double aval = a[bi + j];
+	//			c[j] = (aval==0) ? Double.NaN : (aval>0) ?
+	//					Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
+	//		}
+	//		for( int j = bi; j < bi+blen; j++ )
+	//			c[bix[j]] = a[ai+bix[j]] / b[j];
+	//		return c;
+		}
+		return c;
 	}
 
 	public static SparseRowVector vectDivWrite(int len, double[] a, double[] b, int ai, int[] bix, int bi, int alen) {
@@ -2263,12 +2284,25 @@ public class LibSpoofPrimitives
 			memPool.set(new VectorBuffer(numVectors, len, len2));
 	}
 
+	public static void setupSparseThreadLocalMemory(int numVectors, int len, int len2) {
+		if( numVectors > 0 )
+			sparseMemPool.set(new SparseVectorBuffer(numVectors, len, len2));
+	}
+
 	public static void cleanupThreadLocalMemory() {
 		memPool.remove();
 	}
 
+	public static void cleanupSparseThreadLocalMemory() {
+		sparseMemPool.remove();
+	}
+
 	public static double[] allocVector(int len, boolean reset) {
 		return allocVector(len, reset, 0);
+	}
+
+	public static SparseRowVector allocSparseVector(int len, boolean reset) {
+		return allocSparseVector(len, reset, 0);
 	}
 
 	protected static double[] allocVector(int len, boolean reset, double resetVal) {
@@ -2283,6 +2317,24 @@ public class LibSpoofPrimitives
 		//reset vector if required
 		if( reset )
 			Arrays.fill(vect, resetVal);
+		return vect;
+	}
+
+	protected static SparseRowVector allocSparseVector(int len, boolean reset, double resetVal) {
+		SparseVectorBuffer buff = sparseMemPool.get();
+
+		//find next matching vector in ring buffer or
+		//allocate new vector if required
+		SparseRowVector vect = buff.next(len);
+		if( vect == null )
+			vect = new SparseRowVector(len);
+
+		//reset vector if required
+		if( reset ) {
+			double[] filler = new double[len];
+			Arrays.fill(filler, resetVal);
+			vect.setValues(filler);
+		}
 		return vect;
 	}
 
@@ -2331,6 +2383,50 @@ public class LibSpoofPrimitives
 			int lnum = (len2>0 && len1!=len2) ? 2*num : num;
 			return (_len1 == len1 && _len2 == len2
 				&& _data.length == lnum);
+		}
+	}
+
+	private static class SparseVectorBuffer {
+		private static final int MAX_SIZE = 512*1024; //4MB
+		private final SparseRowVector[] _data;
+		private int _pos;
+		private int _len1;
+		private int _len2;
+
+		public SparseVectorBuffer(int num, int len1, int len2) {
+			//best effort size restriction since large intermediates
+			//not necessarily used (num refers to the total number)
+			len1 = Math.min(len1, MAX_SIZE);
+			len2 = Math.min(len2, MAX_SIZE);
+			//pre-allocate ring buffer
+			int lnum = (len2>0 && len1!=len2) ? 2*num : num;
+			_data = new SparseRowVector[lnum];
+			for( int i=0; i<num; i++ ) {
+				if( lnum > num ) {
+					_data[2*i] = new SparseRowVector(len1);
+					_data[2*i+1] = new SparseRowVector(len2);
+				}
+				else {
+					_data[i] = new SparseRowVector(len1);
+				}
+			}
+			_pos = -1;
+			_len1 = len1;
+			_len2 = len2;
+		}
+		public SparseRowVector next(int len) {
+			if( _len1!=len && _len2!=len )
+				return null;
+			do {
+				_pos = (_pos+1>=_data.length) ? 0 : _pos+1;
+			} while( _data[_pos].size()!=len );
+			return _data[_pos];
+		}
+		@SuppressWarnings("unused")
+		public boolean isReusable(int num, int len1, int len2) {
+			int lnum = (len2>0 && len1!=len2) ? 2*num : num;
+			return (_len1 == len1 && _len2 == len2
+					&& _data.length == lnum);
 		}
 	}
 }
