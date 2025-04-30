@@ -719,6 +719,7 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 	}
 
 	//test sparseRowVector implementation
+	//vector - scalar
 
 	@Test
 	public void testVectorScalarMultSparseToSparse() {
@@ -728,6 +729,18 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 	@Test
 	public void testVectorScalarDivSparseToSparse() {
 		testVectorBinarySparsePrimitive(BinType.VECT_DIV_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR);
+	}
+
+	//vector - vector
+
+	@Test
+	public void testVectorVectorMultSparseToSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_MULT, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorVectorDivSparseToSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_DIV, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 
 	@SuppressWarnings("incomplete-switch")
@@ -899,7 +912,7 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 			else if( type1==InputType.SCALAR && type2==InputType.VECTOR_SPARSE )
 				me = LibSpoofPrimitives.class.getMethod(meName, new Class[]{int.class, double.class, double[].class, int[].class, int.class, int.class});
 			else if( type1==InputType.VECTOR_SPARSE && type2==InputType.VECTOR_SPARSE )
-				me = LibSpoofPrimitives.class.getMethod(meName, new Class[]{int.class, double[].class, double[].class, int[].class, int[].class, int.class, int.class, int.class});
+				me = LibSpoofPrimitives.class.getMethod(meName, new Class[]{int.class, double[].class, double[].class, int[].class, int[].class, int.class, int.class, int.class, int.class});
 			else
 				me = LibSpoofPrimitives.class.getMethod(meName, new Class[]{double[].class, double[].class, int[].class, int.class, int.class, int.class, int.class});
 
@@ -918,6 +931,9 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 				else if( type1==InputType.SCALAR && type2==InputType.VECTOR_SPARSE )
 					retX = (SparseRowVector) me.invoke(null, n, inA.max(), bValuesCopy,
 							bIndexesCopy, inB.getSparseBlock().pos(i), inB.getSparseBlock().size(i));
+				else if( type1==InputType.VECTOR_SPARSE && type2==InputType.VECTOR_SPARSE )
+					retX = (SparseRowVector) me.invoke(null, n, aValuesCopy, bValuesCopy,
+							aIndexesCopy, bIndexesCopy, inA.getSparseBlock().pos(i), inB.getSparseBlock().pos(i), inA.getSparseBlock().size(i), inB.getSparseBlock().size(i));
 				else if( type1==InputType.VECTOR_SPARSE && type2==InputType.VECTOR_DENSE )
 					retX = (SparseRowVector) me.invoke(null, n, aValuesCopy, inB.getDenseBlockValues(),
 							aIndexesCopy, inA.getSparseBlock().pos(i), i*n, inA.getSparseBlock().size(i));
