@@ -40,7 +40,8 @@ K = rbind(Z, Y, Y, Y, Y, Y, Y, Y, Y)
 #S = X*rowSums(K*v)*X
 # S = (X*v)/rowSums(X*v)
 # S = (X/v)+rowMeans(X-v)
+# S = (X*v)+rowSums(X*v)
 S = (X*rowSums(X*v))/(X*v)
-#S = (X*v)+rowSums(X*v)
+
 
 writeMM(as(S, "CsparseMatrix"), paste(args[2], "S", sep=""));
