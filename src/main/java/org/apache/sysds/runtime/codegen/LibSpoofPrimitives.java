@@ -2160,7 +2160,7 @@ public class LibSpoofPrimitives
 	//todo insert SparseRowVector implementations
 
 	public static SparseRowVector vectMultWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		SparseRowVector c = new SparseRowVector(a, aix);
+		SparseRowVector c = allocSparseVector(alen, true);
 		if( a == null ) return c;
 		LibMatrixMult.vectMultiplyWrite(bval, a, c.values(), ai, 0, alen);
 		return c;
@@ -2173,9 +2173,10 @@ public class LibSpoofPrimitives
 	public static SparseRowVector vectDivWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
 		double init = 0;
 		if (bval != 0) {
+			SparseRowVector c = allocSparseVector(alen, false);
 			for( int j = ai; j < ai+alen; j++ )
 				a[j] = a[j] / bval;
-			return new SparseRowVector(a, aix);
+			return new SparseRowVector(a, aix, alen);
 		} else {
 			init = Double.NaN;
 			double[] c = allocVector(len, true, init);
@@ -2185,50 +2186,32 @@ public class LibSpoofPrimitives
 		}
 	}
 
-	public static SparseRowVector vectDivWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen) {
+	public static SparseRowVector vectDivWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
 		SparseRowVector c = allocSparseVector(alen, false);
-		if(a.length < b.length) {
-			SparseRowVector bSparse = new SparseRowVector(b, aix);
-			for (int i = bi; i < b.length; i++) {
-				if(b[i] == 0) {
-					c.set(bix[i], Double.NaN);
+		if(alen != 0 && blen != 0) {
+			if(a.length < b.length) {
+				SparseRowVector bSparse = new SparseRowVector(b, bix, blen);
+				for (int i = bi; i < bi+blen; i++) {
+					if(b[i] == 0) {
+						c.set(bix[i], Double.NaN);
+					}
+				}
+				for (int i = ai; i < ai+alen; i++) {
+					c.set(aix[i], a[i] / bSparse.get(aix[i]));
+				}
+			} else {
+				SparseRowVector aSparse = new SparseRowVector(a, aix, alen);
+				for (int i = ai; i < ai+alen; i++) {
+					double aval = a[i];
+					c.set(aix[i], (aval==0) ? Double.NaN : (aval>0) ?
+							Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY);
+				}
+				for (int i = bi; i < bi+blen; i++) {
+					c.set(bix[i], aSparse.get(bix[i]) / b[i]);
 				}
 			}
-			for (int i = ai; i < a.length; i++) {
-				c.set(aix[i], a[i] / bSparse.get(aix[i]));
-			}
-			//		double[] c = allocVector(len, false);
-			//		for( int j = 0; j < len; j++ )
-			//			if( b[bi + j] == 0 ) //prep 0/0=NaN
-			//				c[j] = Double.NaN;
-			//		for( int j = ai; j < ai+alen; j++ )
-			//			c[aix[j]] = a[j] / b[bi+aix[j]];
-			//		return c;
-		} else {
-			SparseRowVector aSparse = new SparseRowVector(a, aix);
-			for (int i = ai; i < a.length; i++) {
-				double aval = a[i];
-				c.set(aix[i], (aval==0) ? Double.NaN : (aval>0) ?
-						Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY);
-			}
-			for (int i = bi; i < b.length; i++) {
-				c.set(bix[i], aSparse.get(bix[i]) / b[i]);
-			}
-//			double[] c = allocVector(len, false);
-	//		for( int j = 0; j < len; j++ ) {
-	//			double aval = a[bi + j];
-	//			c[j] = (aval==0) ? Double.NaN : (aval>0) ?
-	//					Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
-	//		}
-	//		for( int j = bi; j < bi+blen; j++ )
-	//			c[bix[j]] = a[ai+bix[j]] / b[j];
-	//		return c;
 		}
 		return c;
-	}
-
-	public static SparseRowVector vectDivWrite(int len, double[] a, double[] b, int ai, int[] bix, int bi, int alen) {
-		return new SparseRowVector(a, bix);
 	}
 
 	public static void vectWrite(SparseRowVector a, double[] c, int ci, int len) {
@@ -2238,6 +2221,7 @@ public class LibSpoofPrimitives
 			c[ci+aix[i]] = a.get(aix[i]);
 	}
 
+	//todo look at this implementation
 	public static SparseRowVector vectMultWrite(int len, double[] a, double[] b, int[] aix, int ai, int bi, int alen) {
 		SparseRowVector c = new SparseRowVector(a, aix);
 		//create ring buffer SparseRowVec access
@@ -2301,10 +2285,6 @@ public class LibSpoofPrimitives
 		return allocVector(len, reset, 0);
 	}
 
-	public static SparseRowVector allocSparseVector(int len, boolean reset) {
-		return allocSparseVector(len, reset, 0);
-	}
-
 	protected static double[] allocVector(int len, boolean reset, double resetVal) {
 		VectorBuffer buff = memPool.get();
 
@@ -2320,6 +2300,10 @@ public class LibSpoofPrimitives
 		return vect;
 	}
 
+	public static SparseRowVector allocSparseVector(int len, boolean reset) {
+		return allocSparseVector(len, reset, 0);
+	}
+
 	protected static SparseRowVector allocSparseVector(int len, boolean reset, double resetVal) {
 		SparseVectorBuffer buff = sparseMemPool.get();
 
@@ -2328,6 +2312,8 @@ public class LibSpoofPrimitives
 		SparseRowVector vect = buff.next(len);
 		if( vect == null )
 			vect = new SparseRowVector(len);
+		else
+			vect.reset(4, len);
 
 		//reset vector if required
 		if( reset ) {
@@ -2419,7 +2405,7 @@ public class LibSpoofPrimitives
 				return null;
 			do {
 				_pos = (_pos+1>=_data.length) ? 0 : _pos+1;
-			} while( _data[_pos].size()!=len );
+			} while( _data[_pos].values().length!=len );
 			return _data[_pos];
 		}
 		@SuppressWarnings("unused")
