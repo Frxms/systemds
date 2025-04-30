@@ -734,13 +734,23 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 	//vector - vector
 
 	@Test
-	public void testVectorVectorMultSparseToSparse() {
+	public void testVectorVectorMultSparseSparse() {
 		testVectorBinarySparsePrimitive(BinType.VECT_MULT, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 
 	@Test
-	public void testVectorVectorDivSparseToSparse() {
+	public void testVectorVectorDivSparseSparse() {
 		testVectorBinarySparsePrimitive(BinType.VECT_DIV, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorVectorPlusSparseSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_PLUS, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorVectorMinusSparseSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_MINUS, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 
 	@SuppressWarnings("incomplete-switch")
