@@ -175,7 +175,7 @@ public class CNodeBinary extends CNode {
 					&& _inputs.get(1).getDataType().isMatrix());
 			boolean vectorVector = _inputs.get(0).getDataType().isMatrix()
 					&& _inputs.get(1).getDataType().isMatrix();
-
+			//todo look at isVectorScalarPrimitive()
 			boolean sparseOutput = lsparseLhs && !lsparseRhs ?
 					!(_type.name().contains("VECT_MINUS_SCALAR") || _type.name().contains("VECT_PLUS_SCALAR")) :
 			!lsparseLhs && lsparseRhs ?
@@ -192,7 +192,8 @@ public class CNodeBinary extends CNode {
 			//replace input references and start indexes
 			for( int j=0; j<2; j++ ) {
 				String varj = _inputs.get(j).getVarname(api);
-
+				//todo check in on the following lsparseLhs checks.
+				// When there is an STMP doesnt that imply, that this is sparse, so the check should be unnecessary
 				//replace sparse and dense inputs
 				tmp = tmp.replace("%IN"+(j+1)+"v%",
 						varj.startsWith("STMP") && (lsparseLhs && j == 0 || lsparseRhs && j == 1) ?
@@ -206,6 +207,8 @@ public class CNodeBinary extends CNode {
 								varj.startsWith("b") ? (api == GeneratorAPI.JAVA ? varj + ".values(rix)" :
 										(_type == BinType.VECT_MATRIXMULT ? varj : varj + ".vals(0)")) :
 										_inputs.get(j).getDataType() == DataType.MATRIX ? (api == GeneratorAPI.JAVA ? varj : varj + ".vals(0)") : varj);
+
+				tmp = tmp.replace("%"+(j+1)+"Len%", varj.startsWith("STMP") ? varj+".size()" : j ==  0 ? "alen" : "blen");
 
 				//replace start position of main input
 				tmp = tmp.replace("%POS"+(j+1)+"%", (_inputs.get(j) instanceof CNodeData

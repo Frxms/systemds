@@ -125,7 +125,7 @@ public class Binary extends CodeTemplate {
 			case VECT_PLUS:{
 				String vectName = type.getVectorPrimitiveName();
 				if(DMLScript.SPARSE_INTERMEDIATE && sparseLhs && sparseRhs) {
-					return "    SparseRowVector %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%LEN%, %IN1v%, %IN2v%, %IN1i%, %IN2i%, %POS1%, %POS2%, alen);\n";
+					return "    SparseRowVector %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%LEN%, %IN1v%, %IN2v%, %IN1i%, %IN2i%, %POS1%, %POS2%, %1Len%, %2Len%);\n";
 				} else {
 					return sparseLhs ?
 							"    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1v%, %IN2%, %IN1i%, %POS1%, %POS2%, alen, %LEN%);\n" :
