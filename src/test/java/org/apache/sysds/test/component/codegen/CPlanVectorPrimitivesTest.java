@@ -753,6 +753,55 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 		testVectorBinarySparsePrimitive(BinType.VECT_MINUS, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 
+	@Test
+	public void testVectorVectorMinSparseSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_MIN, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
+	}
+	@Test
+	public void testVectorVectorMaxSparseSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_MAX, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorVectorEqualSparseSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_EQUAL, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorVectorNotEqualSparseSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_NOTEQUAL, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorVectorLessSparseSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_LESS, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorVectorLessEqualSparseSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_LESSEQUAL, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorVectorGreaterSparseSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_GREATER, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorVectorGreaterEqualSparseSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_GREATEREQUAL, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorVectorXorSparseSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_XOR, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorVectorBitwAndSparseSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_BITWAND, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
+	}
+
 	@SuppressWarnings("incomplete-switch")
 	private static void testVectorAggPrimitive(UnaryType aggtype, InputType type1)
 	{
