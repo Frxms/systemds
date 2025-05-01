@@ -2162,6 +2162,7 @@ public class LibSpoofPrimitives
 	public static SparseRowVector vectMultWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
 		if( a == null ) return allocSparseVector(alen);
 		SparseRowVector c = allocSparseVector(alen, aix);
+		//todo test if SparseRowVector add is faster
 		LibMatrixMult.vectMultiplyWrite(bval, a, c.values(), ai, 0, alen);
 		return c;
 	}
@@ -2227,14 +2228,37 @@ public class LibSpoofPrimitives
 		return c;
 	}
 
-	public static SparseRowVector vectPlusWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
+	public static SparseRowVector vectMinusWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
+		SparseRowVector c = allocSparseVector(alen, a, aix);
+		for (int i = 0; i < bi+blen; i++) {
+			c.add(bix[i], -b[i]);
+		}
+		return c;
+	}
 
-//		double[] c = allocVector(len, false);
-//		System.arraycopy(b, bi, c, 0, len);
-//		for( int j = ai; j < ai+alen; j++ )
-//			c[aix[j]] += a[j];
-//		return c;
-		return allocSparseVector(alen);
+	public static SparseRowVector vectPlusWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
+		if(alen < blen) {
+			SparseRowVector c = allocSparseVector(blen, b, bix);
+			for (int i = 0; i < ai+alen; i++) {
+				c.add(aix[i], a[i]);
+			}
+			return c;
+		} else {
+			SparseRowVector c = allocSparseVector(alen, a, aix);
+			for (int i = 0; i < bi+blen; i++) {
+				c.add(bix[i], b[i]);
+			}
+			return c;
+		}
+	}
+
+	public static SparseRowVector vectXorWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
+		SparseRowVector c = allocSparseVector(alen);
+		for (int i = 0; i < bi+blen; i++)
+			c.set(bix[i], (b[i] != 0) ? 1 : 0);
+		for (int i = 0; i < ai+alen; i++)
+			c.set(aix[i], ((a[i] != 0) != (c.get(aix[i]) != 0)) ? 1 : 0);
+		return c;
 	}
 
 	//complex builtin functions that are not directly generated
@@ -2300,14 +2324,17 @@ public class LibSpoofPrimitives
 		return vect;
 	}
 
+	//alocate empty vector
 	public static SparseRowVector allocSparseVector(int len) {
 		return allocSparseVector(len, null, null, false, false);
 	}
 
+	//allocate vector with the vales and indexes filled
 	public static SparseRowVector allocSparseVector(int len, double[] values,int[] indexes) {
 		return allocSparseVector(len, values, indexes, true, false);
 	}
 
+	//allocate vector with only the indexes filled
 	public static SparseRowVector allocSparseVector(int len, int[] indexes) {
 		return allocSparseVector(len, null, indexes, false, true);
 	}
