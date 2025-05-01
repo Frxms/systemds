@@ -2203,13 +2203,14 @@ public class LibSpoofPrimitives
 	public static SparseRowVector vectDivWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
 		SparseRowVector c = allocSparseVector(alen);
 		if(alen != 0 && blen != 0) {
-			if(a.length < b.length) {
+			//decide between two versions. First is smaller for smaller alen and the other for smaller blen
+			if(alen < blen) {
 				SparseRowVector bSparse = allocSparseVector(blen, b, bix);
-				for (int i = bi; i < bi+blen; i++) {
-					if(b[i] == 0) {
-						c.set(bix[i], Double.NaN);
-					}
-				}
+//				for (int i = bi; i < bi+blen; i++) {
+//					if(b[i] == 0) {
+//						c.set(bix[i], Double.NaN);
+//					}
+//				}
 				for (int i = ai; i < ai+alen; i++) {
 					c.set(aix[i], a[i] / bSparse.get(aix[i]));
 				}
