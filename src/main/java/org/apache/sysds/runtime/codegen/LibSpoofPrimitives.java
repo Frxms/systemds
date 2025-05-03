@@ -2254,11 +2254,142 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectXorWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
+		//todo: is this correct?
 		SparseRowVector c = allocSparseVector(alen);
 		for (int i = 0; i < bi+blen; i++)
 			c.set(bix[i], (b[i] != 0) ? 1 : 0);
 		for (int i = 0; i < ai+alen; i++)
 			c.set(aix[i], ((a[i] != 0) != (c.get(aix[i]) != 0)) ? 1 : 0);
+//		int aIndex = ai;
+//		int bIndex = bi;
+//		while(aIndex < ai+alen && bIndex < bi+blen) {
+//			if(aix[aIndex] == bix[bIndex]) {
+//				c.set(aix[aIndex], ((a[aIndex] != 0) != (b[bIndex] != 0)) ? 1 : 0);
+//				aIndex++;
+//				bIndex++;
+//			} else if(aix[aIndex] < bix[bIndex]) {
+//				c.set(aix[aIndex], 1);
+//				aIndex++;
+//			} else {
+//				c.set(bix[bIndex], 1);
+//				bIndex++;
+//			}
+//		}
+//		for (; aIndex < ai+alen; aIndex++)  c.set(aix[aIndex], 1);
+//		for (; bIndex < bi+blen; bIndex++)  c.set(bix[bIndex], 1);
+		return c;
+	}
+
+	public static SparseRowVector vectMinWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
+		SparseRowVector c = allocSparseVector(alen);
+		int aIndex = ai;
+		int bIndex = bi;
+		while(aIndex < ai+alen && bIndex < bi+blen) {
+			if(aix[aIndex] == bix[bIndex]) {
+				c.set(aix[aIndex], Math.min(a[aIndex], b[bIndex]));
+				aIndex++;
+				bIndex++;
+			} else if(aix[aIndex] < bix[bIndex]) {
+				c.set(aix[aIndex], Math.min(a[aIndex], 0));
+				aIndex++;
+			} else {
+				c.set(bix[bIndex], Math.min(b[bIndex], 0));
+				bIndex++;
+			}
+		}
+		for (; aIndex < ai+alen; aIndex++)  c.set(aix[aIndex], Math.min(a[aIndex], 0));
+		for (; bIndex < bi+blen; bIndex++)  c.set(bix[bIndex], Math.min(b[bIndex], 0));
+//		int aCount = 0;
+//		for (int i = 0; i < bi+blen; i++) {
+//			for (int j = aCount; j < ai+alen; j++) {
+//				if(aix[j] == bix[i]) {
+//					c.set(aix[j], Math.min(a[j], b[i]));
+//					aCount++;
+//					break;
+//				}
+//				else if(aix[j] < bix[i]) {
+//					c.set(aix[j], Math.min(a[j], 0));
+//					aCount++;
+//				}
+//				else if(aix[j] > bix[i]) {
+//					c.set(bix[i], Math.min(b[i], 0));
+//					break;
+//				}
+//			}
+//			if(aCount == alen) {
+//				c.set(bix[i], Math.min(b[i], 0));
+//			}
+//		}
+//		for (int i = aCount; i < ai+alen; i++) {
+//			c.set(aix[i], Math.min(a[i], 0));
+//		}
+		return c;
+	}
+
+	public static SparseRowVector vectMaxWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
+		SparseRowVector c = allocSparseVector(alen);
+		int aIndex = ai;
+		int bIndex = bi;
+		while(aIndex < ai+alen && bIndex < bi+blen) {
+			if(aix[aIndex] == bix[bIndex]) {
+				c.set(aix[aIndex], Math.max(a[aIndex], b[bIndex]));
+				aIndex++;
+				bIndex++;
+			} else if(aix[aIndex] < bix[bIndex]) {
+				c.set(aix[aIndex], Math.max(a[aIndex], 0));
+				aIndex++;
+			} else {
+				c.set(bix[bIndex], Math.max(b[bIndex], 0));
+				bIndex++;
+			}
+		}
+		for (; aIndex < ai+alen; aIndex++)  c.set(aix[aIndex], Math.max(a[aIndex], 0));
+		for (; bIndex < bi+blen; bIndex++)  c.set(bix[bIndex], Math.max(b[bIndex], 0));
+		return c;
+	}
+
+	public static double[] vectEqualWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
+		double[] c = allocVector(len, true, 1);
+		int aIndex = ai;
+		int bIndex = bi;
+		while(aIndex < ai+alen && bIndex < bi+blen) {
+			if (aix[aIndex] == bix[bIndex]) {
+				c[aix[aIndex]] = (a[aIndex] == b[bIndex]) ? 1 : 0;
+				aIndex++;
+				bIndex++;
+			} else if(aix[aIndex] < bix[bIndex]) {
+				c[aix[aIndex]] = 0;
+				aIndex++;
+			} else {
+				c[bix[bIndex]] = 0;
+				bIndex++;
+			}
+		}
+		for (; aIndex < ai+alen; aIndex++) c[aix[aIndex]] = 0;
+		for (; bIndex < bi+blen; bIndex++)  c[bix[bIndex]] = 0;
+		return c;
+	}
+
+	public static SparseRowVector vectNotequalWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
+		SparseRowVector c = allocSparseVector(alen);
+		int aIndex = ai;
+		int bIndex = bi;
+		while(aIndex < ai+alen && bIndex < bi+blen) {
+			if(aix[aIndex] == bix[bIndex]) {
+				c.set(aix[aIndex], (a[aIndex] != b[bIndex]) ? 1 : 0);
+				aIndex++;
+				bIndex++;
+			} else if(aix[aIndex] < bix[bIndex]) {
+				//todo: is putting a 1 instantly too unsafe?
+				c.set(aix[aIndex], 1);
+				aIndex++;
+			} else {
+				c.set(bix[bIndex], 1);
+				bIndex++;
+			}
+		}
+		for (; aIndex < ai+alen; aIndex++)  c.set(aix[aIndex], 1);
+		for (; bIndex < bi+blen; bIndex++)  c.set(bix[bIndex], 1);
 		return c;
 	}
 
