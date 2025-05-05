@@ -776,6 +776,7 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 		testVectorBinarySparsePrimitive(BinType.VECT_GREATEREQUAL_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR);
 	}
 
+	//todo: this only makes sense, when bval is 0
 	@Test
 	public void testVectorScalarXorSparseToSparse() {
 		testVectorBinarySparsePrimitive(BinType.VECT_XOR_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR);
@@ -1034,7 +1035,7 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 
 			for( int i=0; i<m; i++ ) {
 				//execute vector primitive via reflection
-				double[] ret1 = new double[n-1];
+				double[] ret1 = new double[n];
 				SparseRowVector retX = null;
 				double[] aValuesCopy = Arrays.copyOf(inA.getSparseBlock().values(i), inA.getSparseBlock().size(i));
 				int[] aIndexesCopy = Arrays.copyOf(inA.getSparseBlock().indexes(i), inA.getSparseBlock().size(i));
@@ -1059,9 +1060,9 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 							aIndexesCopy, inA.getSparseBlock().pos(i), i*n, inA.getSparseBlock().size(i));
 
 				if(sparse) {
+					int[] indexes = retX.indexes();
 					for (int j = 0; j < retX.size(); j++) {
-						int[] indexes = retX.indexes();
-						ret1[indexes[j]] = retX.values()[j];
+						ret1[indexes[j]] = retX.get(indexes[j]);
 					}
 				}
 
