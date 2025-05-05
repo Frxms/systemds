@@ -2393,6 +2393,122 @@ public class LibSpoofPrimitives
 		return c;
 	}
 
+	public static SparseRowVector vectLessWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
+		SparseRowVector c = allocSparseVector(alen);
+		int aIndex = ai;
+		int bIndex = bi;
+		while(aIndex < ai+alen && bIndex < bi+blen) {
+			if(aix[aIndex] == bix[bIndex]) {
+				c.set(aix[aIndex], (a[aIndex] < b[bIndex]) ? 1 : 0);
+				aIndex++;
+				bIndex++;
+			} else if(aix[aIndex] < bix[bIndex]) {
+				c.set(aix[aIndex], (a[aIndex] < 0) ? 1 : 0);
+				aIndex++;
+			} else {
+				c.set(bix[bIndex], (0 < b[bIndex]) ? 1 : 0);
+				bIndex++;
+			}
+		}
+		for(; aIndex < ai+alen; aIndex++) c.set(aix[aIndex], (a[aIndex] < 0) ? 1 : 0);
+		for(; bIndex < bi+blen; bIndex++) c.set(bix[bIndex], (0 < b[bIndex]) ? 1 : 0);
+		return c;
+	}
+
+	public static double[] vectLessequalWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
+		double[] c = allocVector(len, true, 1);
+		int aIndex = ai;
+		int bIndex = bi;
+		while(aIndex < ai+alen && bIndex < bi+blen) {
+			if(aix[aIndex] == bix[bIndex]) {
+				c[aix[aIndex]] = (a[aIndex] <= b[bIndex]) ? 1 : 0;
+				aIndex++;
+				bIndex++;
+			} else if(aix[aIndex] < bix[bIndex]) {
+				c[aix[aIndex]] = (a[aIndex] <= 0) ? 1 : 0;
+				aIndex++;
+			} else {
+				c[bix[bIndex]] = (0 <= b[bIndex]) ? 1 : 0;
+				bIndex++;
+			}
+		}
+		for(; aIndex < ai+alen; aIndex++) c[aix[aIndex]] = (a[aIndex] <= 0) ? 1 : 0;
+		for(; bIndex < bi+blen; bIndex++)  c[bix[bIndex]] = (0 <= b[bIndex]) ? 1 : 0;
+		return c;
+//		double[] c = allocVector(len, false);
+//		for( int j=0; j<len; j++ )
+//			c[j] = ( 0 <= b[bi+j] ) ? 1 : 0;
+//		for( int j = ai; j < ai+alen; j++ )
+//			c[aix[j]] = (a[j] <= b[bi+aix[j]]) ? 1 : 0;
+//		return c;
+	}
+
+	public static SparseRowVector vectGreaterWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
+		SparseRowVector c = allocSparseVector(alen);
+		int aIndex = ai;
+		int bIndex = bi;
+		while(aIndex < ai+alen && bIndex < bi+blen) {
+			if(aix[aIndex] == bix[bIndex]) {
+				c.set(aix[aIndex], (a[aIndex] > b[bIndex]) ? 1 : 0);
+				aIndex++;
+				bIndex++;
+			} else if(aix[aIndex] < bix[bIndex]) {
+				c.set(aix[aIndex], (a[aIndex] > 0) ? 1 : 0);
+				aIndex++;
+			} else {
+				c.set(bix[bIndex], (0 > b[bIndex]) ? 1 : 0);
+				bIndex++;
+			}
+		}
+		for(; aIndex < ai+alen; aIndex++) c.set(aix[aIndex], (a[aIndex] > 0) ? 1 : 0);
+		for(; bIndex < bi+blen; bIndex++) c.set(bix[bIndex], (0 > b[bIndex]) ? 1 : 0);
+		return c;
+	}
+
+	public static double[] vectGreaterequalWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
+		double[] c = allocVector(len, true, 1);
+		int aIndex = ai;
+		int bIndex = bi;
+		while(aIndex < ai+alen && bIndex < bi+blen) {
+			if(aix[aIndex] == bix[bIndex]) {
+				c[aix[aIndex]] = (a[aIndex] >= b[bIndex]) ? 1 : 0;
+				aIndex++;
+				bIndex++;
+			} else if(aix[aIndex] < bix[bIndex]) {
+				c[aix[aIndex]] = (a[aIndex] >= 0) ? 1 : 0;
+				aIndex++;
+			} else {
+				c[bix[bIndex]] = (0 >= b[bIndex]) ? 1 : 0;
+				bIndex++;
+			}
+		}
+		for(; aIndex < ai+alen; aIndex++) c[aix[aIndex]] = (a[aIndex] >= 0) ? 1 : 0;
+		for(; bIndex < bi+blen; bIndex++)  c[bix[bIndex]] = (0 >= b[bIndex]) ? 1 : 0;
+		return c;
+	}
+
+	public static SparseRowVector vectBitwandWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
+		SparseRowVector c = allocSparseVector(alen);
+		int aIndex = ai;
+		int bIndex = bi;
+		while(aIndex < ai+alen && bIndex < bi+blen) {
+			if(aix[aIndex] == bix[bIndex]) {
+				c.set(aix[aIndex], bwAnd(a[aIndex], b[bIndex]));
+				aIndex++;
+				bIndex++;
+			} else if(aix[aIndex] < bix[bIndex]) {
+				aIndex++;
+			} else {
+				bIndex++;
+			}
+		}
+		return c;
+//		double[] c = allocVector(len, true);
+//		for( int j = ai; j < ai+alen; j++ )
+//			c[aix[j]] = bwAnd(a[j], b[bi+aix[j]]);
+//		return c;
+	}
+
 	//complex builtin functions that are not directly generated
 	//(included here in order to reduce the number of imports)
 
