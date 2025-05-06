@@ -787,6 +787,58 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 		testVectorBinarySparsePrimitive(BinType.VECT_BITWAND_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR);
 	}
 
+	//scalar - vector
+
+	@Test
+	public void testScalarVectorMinSparseToSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_MIN_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testScalarVectorMaxSparseToSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_MAX_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testScalarVectorEqualSparseToSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_EQUAL_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testScalarVectorNotEqualSparseToSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_NOTEQUAL_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testScalarVectorLessSparseToSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_LESS_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testScalarVectorLessEqualSparseToSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_LESSEQUAL_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testScalarVectorGreaterSparseToSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_GREATER_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testScalarVectorGreaterEqualSparseToSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_GREATEREQUAL_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testScalarVectorXorSparseToSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_XOR_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testScalarVectorBitwAndSparseToSparse() {
+		testVectorBinarySparsePrimitive(BinType.VECT_BITWAND_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE);
+	}
+
 	//vector - vector
 
 	@Test
