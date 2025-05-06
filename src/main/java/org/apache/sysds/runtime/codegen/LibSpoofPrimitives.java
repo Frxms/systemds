@@ -2269,6 +2269,10 @@ public class LibSpoofPrimitives
 		}
 	}
 
+	public static SparseRowVector vectXorWrite(int len, double bval, double[] a, int[] aix, int ai, int alen) {
+		return vectXorWrite(len, a, bval, aix, ai, alen);
+	}
+
 	public static SparseRowVector vectXorWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
 		//todo: is this correct?
 		SparseRowVector c = allocSparseVector(alen);
@@ -2323,6 +2327,10 @@ public class LibSpoofPrimitives
 				c.set(aix[i], Math.min(a[i], bval));
 			return c;
 		}
+	}
+
+	public static SparseRowVector vectMinWrite(int len, double bval, double[] a, int[] aix, int ai, int alen) {
+		return vectMinWrite(len, a, bval, aix, ai, alen);
 	}
 
 	public static SparseRowVector vectMinWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
@@ -2386,6 +2394,10 @@ public class LibSpoofPrimitives
 		}
 	}
 
+	public static SparseRowVector vectMaxWrite(int len, double bval, double[] a, int[] aix, int ai, int alen) {
+		return vectMaxWrite(len, a, bval, aix, ai, alen);
+	}
+
 	public static SparseRowVector vectMaxWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
 		SparseRowVector c = allocSparseVector(alen);
 		int aIndex = ai;
@@ -2420,6 +2432,10 @@ public class LibSpoofPrimitives
 				c.set(aix[i], (a[i] == bval) ? 1 : 0);
 			return c;
 		}
+	}
+
+	public static SparseRowVector vectEqualWrite(int len, double bval, double[] a, int[] aix, int ai, int alen) {
+		return vectEqualWrite(len, a, bval, aix, ai, alen);
 	}
 
 	public static double[] vectEqualWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
@@ -2460,6 +2476,10 @@ public class LibSpoofPrimitives
 		}
 	}
 
+	public static SparseRowVector vectNotequalWrite(int len, double bval, double[] a, int[] aix, int ai, int alen) {
+		return vectNotequalWrite(len, a, bval, aix, ai, alen);
+	}
+
 	public static SparseRowVector vectNotequalWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
 		SparseRowVector c = allocSparseVector(alen);
 		int aIndex = ai;
@@ -2498,6 +2518,10 @@ public class LibSpoofPrimitives
 		}
 	}
 
+	public static SparseRowVector vectLessWrite(int len, double bval, double[] a, int[] aix, int ai, int alen) {
+		return vectGreaterequalWrite(len, a, bval, aix, ai, alen);
+	}
+
 	public static SparseRowVector vectLessWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
 		SparseRowVector c = allocSparseVector(alen);
 		int aIndex = ai;
@@ -2533,6 +2557,10 @@ public class LibSpoofPrimitives
 			}
 			return c;
 		}
+	}
+
+	public static SparseRowVector vectLessequalWrite(int len, double bval, double[] a, int[] aix, int ai, int alen) {
+		return vectGreaterWrite(len, a, bval, aix, ai, alen);
 	}
 
 	public static double[] vectLessequalWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
@@ -2578,6 +2606,10 @@ public class LibSpoofPrimitives
 		}
 	}
 
+	public static SparseRowVector vectGreaterWrite(int len, double bval, double[] a, int[] aix, int ai, int alen) {
+		return vectLessequalWrite(len, a, bval, aix, ai, alen);
+	}
+
 	public static SparseRowVector vectGreaterWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
 		SparseRowVector c = allocSparseVector(alen);
 		int aIndex = ai;
@@ -2615,6 +2647,10 @@ public class LibSpoofPrimitives
 		}
 	}
 
+	public static SparseRowVector vectGreaterequalWrite(int len, double bval, double[] a, int[] aix, int ai, int alen) {
+		return vectLessWrite(len, a, bval, aix, ai, alen);
+	}
+
 	public static double[] vectGreaterequalWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
 		double[] c = allocVector(len, true, 1);
 		int aIndex = ai;
@@ -2643,6 +2679,10 @@ public class LibSpoofPrimitives
 		for(int i = ai; i < ai+alen; i++)
 			c.set(aix[i], bwAnd(a[i], bval1));
 		return c;
+	}
+
+	public static SparseRowVector vectBitwandWrite(int len, double bval, double[] a, int[] aix, int ai, int alen) {
+		return vectBitwandWrite(len, a, bval, aix, ai, alen);
 	}
 
 	public static SparseRowVector vectBitwandWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
