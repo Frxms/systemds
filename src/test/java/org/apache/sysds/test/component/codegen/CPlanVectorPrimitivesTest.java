@@ -1102,11 +1102,11 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 							bIndexesCopy, inB.getSparseBlock().pos(i), inB.getSparseBlock().size(i));
 				else if( type1==InputType.VECTOR_SPARSE && type2==InputType.VECTOR_SPARSE )
 					if(sparse)
-						ret1 = (double[]) me.invoke(null, n, aValuesCopy, bValuesCopy,
-								aIndexesCopy, bIndexesCopy, inA.getSparseBlock().pos(i), inB.getSparseBlock().pos(i), inA.getSparseBlock().size(i), inB.getSparseBlock().size(i));
-					else
 						retX = (SparseRowVector) me.invoke(null, n, aValuesCopy, bValuesCopy,
-								aIndexesCopy, bIndexesCopy, inA.getSparseBlock().pos(i), inB.getSparseBlock().pos(i), inA.getSparseBlock().size(i), inB.getSparseBlock().size(i));
+							aIndexesCopy, bIndexesCopy, inA.getSparseBlock().pos(i), inB.getSparseBlock().pos(i), inA.getSparseBlock().size(i), inB.getSparseBlock().size(i));
+					else
+						ret1 = (double[]) me.invoke(null, n, aValuesCopy, bValuesCopy,
+							aIndexesCopy, bIndexesCopy, inA.getSparseBlock().pos(i), inB.getSparseBlock().pos(i), inA.getSparseBlock().size(i), inB.getSparseBlock().size(i));
 				else if( type1==InputType.VECTOR_SPARSE && type2==InputType.VECTOR_DENSE )
 					retX = (SparseRowVector) me.invoke(null, n, aValuesCopy, inB.getDenseBlockValues(),
 							aIndexesCopy, inA.getSparseBlock().pos(i), i*n, inA.getSparseBlock().size(i));

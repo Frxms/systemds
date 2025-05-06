@@ -2789,17 +2789,17 @@ public class LibSpoofPrimitives
 		SparseRowVector vect = buff.next(len);
 		if(vect == null)
 			vect = new SparseRowVector(len);
+		//reset vector for normal outputs
+		else
+			vect.reset(4, len);
+
 		//fill vector if required
-		else if(fill) {
+		if(fill) {
 			vect.setValues(values);
 			vect.setIndexes(indexes);
 			vect.setSize(len);
-		//reset vector for normal outputs
-		} else
-			vect.reset(4, len);
-
 		//indexes copy for multiplication
-		if(indexCopy) {
+		} else if(indexCopy) {
 			vect.setIndexes(indexes);
 			vect.setSize(len);
 		}
