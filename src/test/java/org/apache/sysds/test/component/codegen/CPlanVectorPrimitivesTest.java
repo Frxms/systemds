@@ -718,7 +718,7 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 		testVectorBinaryPrimitive(BinType.VECT_BITWAND, InputType.VECTOR_SPARSE, InputType.VECTOR_DENSE);
 	}
 
-	//test sparseRowVector implementation
+	//********************testing with sparse intermediates********************//
 	//vector - scalar
 
 	@Test
@@ -910,6 +910,69 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 		testVectorBinarySparsePrimitive(BinType.VECT_BITWAND, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 
+	//unary primitives with sparse intermediates
+
+	@Test
+	public void testVectorSqrtSparseToSparse() {
+		testVectorUnarySparsePrimitive(UnaryType.VECT_SQRT, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorAbsSparseToSparse() {
+		testVectorUnarySparsePrimitive(UnaryType.VECT_ABS, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorRoundSparseToSparse() {
+		testVectorUnarySparsePrimitive(UnaryType.VECT_ROUND, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorCeilSparseToSparse() {
+		testVectorUnarySparsePrimitive(UnaryType.VECT_CEIL, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorFloorSparseToSparse() {
+		testVectorUnarySparsePrimitive(UnaryType.VECT_FLOOR, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorSinSparseToSparse() {
+		testVectorUnarySparsePrimitive(UnaryType.VECT_SIN, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorTanSparseToSparse() {
+		testVectorUnarySparsePrimitive(UnaryType.VECT_TAN, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorAsinSparseToSparse() {
+		testVectorUnarySparsePrimitive(UnaryType.VECT_ASIN, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorAtanSparseToSparse() {
+		testVectorUnarySparsePrimitive(UnaryType.VECT_ATAN, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorSinhSparseToSparse() {
+		testVectorUnarySparsePrimitive(UnaryType.VECT_SINH, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorTanhSparseToSparse() {
+		testVectorUnarySparsePrimitive(UnaryType.VECT_TANH, InputType.VECTOR_SPARSE);
+	}
+
+	@Test
+	public void testVectorSignSparseToSparse() {
+		testVectorUnarySparsePrimitive(UnaryType.VECT_SIGN, InputType.VECTOR_SPARSE);
+	}
+
+
 	@SuppressWarnings("incomplete-switch")
 	private static void testVectorAggPrimitive(UnaryType aggtype, InputType type1)
 	{
@@ -982,6 +1045,47 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 				TestUtils.compareMatrices(ret1, ret2, eps);
 			}
 		} 
+		catch( Exception ex ) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	private static void testVectorUnarySparsePrimitive(UnaryType utype, InputType type1)
+	{
+		try {
+			//generate input data
+			double sparsity = (type1 == InputType.VECTOR_DENSE) ? sparsity1 : sparsity2;
+			MatrixBlock in = MatrixBlock.randOperations(m, n, sparsity, -1, 1, "uniform", 7);
+
+			//get vector primitive via reflection
+			String meName = "vect"+StringUtils.camelize(utype.name().split("_")[1])+"Write";
+			Method me = LibSpoofPrimitives.class.getMethod(meName, new Class[]{int.class, double[].class, int[].class, int.class, int.class});
+
+
+			for( int i=0; i<m; i++ ) {
+				double[] ret1 = new double[n];
+				double[] valuesCopy = Arrays.copyOf(in.getSparseBlock().values(i), in.getSparseBlock().size(i));
+				int[] indexesCopy = Arrays.copyOf(in.getSparseBlock().indexes(i), in.getSparseBlock().size(i));
+				//execute vector primitive via reflection
+				SparseRowVector retX = (SparseRowVector) me.invoke(null, n, valuesCopy, indexesCopy,
+								in.getSparseBlock().pos(i), in.getSparseBlock().size(i));
+
+				int[] indexes = retX.indexes();
+				for (int j = 0; j < retX.size(); j++) {
+					ret1[indexes[j]] = retX.get(indexes[j]);
+				}
+
+				//execute comparison operation
+				String opcode = utype.name().split("_")[1].toLowerCase();
+				UnaryOperator uop = new UnaryOperator(Builtin.getBuiltinFnObject(opcode));
+				double[] ret2 = DataConverter.convertToDoubleVector(
+						in.slice(i, i, 0, n-1, new MatrixBlock())
+								.unaryOperations(uop, new MatrixBlock()), false);
+
+				//compare results
+				TestUtils.compareMatrices(ret1, ret2, eps);
+			}
+		}
 		catch( Exception ex ) {
 			throw new RuntimeException(ex);
 		}
