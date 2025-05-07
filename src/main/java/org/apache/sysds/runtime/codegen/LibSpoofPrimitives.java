@@ -2162,7 +2162,6 @@ public class LibSpoofPrimitives
 	public static SparseRowVector vectMultWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
 		if( a == null ) return allocSparseVector(alen);
 		SparseRowVector c = allocSparseVector(alen, aix);
-		//todo test if SparseRowVector add is faster
 		LibMatrixMult.vectMultiplyWrite(bval, a, c.values(), ai, 0, alen);
 		return c;
 	}
@@ -2187,11 +2186,10 @@ public class LibSpoofPrimitives
 	public static SparseRowVector vectDivWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
 		double init = 0;
 		if (bval != 0) {
-			//todo: this might not be feasable
 			SparseRowVector c = allocSparseVector(alen);
 			for( int i = ai; i < ai+alen; i++ )
-				a[i] = a[i] / bval;
-			return new SparseRowVector(a, aix, alen);
+				c.set(aix[i], a[i] / bval);
+			return c;
 		} else {
 			init = Double.NaN;
 			double[] c = allocVector(len, true, init);
@@ -2255,7 +2253,7 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectXorWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		//todo: this might not be feasable
+		//todo: this might not be feasible
 		if(bval != 0) {
 			double[] c = allocVector(len, true, 1);
 			for(int i = ai; i < ai+alen; i++)
@@ -2380,8 +2378,8 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectMaxWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		//todo: this might not be feasable
-		if(0 < bval) {
+		//todo: this might not be feasible
+		if(bval > 0) {
 			double[] c = allocVector(len, true, bval);
 			for(int i = ai; i < ai+alen; i++)
 				c[aix[i]] = Math.max(a[i], bval);
@@ -2461,7 +2459,7 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectNotequalWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		//todo: this might not be feasable
+		//todo: this might not be feasible
 		if(bval != 0) {
 			double[] c = allocVector(len, true, 1);
 			for(int i = ai; i < ai+alen; i++)
@@ -2504,6 +2502,7 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectLessWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
+		//todo: this might not be feasible
 		if(bval > 0) {
 			double[] c = allocVector(len, true, 1);
 			for(int i = ai; i < ai+alen; i++)
@@ -2545,6 +2544,7 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectLessequalWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
+		//todo: this might not be feasible
 		if(bval >= 0) {
 			double[] c = allocVector(len, true, 1);
 			for(int i = ai; i < ai+alen; i++)
@@ -2592,6 +2592,7 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectGreaterWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
+		//todo: this might not be feasible
 		if(bval < 0) {
 			double[] c = allocVector(len, true, 1);
 			for(int i = ai; i < ai+alen; i++)
@@ -2633,6 +2634,7 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectGreaterequalWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
+		//todo: this might not be feasible
 		if(bval <= 0) {
 			double[] c = allocVector(len, true, 1);
 			for(int i = ai; i < ai+alen; i++)
@@ -2795,6 +2797,9 @@ public class LibSpoofPrimitives
 
 		//fill vector if required
 		if(fill) {
+			//todo: do i need to copy these arrays?
+//			System.arraycopy(values, 0, vect.values(), 0, len);
+//			System.arraycopy(indexes, 0, vect.indexes(), 0, len);
 			vect.setValues(values);
 			vect.setIndexes(indexes);
 			vect.setSize(len);
