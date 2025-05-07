@@ -2705,6 +2705,13 @@ public class LibSpoofPrimitives
 		return c;
 	}
 
+	public static SparseRowVector vectSqrtWrite(int len, double[] a, int[] aix, int ai, int alen) {
+		SparseRowVector c = allocSparseVector(alen);
+		for( int i = ai; i < ai+alen; i++ )
+			c.set(aix[i], Math.sqrt(a[i]));
+		return c;
+	}
+
 	//complex builtin functions that are not directly generated
 	//(included here in order to reduce the number of imports)
 
