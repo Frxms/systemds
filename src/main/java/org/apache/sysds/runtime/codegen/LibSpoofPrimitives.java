@@ -2707,8 +2707,85 @@ public class LibSpoofPrimitives
 
 	public static SparseRowVector vectSqrtWrite(int len, double[] a, int[] aix, int ai, int alen) {
 		SparseRowVector c = allocSparseVector(alen);
-		for( int i = ai; i < ai+alen; i++ )
+		for(int i = ai; i < ai+alen; i++)
 			c.set(aix[i], Math.sqrt(a[i]));
+		return c;
+	}
+
+	public static SparseRowVector vectAbsWrite(int len, double[] a, int[] aix, int ai, int alen) {
+		SparseRowVector c = allocSparseVector(alen);
+		for(int i = ai; i < ai+alen; i++)
+			c.set(aix[i], Math.abs(a[i]));
+		return c;
+	}
+
+	public static SparseRowVector vectRoundWrite(int len, double[] a, int[] aix, int ai, int alen) {
+		SparseRowVector c = allocSparseVector(alen);
+		for(int i = ai; i < ai+alen; i++)
+			c.set(aix[i], Math.round(a[i]));
+		return c;
+	}
+
+	public static SparseRowVector vectCeilWrite(int len, double[] a, int[] aix, int ai, int alen) {
+		SparseRowVector c = allocSparseVector(alen);
+		for(int i = ai; i < ai+alen; i++)
+			c.set(aix[i], FastMath.ceil(a[i]));
+		return c;
+	}
+
+	public static SparseRowVector vectFloorWrite(int len, double[] a, int[] aix, int ai, int alen) {
+		SparseRowVector c = allocSparseVector(alen);
+		for(int i = ai; i < ai+alen; i++)
+			c.set(aix[i], FastMath.floor(a[i]));
+		return c;
+	}
+
+	public static SparseRowVector vectSinWrite(int len, double[] a, int[] aix, int ai, int alen) {
+		SparseRowVector c = allocSparseVector(alen);
+		for(int i = ai; i < ai+alen; i++)
+			c.set(aix[i], FastMath.sin(a[i]));
+		return c;
+	}
+
+	public static SparseRowVector vectTanWrite(int len, double[] a, int[] aix, int ai, int alen) {
+		SparseRowVector c = allocSparseVector(alen);
+		for(int i = ai; i < ai+alen; i++)
+			c.set(aix[i], FastMath.tan(a[i]));
+		return c;
+	}
+
+	public static SparseRowVector vectAsinWrite(int len, double[] a, int[] aix, int ai, int alen) {
+		SparseRowVector c = allocSparseVector(alen);
+		for(int i = ai; i < ai+alen; i++)
+			c.set(aix[i], FastMath.asin(a[i]));
+		return c;
+	}
+
+	public static SparseRowVector vectAtanWrite(int len, double[] a, int[] aix, int ai, int alen) {
+		SparseRowVector c = allocSparseVector(alen);
+		for(int i = ai; i < ai+alen; i++)
+			c.set(aix[i], FastMath.atan(a[i]));
+		return c;
+	}
+
+	public static SparseRowVector vectSinhWrite(int len, double[] a, int[] aix, int ai, int alen) {
+		SparseRowVector c = allocSparseVector(alen);
+		for(int i = ai; i < ai+alen; i++)
+			c.set(aix[i], FastMath.sinh(a[i]));
+		return c;
+	}
+
+	public static SparseRowVector vectTanhWrite(int len, double[] a, int[] aix, int ai, int alen) {
+		SparseRowVector c = allocSparseVector(alen);
+		for(int i = ai; i < ai+alen; i++)
+			c.set(aix[i], FastMath.tanh(a[i]));
+		return c;
+	}
+
+	public static SparseRowVector vectSignWrite(int len, double[] a, int[] aix, int ai, int alen) {
+		SparseRowVector c = allocSparseVector(alen);
+		for(int i = ai; i < ai+alen; i++)
+			c.set(aix[i], FastMath.signum(a[i]));
 		return c;
 	}
 
