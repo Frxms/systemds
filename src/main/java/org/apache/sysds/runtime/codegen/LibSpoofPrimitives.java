@@ -2157,7 +2157,21 @@ public class LibSpoofPrimitives
 		return c;
 	}
 
-	//todo insert SparseRowVector implementations
+	/**
+	 * Vector primitives with SparseRowVector intermediates
+	 * Changes:
+	 * 	- Changed method signature to avoid method duplicate conflicts
+	 * 		e.g. (double[], double, int[], int, int, int) --> (int, double[], double, int[], int, int)
+	 *  - Added blen for vector - vector calculations to be able to use both vectors as SparseRowVectors
+	 *  - Implemented a new SparseVectorBuffer class that creates a ring buffer for SparseRowVectors in different sizes
+	 * todo:
+	 *  - 0/0 in vectDivWrite(sparse) results in 0 instead of the desired NaN, because the zeros are skipped
+	 *  - vect - scalar operations, XOR, MIN, MAX, GREATER, GREATEREQUAL, LESS, LESSEQUAL, EQUAL, NOTEQUAL, POW have a double[] return for certain bval values
+	 *  - think about vectXorWrite
+	 *  - is setting 0 or 1 for EQUAL or NOTEQUAL unsafe?
+	 *  - should the vector allocated by the ringbuffer be deep copied?
+	 *  - what is the use of vectWrite
+	 */
 
 	public static SparseRowVector vectMultWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
 		if( a == null ) return allocSparseVector(alen);
@@ -2179,10 +2193,11 @@ public class LibSpoofPrimitives
 	public static void vectWrite(SparseRowVector a, double[] c, int ci, int len) {
 		if( a == null ) return;
 		int[] aix = a.indexes();
-		for( int i=0; i<0+a.size(); i++ )
+		for( int i=0; i<a.size(); i++ )
 			c[ci+aix[i]] = a.get(aix[i]);
 	}
 
+	//todo 1
 	public static SparseRowVector vectDivWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
 		double init = 0;
 		if (bval != 0) {
@@ -2199,6 +2214,7 @@ public class LibSpoofPrimitives
 		}
 	}
 
+	//todo 1
 	public static SparseRowVector vectDivWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
 		SparseRowVector c = allocSparseVector(alen);
 		if(alen != 0 && blen != 0) {
@@ -2253,7 +2269,7 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectXorWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		//todo: this might not be feasible
+		//todo 2
 		if(bval != 0) {
 			double[] c = allocVector(len, true, 1);
 			for(int i = ai; i < ai+alen; i++)
@@ -2313,7 +2329,7 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectMinWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		//todo: this might not be feasable
+		//todo 2
 		if(bval < 0) {
 			double[] c = allocVector(len, true, bval);
 			for(int i = ai; i < ai+alen; i++)
@@ -2378,7 +2394,7 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectMaxWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		//todo: this might not be feasible
+		//todo 2
 		if(bval > 0) {
 			double[] c = allocVector(len, true, bval);
 			for(int i = ai; i < ai+alen; i++)
@@ -2446,6 +2462,7 @@ public class LibSpoofPrimitives
 				aIndex++;
 				bIndex++;
 			} else if(aix[aIndex] < bix[bIndex]) {
+				//todo: is putting a 0 instantly too unsafe?
 				c[aix[aIndex]] = 0;
 				aIndex++;
 			} else {
@@ -2459,7 +2476,7 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectNotequalWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		//todo: this might not be feasible
+		//todo 2
 		if(bval != 0) {
 			double[] c = allocVector(len, true, 1);
 			for(int i = ai; i < ai+alen; i++)
@@ -2502,7 +2519,7 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectLessWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		//todo: this might not be feasible
+		//todo 2
 		if(bval > 0) {
 			double[] c = allocVector(len, true, 1);
 			for(int i = ai; i < ai+alen; i++)
@@ -2544,7 +2561,7 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectLessequalWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		//todo: this might not be feasible
+		//todo 2
 		if(bval >= 0) {
 			double[] c = allocVector(len, true, 1);
 			for(int i = ai; i < ai+alen; i++)
@@ -2592,7 +2609,7 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectGreaterWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		//todo: this might not be feasible
+		//todo 2
 		if(bval < 0) {
 			double[] c = allocVector(len, true, 1);
 			for(int i = ai; i < ai+alen; i++)
@@ -2634,7 +2651,7 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectGreaterequalWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		//todo: this might not be feasible
+		//todo 2
 		if(bval <= 0) {
 			double[] c = allocVector(len, true, 1);
 			for(int i = ai; i < ai+alen; i++)
@@ -2852,12 +2869,12 @@ public class LibSpoofPrimitives
 		return vect;
 	}
 
-	//alocate empty vector
+	//allocate an empty vector
 	public static SparseRowVector allocSparseVector(int len) {
 		return allocSparseVector(len, null, null, false, false);
 	}
 
-	//allocate vector with the vales and indexes filled
+	//allocate a vector with the vales and indexes filled
 	public static SparseRowVector allocSparseVector(int len, double[] values,int[] indexes) {
 		return allocSparseVector(len, values, indexes, true, false);
 	}
@@ -2871,7 +2888,7 @@ public class LibSpoofPrimitives
 		SparseVectorBuffer buff = sparseMemPool.get();
 
 		//find next matching vector in ring buffer or
-		//allocate new vector if required
+		//allocate new vector if no vector was returned
 		SparseRowVector vect = buff.next(len);
 		if(vect == null)
 			vect = new SparseRowVector(len);
@@ -2879,7 +2896,7 @@ public class LibSpoofPrimitives
 		else
 			vect.reset(4, len);
 
-		//fill vector if required
+		//fill vector
 		if(fill) {
 			//todo: do i need to copy these arrays?
 //			System.arraycopy(values, 0, vect.values(), 0, len);
@@ -2887,7 +2904,7 @@ public class LibSpoofPrimitives
 			vect.setValues(values);
 			vect.setIndexes(indexes);
 			vect.setSize(len);
-		//indexes copy for multiplication
+		//indexes copy
 		} else if(indexCopy) {
 			vect.setIndexes(indexes);
 			vect.setSize(len);
@@ -2944,6 +2961,7 @@ public class LibSpoofPrimitives
 		}
 	}
 
+	//Ring buffer for SparseRowVectors of different sizes
 	private static class SparseVectorBuffer {
 		private static final int MAX_SIZE = 512*1024; //4MB
 		private final SparseRowVector[] _data;
