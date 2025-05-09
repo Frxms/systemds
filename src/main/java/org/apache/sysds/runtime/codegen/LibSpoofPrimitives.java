@@ -2166,6 +2166,7 @@ public class LibSpoofPrimitives
 	 *  - Implemented a new SparseVectorBuffer class that creates a ring buffer for SparseRowVectors in different sizes
 	 * todo:
 	 *  - 0/0 in vectDivWrite(sparse) results in 0 instead of the desired NaN, because the zeros are skipped
+	 *  	maybe even adjust it in a way, that would still make sense the vect - vect implementation like in EQUAL
 	 *  - vect - scalar operations, XOR, MIN, MAX, GREATER, GREATEREQUAL, LESS, LESSEQUAL, EQUAL, NOTEQUAL, POW have a double[] return for certain bval values
 	 *  - think about vectXorWrite
 	 *  - is setting 0 or 1 for EQUAL or NOTEQUAL unsafe?
@@ -2452,6 +2453,7 @@ public class LibSpoofPrimitives
 		return vectEqualWrite(len, a, bval, aix, ai, alen);
 	}
 
+	//doesn't return SparseRowVector, but still uses two sparse vectors as inputs
 	public static double[] vectEqualWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
 		double[] c = allocVector(len, true, 1);
 		int aIndex = ai;
@@ -2580,6 +2582,7 @@ public class LibSpoofPrimitives
 		return vectGreaterWrite(len, a, bval, aix, ai, alen);
 	}
 
+	//doesn't return SparseRowVector, but still uses two sparse vectors as inputs
 	public static double[] vectLessequalWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
 		double[] c = allocVector(len, true, 1);
 		int aIndex = ai;
@@ -2670,6 +2673,7 @@ public class LibSpoofPrimitives
 		return vectLessWrite(len, a, bval, aix, ai, alen);
 	}
 
+	//doesn't return SparseRowVector, but still uses two sparse vectors as inputs
 	public static double[] vectGreaterequalWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
 		double[] c = allocVector(len, true, 1);
 		int aIndex = ai;
