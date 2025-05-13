@@ -2216,30 +2216,20 @@ public class LibSpoofPrimitives
 	}
 
 	//todo 1
-	public static SparseRowVector vectDivWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
-		SparseRowVector c = allocSparseVector(alen);
+	public static double[] vectDivWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
+		double[] c = allocVector(len, true, Double.NaN);
 		if(alen != 0 && blen != 0) {
 			//decide between two versions. First is smaller for smaller alen and the other for smaller blen
 			if(alen < blen) {
 				SparseRowVector bSparse = allocSparseVector(blen, b, bix);
-//				for (int i = bi; i < bi+blen; i++) {
-//					if(b[i] == 0) {
-//						c.set(bix[i], Double.NaN);
-//					}
-//				}
-				for (int i = ai; i < ai+alen; i++) {
-					c.set(aix[i], a[i] / bSparse.get(aix[i]));
-				}
+				for (int i = ai; i < ai+alen; i++)
+					c[aix[i]] = a[i] / bSparse.get(aix[i]);
 			} else {
 				SparseRowVector aSparse = allocSparseVector(alen, a, aix);
-				for (int i = ai; i < ai+alen; i++) {
-					double aval = a[i];
-					c.set(aix[i], (aval>0) ?
-							Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY);
-				}
-				for (int i = bi; i < bi+blen; i++) {
-					c.set(bix[i], aSparse.get(bix[i]) / b[i]);
-				}
+				for (int i = ai; i < ai+alen; i++)
+					c[aix[i]] = (a[i] > 0) ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
+				for (int i = bi; i < bi+blen; i++)
+					c[bix[i]] = aSparse.get(bix[i]) / b[i];
 			}
 		}
 		return c;
