@@ -1256,7 +1256,6 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 
 	private static boolean sparseOutput(BinType type) {
 		switch(type) {
-			case VECT_DIV:
 			case VECT_EQUAL:
 			case VECT_LESSEQUAL:
 			case VECT_GREATEREQUAL:
