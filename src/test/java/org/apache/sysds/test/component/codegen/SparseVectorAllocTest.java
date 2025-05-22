@@ -41,32 +41,22 @@ public class SparseVectorAllocTest extends AutomatedTestBase
 
 	@Test
 	public void testAllocationWithValues1() {
-		testSparseVectorWithValues(1, 10, val1.length,val1, indexes1);
+		testSparseVectorWithValues(1, 10,val1, indexes1);
 	}
 
 	@Test
 	public void testAllocationWithValues2() {
-		testSparseVectorWithValues(1, 10, val2.length, val2, indexes2);
-	}
-
-	@Test
-	public void testAllocationWithValues3() {
-		testSparseVectorWithValues(1, 10, 3, val2, indexes2);
+		testSparseVectorWithValues(1, 10, val2, indexes2);
 	}
 
 	@Test
 	public void testAllocationWithIndexes1() {
-		testSparseVectorWithIndexes(1, 10, indexes1.length, indexes1);
+		testSparseVectorWithIndexes(1, 10, indexes1);
 	}
 
 	@Test
 	public void testAllocationWithIndexes2() {
-		testSparseVectorWithIndexes(1, 10, indexes2.length, indexes2);
-	}
-
-	@Test
-	public void testAllocationWithIndexes3() {
-		testSparseVectorWithIndexes(1, 10, 3, indexes1);
+		testSparseVectorWithIndexes(1, 10, indexes2);
 	}
 
 	@Test
@@ -79,6 +69,11 @@ public class SparseVectorAllocTest extends AutomatedTestBase
 		testBufferReuse(1, 10, -1, 5, val2, indexes2);
 	}
 
+	/** tests the allocation of an empty vector
+	 * @param numVectors number of vectors that should be pre-allocated
+	 * @param len the length of the vector
+	 * @param expLen the expected length of the allocated vector
+	 */
 	public void testBasicSparseVectorAllocation(int numVectors, int len, int expLen) {
 		//test the basic allocation of an empty vector
 		LibSpoofPrimitives.setupSparseThreadLocalMemory(numVectors, len, -1);
@@ -90,7 +85,13 @@ public class SparseVectorAllocTest extends AutomatedTestBase
 		LibSpoofPrimitives.cleanupSparseThreadLocalMemory();
 	}
 
-	public void testSparseVectorWithValues(int numVectors, int len, int expLen,double[] values, int[] indexes) {
+	/** tests the allocation of a vector with certain values and indexes
+	 * @param numVectors number of vectors that should be pre-allocated
+	 * @param len the length of the vector
+	 * @param values expected values
+	 * @param indexes expected indexes
+	 */
+	public void testSparseVectorWithValues(int numVectors, int len, double[] values, int[] indexes) {
 		//test the allocation of a vector with preset values
 		LibSpoofPrimitives.setupSparseThreadLocalMemory(numVectors, len, -1);
 
@@ -102,7 +103,12 @@ public class SparseVectorAllocTest extends AutomatedTestBase
 		LibSpoofPrimitives.cleanupSparseThreadLocalMemory();
 	}
 
-	public void testSparseVectorWithIndexes(int numVectors, int len, int expLen,int[] indexes) {
+	/** tests the allocation of a vector with certain indexes
+	 * @param numVectors number of vectors that should be pre-allocated
+	 * @param len the length of the vector
+	 * @param indexes expected indexes
+	 */
+	public void testSparseVectorWithIndexes(int numVectors, int len, int[] indexes) {
 		//test allocation of a vector with preset indexes
 		LibSpoofPrimitives.setupSparseThreadLocalMemory(numVectors, len, -1);
 
@@ -114,6 +120,14 @@ public class SparseVectorAllocTest extends AutomatedTestBase
 		LibSpoofPrimitives.cleanupSparseThreadLocalMemory();
 	}
 
+	/** tests the allocation of a vector that is reused multiple times
+	 * @param numVectors number of vectors that should be pre-allocated
+	 * @param len1 length of the first vector
+	 * @param len2 length of the second vector
+	 * @param expLen expected length of allocated vector
+	 * @param values expected values
+	 * @param indexes expected indexes
+	 */
 	public void testBufferReuse(int numVectors, int len1, int len2, int expLen, double[] values, int[] indexes) {
 		//test the reuse of the vectors in the ring buffer
 		LibSpoofPrimitives.setupSparseThreadLocalMemory(numVectors, len1, len2);
