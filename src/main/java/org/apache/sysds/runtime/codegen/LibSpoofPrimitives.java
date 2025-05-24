@@ -2165,9 +2165,7 @@ public class LibSpoofPrimitives
 	 *  - Added blen for vector - vector calculations to be able to use both vectors as SparseRowVectors
 	 *  - Implemented a new SparseVectorBuffer class that creates a ring buffer for SparseRowVectors in different sizes
 	 * todo:
-	 *  - 0/0 in vectDivWrite(sparse) results in 0 instead of the desired NaN, because the zeros are skipped
-	 *  	maybe even adjust it in a way, that would still make sense the vect - vect implementation like in EQUAL
-	 *  - vect - scalar operations, XOR, MIN, MAX, GREATER, GREATEREQUAL, LESS, LESSEQUAL, EQUAL, NOTEQUAL, POW have a double[] return for certain bval values
+	 *  - vect - scalar operations, MIN, MAX, GREATER, GREATEREQUAL, LESS, LESSEQUAL, EQUAL, NOTEQUAL, POW have a double[] return for certain bval values
 	 *  - think about vectXorWrite
 	 *  - is setting 0 or 1 for EQUAL or NOTEQUAL unsafe?
 	 *  - should the vector allocated by the ringbuffer be deep copied?
@@ -2198,7 +2196,6 @@ public class LibSpoofPrimitives
 			c[ci+aix[i]] = a.get(aix[i]);
 	}
 
-	//todo 1
 	public static SparseRowVector vectDivWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
 		double init = 0;
 		if (bval != 0) {
@@ -2215,18 +2212,12 @@ public class LibSpoofPrimitives
 		}
 	}
 
-	//todo 1
 	public static SparseRowVector vectDivWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
 		SparseRowVector c = allocSparseVector(alen);
 		if(alen != 0 && blen != 0) {
 			//decide between two versions. First is smaller for smaller alen and the other for smaller blen
 			if(alen < blen) {
 				SparseRowVector bSparse = allocSparseVector(blen, b, bix);
-//				for (int i = bi; i < bi+blen; i++) {
-//					if(b[i] == 0) {
-//						c.set(bix[i], Double.NaN);
-//					}
-//				}
 				for (int i = ai; i < ai+alen; i++) {
 					c.set(aix[i], a[i] / bSparse.get(aix[i]));
 				}
@@ -2270,7 +2261,6 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectXorWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		//todo 2
 		if(bval != 0) {
 			double[] c = allocVector(len, true, 1);
 			for(int i = ai; i < ai+alen; i++)
@@ -2279,7 +2269,7 @@ public class LibSpoofPrimitives
 		} else {
 			SparseRowVector c = allocSparseVector(alen);
 			for(int i = ai; i < ai+alen; i++)
-				c.set(aix[i], (a[i] != 0) ? 0 : 1);
+				c.set(aix[i], (a[i] != 0) ? 1 : 0);
 			return c;
 		}
 	}
@@ -2289,29 +2279,11 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectXorWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
-		//todo: is this correct?
 		SparseRowVector c = allocSparseVector(alen);
 		for (int i = bi; i < bi+blen; i++)
 			c.set(bix[i], (b[i] != 0) ? 1 : 0);
 		for (int i = ai; i < ai+alen; i++)
 			c.set(aix[i], ((a[i] != 0) != (c.get(aix[i]) != 0)) ? 1 : 0);
-//		int aIndex = ai;
-//		int bIndex = bi;
-//		while(aIndex < ai+alen && bIndex < bi+blen) {
-//			if(aix[aIndex] == bix[bIndex]) {
-//				c.set(aix[aIndex], ((a[aIndex] != 0) != (b[bIndex] != 0)) ? 1 : 0);
-//				aIndex++;
-//				bIndex++;
-//			} else if(aix[aIndex] < bix[bIndex]) {
-//				c.set(aix[aIndex], 1);
-//				aIndex++;
-//			} else {
-//				c.set(bix[bIndex], 1);
-//				bIndex++;
-//			}
-//		}
-//		for (; aIndex < ai+alen; aIndex++)  c.set(aix[aIndex], 1);
-//		for (; bIndex < bi+blen; bIndex++)  c.set(bix[bIndex], 1);
 		return c;
 	}
 
@@ -2367,30 +2339,6 @@ public class LibSpoofPrimitives
 		}
 		for (; aIndex < ai+alen; aIndex++)  c.set(aix[aIndex], Math.min(a[aIndex], 0));
 		for (; bIndex < bi+blen; bIndex++)  c.set(bix[bIndex], Math.min(b[bIndex], 0));
-//		int aCount = 0;
-//		for (int i = 0; i < bi+blen; i++) {
-//			for (int j = aCount; j < ai+alen; j++) {
-//				if(aix[j] == bix[i]) {
-//					c.set(aix[j], Math.min(a[j], b[i]));
-//					aCount++;
-//					break;
-//				}
-//				else if(aix[j] < bix[i]) {
-//					c.set(aix[j], Math.min(a[j], 0));
-//					aCount++;
-//				}
-//				else if(aix[j] > bix[i]) {
-//					c.set(bix[i], Math.min(b[i], 0));
-//					break;
-//				}
-//			}
-//			if(aCount == alen) {
-//				c.set(bix[i], Math.min(b[i], 0));
-//			}
-//		}
-//		for (int i = aCount; i < ai+alen; i++) {
-//			c.set(aix[i], Math.min(a[i], 0));
-//		}
 		return c;
 	}
 
