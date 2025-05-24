@@ -175,13 +175,13 @@ public class CNodeBinary extends CNode {
 					&& _inputs.get(1).getDataType().isMatrix());
 			boolean vectorVector = _inputs.get(0).getDataType().isMatrix()
 					&& _inputs.get(1).getDataType().isMatrix();
-			//todo look at isVectorScalarPrimitive()
+			//todo this might need to be changed be implemented in Binary/Unary
 			boolean sparseOutput = lsparseLhs && !lsparseRhs ?
 					!(_type.name().contains("VECT_MINUS_SCALAR") || _type.name().contains("VECT_PLUS_SCALAR")) :
 			!lsparseLhs && lsparseRhs ?
 					!(_type.name().contains("VECT_MINUS_SCALAR") || _type.name().contains("VECT_PLUS_SCALAR")
-							|| _type.name().contains("VECT_DIV") || _type.name().contains("VECT_MULT")) :
-					lsparseLhs && lsparseRhs ? true : false;
+							|| _type.name().contains("VECT_DIV_SCALAR") || _type.name().contains("VECT_MULT_SCALAR")) :
+					lsparseLhs && lsparseRhs ? !(_type.name().contains("VECT_DIV")) : false;
 			//todo this evaluates to true even though it should be sparse when using b
 			String var = createVarname(sparseOutput);
 			String tmp = getLanguageTemplateClass(this, api)
