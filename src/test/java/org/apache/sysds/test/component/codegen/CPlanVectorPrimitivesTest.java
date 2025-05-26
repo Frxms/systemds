@@ -1174,6 +1174,7 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 			MatrixBlock inB = MatrixBlock.randOperations(m, n, sparsityB, -5, 5, "uniform", 7);
 
 			boolean sparse = sparseOutput(bintype);
+			int testType = testType(bintype);
 
 			//get vector primitive via reflection
 			String meName = "vect"+StringUtils.camelize(bintype.name().split("_")[1])+"Write";
@@ -1190,11 +1191,31 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 				double[] ret1 = new double[n];
 				SparseRowVector retX = null;
 				if( type1==InputType.VECTOR_SPARSE && type2==InputType.SCALAR )
-					retX = (SparseRowVector) me.invoke(null, n, inA.getSparseBlock().values(i), inB.max(), inA.getSparseBlock().indexes(i),
-						inA.getSparseBlock().pos(i), inA.getSparseBlock().size(i));
+					if(testType >= 0 && i == m-1) {
+						if(testType == 0) {
+							retX = (SparseRowVector) me.invoke(null, n, inA.getSparseBlock().values(i), 0, inA.getSparseBlock().indexes(i),
+								inA.getSparseBlock().pos(i), inA.getSparseBlock().size(i));
+						} else {
+							retX = (SparseRowVector) me.invoke(null, n, inA.getSparseBlock().values(i), inB.min(), inA.getSparseBlock().indexes(i),
+								inA.getSparseBlock().pos(i), inA.getSparseBlock().size(i));
+						}
+					} else {
+						retX = (SparseRowVector) me.invoke(null, n, inA.getSparseBlock().values(i), inB.max(), inA.getSparseBlock().indexes(i),
+							inA.getSparseBlock().pos(i), inA.getSparseBlock().size(i));
+					}
 				else if( type1==InputType.SCALAR && type2==InputType.VECTOR_SPARSE )
-					retX = (SparseRowVector) me.invoke(null, n, inA.max(), inB.getSparseBlock().values(i),
-						inB.getSparseBlock().indexes(i), inB.getSparseBlock().pos(i), inB.getSparseBlock().size(i));
+					if(testType >= 0 && i == m-1) {
+						if(testType == 0) {
+							retX = (SparseRowVector) me.invoke(null, n, 0, inB.getSparseBlock().values(i),
+								inB.getSparseBlock().indexes(i), inB.getSparseBlock().pos(i), inB.getSparseBlock().size(i));
+						} else {
+							retX = (SparseRowVector) me.invoke(null, n, inA.min(), inB.getSparseBlock().values(i),
+								inB.getSparseBlock().indexes(i), inB.getSparseBlock().pos(i), inB.getSparseBlock().size(i));
+						}
+					} else {
+						retX = (SparseRowVector) me.invoke(null, n, inA.max(), inB.getSparseBlock().values(i),
+							inB.getSparseBlock().indexes(i), inB.getSparseBlock().pos(i), inB.getSparseBlock().size(i));
+					}
 				else if( type1==InputType.VECTOR_SPARSE && type2==InputType.VECTOR_SPARSE )
 					if(sparse)
 						retX = (SparseRowVector) me.invoke(null, n, inA.getSparseBlock().values(i), inB.getSparseBlock().values(i),
@@ -1217,13 +1238,13 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 				double[] ret2 = null;
 				if( type1 == InputType.SCALAR ) {
 					ScalarOperator bop = InstructionUtils.parseScalarBinaryOperator(opcode, true);
-					bop = bop.setConstant(inA.max());
+					bop = bop.setConstant(testType >= 0 && i == m-1 ? testType == 0 ? 0 : inA.min() : inA.max());
 					ret2 = DataConverter.convertToDoubleVector(
 							in2.scalarOperations(bop, new MatrixBlock()), false);
 				}
 				else if( type2 == InputType.SCALAR ) {
 					ScalarOperator bop = InstructionUtils.parseScalarBinaryOperator(opcode, false);
-					bop = bop.setConstant(inB.max());
+					bop = bop.setConstant(testType >= 0 && i == m-1 ? testType == 0 ? 0 : inB.min() : inB.max());
 					ret2 = DataConverter.convertToDoubleVector(
 							in1.scalarOperations(bop, new MatrixBlock()), false);
 				}
@@ -1250,6 +1271,31 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 				return false;
 			default:
 				return true;
+		}
+	}
+
+	/**
+	 * returns -1, for normal testing;
+	 * returns 0, for testing with 0 and non-zeros;
+	 * returns 1, for testing with negative and positive numbers;
+	 */
+	private static int testType(BinType type) {
+		switch(type) {
+			case VECT_DIV_SCALAR:
+			case VECT_EQUAL_SCALAR:
+			case VECT_NOTEQUAL_SCALAR:
+			case VECT_XOR_SCALAR:
+//			case VECT_POW_SCALAR:
+				return 0;
+			case VECT_GREATER_SCALAR:
+			case VECT_GREATEREQUAL_SCALAR:
+			case VECT_LESS_SCALAR:
+			case VECT_LESSEQUAL_SCALAR:
+			case VECT_MIN_SCALAR:
+			case VECT_MAX_SCALAR:
+				return 1;
+			default:
+				return -1;
 		}
 	}
 
