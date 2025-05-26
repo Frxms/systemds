@@ -2164,12 +2164,6 @@ public class LibSpoofPrimitives
 	 * 		e.g. (double[], double, int[], int, int, int) --> (int, double[], double, int[], int, int)
 	 *  - Added blen for vector - vector calculations to be able to use both vectors as SparseRowVectors
 	 *  - Implemented a new SparseVectorBuffer class that creates a ring buffer for SparseRowVectors in different sizes
-	 * todo:
-	 *  - vect - scalar operations, MIN, MAX, GREATER, GREATEREQUAL, LESS, LESSEQUAL, EQUAL, NOTEQUAL, POW have a double[] return for certain bval values
-	 *  - think about vectXorWrite
-	 *  - is setting 0 or 1 for EQUAL or NOTEQUAL unsafe?
-	 *  - should the vector allocated by the ringbuffer be deep copied?
-	 *  - what is the use of vectWrite
 	 */
 
 	public static SparseRowVector vectMultWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
@@ -2289,6 +2283,7 @@ public class LibSpoofPrimitives
 
 	public static SparseRowVector vectPowWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
 		if(bval == 0) {
+			//Todo: why -1 here, even though the result should be 1?
 			double[] c = allocVector(len, true, 1);
 			for(int i = ai; i < ai+alen; i++)
 				c[aix[i]] = Math.pow(a[i], bval) - 1;
@@ -2302,7 +2297,6 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectMinWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		//todo 2
 		if(bval < 0) {
 			double[] c = allocVector(len, true, bval);
 			for(int i = ai; i < ai+alen; i++)
@@ -2343,7 +2337,6 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectMaxWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		//todo 2
 		if(bval > 0) {
 			double[] c = allocVector(len, true, bval);
 			for(int i = ai; i < ai+alen; i++)
@@ -2412,11 +2405,13 @@ public class LibSpoofPrimitives
 				aIndex++;
 				bIndex++;
 			} else if(aix[aIndex] < bix[bIndex]) {
-				//todo: is putting a 0 instantly too unsafe?
-				c[aix[aIndex]] = 0;
+				//todo: this might be too unsafe
+				c[aix[aIndex]] = a[aIndex] == 0 ? 1 : 0;
+//				c[aix[aIndex]] = 0;
 				aIndex++;
 			} else {
-				c[bix[bIndex]] = 0;
+				c[bix[bIndex]] = b[bIndex] == 0 ? 1 : 0;
+//				c[bix[bIndex]] = 0;
 				bIndex++;
 			}
 		}
@@ -2426,7 +2421,6 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectNotequalWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		//todo 2
 		if(bval != 0) {
 			double[] c = allocVector(len, true, 1);
 			for(int i = ai; i < ai+alen; i++)
@@ -2455,11 +2449,13 @@ public class LibSpoofPrimitives
 				aIndex++;
 				bIndex++;
 			} else if(aix[aIndex] < bix[bIndex]) {
-				//todo: is putting a 1 instantly too unsafe?
+				//todo: this might be too unsafe
 				c.set(aix[aIndex], (a[aIndex] != 0) ? 1 : 0);
+//				c.set(aix[aIndex], 1);
 				aIndex++;
 			} else {
 				c.set(bix[bIndex], (b[bIndex] != 0) ? 1 : 0);
+//				c.set(bix[bIndex], 1);
 				bIndex++;
 			}
 		}
@@ -2469,7 +2465,6 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectLessWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		//todo 2
 		if(bval > 0) {
 			double[] c = allocVector(len, true, 1);
 			for(int i = ai; i < ai+alen; i++)
@@ -2511,7 +2506,6 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectLessequalWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		//todo 2
 		if(bval >= 0) {
 			double[] c = allocVector(len, true, 1);
 			for(int i = ai; i < ai+alen; i++)
@@ -2551,16 +2545,9 @@ public class LibSpoofPrimitives
 		for(; aIndex < ai+alen; aIndex++) c[aix[aIndex]] = (a[aIndex] <= 0) ? 1 : 0;
 		for(; bIndex < bi+blen; bIndex++)  c[bix[bIndex]] = (0 <= b[bIndex]) ? 1 : 0;
 		return c;
-//		double[] c = allocVector(len, false);
-//		for( int j=0; j<len; j++ )
-//			c[j] = ( 0 <= b[bi+j] ) ? 1 : 0;
-//		for( int j = ai; j < ai+alen; j++ )
-//			c[aix[j]] = (a[j] <= b[bi+aix[j]]) ? 1 : 0;
-//		return c;
 	}
 
 	public static SparseRowVector vectGreaterWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		//todo 2
 		if(bval < 0) {
 			double[] c = allocVector(len, true, 1);
 			for(int i = ai; i < ai+alen; i++)
@@ -2602,7 +2589,6 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectGreaterequalWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		//todo 2
 		if(bval <= 0) {
 			double[] c = allocVector(len, true, 1);
 			for(int i = ai; i < ai+alen; i++)
@@ -2850,11 +2836,8 @@ public class LibSpoofPrimitives
 
 		//fill vector
 		if(fill) {
-			//todo: do i need to copy these arrays?
 			System.arraycopy(values, 0, vect.values(), 0, len);
 			System.arraycopy(indexes, 0, vect.indexes(), 0, len);
-//			vect.setValues(values);
-//			vect.setIndexes(indexes);
 			vect.setSize(len);
 		//indexes copy
 		} else if(indexCopy) {
