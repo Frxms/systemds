@@ -1064,10 +1064,8 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 
 			for( int i=0; i<m; i++ ) {
 				double[] ret1 = new double[n];
-				double[] valuesCopy = Arrays.copyOf(in.getSparseBlock().values(i), in.getSparseBlock().size(i));
-				int[] indexesCopy = Arrays.copyOf(in.getSparseBlock().indexes(i), in.getSparseBlock().size(i));
 				//execute vector primitive via reflection
-				SparseRowVector retX = (SparseRowVector) me.invoke(null, n, valuesCopy, indexesCopy,
+				SparseRowVector retX = (SparseRowVector) me.invoke(null, n, in.getSparseBlock().values(i), in.getSparseBlock().indexes(i),
 								in.getSparseBlock().pos(i), in.getSparseBlock().size(i));
 
 				int[] indexes = retX.indexes();
@@ -1184,36 +1182,26 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 				me = LibSpoofPrimitives.class.getMethod(meName, new Class[]{int.class, double[].class, double.class, int[].class, int.class, int.class});
 			else if( type1==InputType.SCALAR && type2==InputType.VECTOR_SPARSE )
 				me = LibSpoofPrimitives.class.getMethod(meName, new Class[]{int.class, double.class, double[].class, int[].class, int.class, int.class});
-			else if( type1==InputType.VECTOR_SPARSE && type2==InputType.VECTOR_SPARSE )
+			else //if( type1==InputType.VECTOR_SPARSE && type2==InputType.VECTOR_SPARSE )
 				me = LibSpoofPrimitives.class.getMethod(meName, new Class[]{int.class, double[].class, double[].class, int[].class, int[].class, int.class, int.class, int.class, int.class});
-			else
-				me = LibSpoofPrimitives.class.getMethod(meName, new Class[]{double[].class, double[].class, int[].class, int.class, int.class, int.class, int.class});
 
 			for( int i=0; i<m; i++ ) {
 				//execute vector primitive via reflection
 				double[] ret1 = new double[n];
 				SparseRowVector retX = null;
-				double[] aValuesCopy = Arrays.copyOf(inA.getSparseBlock().values(i), inA.getSparseBlock().size(i));
-				int[] aIndexesCopy = Arrays.copyOf(inA.getSparseBlock().indexes(i), inA.getSparseBlock().size(i));
-				double[] bValuesCopy = Arrays.copyOf(inB.getSparseBlock().values(i), inB.getSparseBlock().size(i));
-				int[] bIndexesCopy = Arrays.copyOf(inB.getSparseBlock().indexes(i), inB.getSparseBlock().size(i));
-
 				if( type1==InputType.VECTOR_SPARSE && type2==InputType.SCALAR )
-					retX = (SparseRowVector) me.invoke(null, n, aValuesCopy, inB.max(), aIndexesCopy,
-							inA.getSparseBlock().pos(i), inA.getSparseBlock().size(i));
+					retX = (SparseRowVector) me.invoke(null, n, inA.getSparseBlock().values(i), inB.max(), inA.getSparseBlock().indexes(i),
+						inA.getSparseBlock().pos(i), inA.getSparseBlock().size(i));
 				else if( type1==InputType.SCALAR && type2==InputType.VECTOR_SPARSE )
-					retX = (SparseRowVector) me.invoke(null, n, inA.max(), bValuesCopy,
-							bIndexesCopy, inB.getSparseBlock().pos(i), inB.getSparseBlock().size(i));
+					retX = (SparseRowVector) me.invoke(null, n, inA.max(), inB.getSparseBlock().values(i),
+						inB.getSparseBlock().indexes(i), inB.getSparseBlock().pos(i), inB.getSparseBlock().size(i));
 				else if( type1==InputType.VECTOR_SPARSE && type2==InputType.VECTOR_SPARSE )
 					if(sparse)
-						retX = (SparseRowVector) me.invoke(null, n, aValuesCopy, bValuesCopy,
-							aIndexesCopy, bIndexesCopy, inA.getSparseBlock().pos(i), inB.getSparseBlock().pos(i), inA.getSparseBlock().size(i), inB.getSparseBlock().size(i));
+						retX = (SparseRowVector) me.invoke(null, n, inA.getSparseBlock().values(i), inB.getSparseBlock().values(i),
+							inA.getSparseBlock().indexes(i), inB.getSparseBlock().indexes(i), inA.getSparseBlock().pos(i), inB.getSparseBlock().pos(i), inA.getSparseBlock().size(i), inB.getSparseBlock().size(i));
 					else
-						ret1 = (double[]) me.invoke(null, n, aValuesCopy, bValuesCopy,
-							aIndexesCopy, bIndexesCopy, inA.getSparseBlock().pos(i), inB.getSparseBlock().pos(i), inA.getSparseBlock().size(i), inB.getSparseBlock().size(i));
-				else if( type1==InputType.VECTOR_SPARSE && type2==InputType.VECTOR_DENSE )
-					retX = (SparseRowVector) me.invoke(null, n, aValuesCopy, inB.getDenseBlockValues(),
-							aIndexesCopy, inA.getSparseBlock().pos(i), i*n, inA.getSparseBlock().size(i));
+						ret1 = (double[]) me.invoke(null, n, inA.getSparseBlock().values(i), inB.getSparseBlock().values(i),
+							inA.getSparseBlock().indexes(i), inB.getSparseBlock().indexes(i), inA.getSparseBlock().pos(i), inB.getSparseBlock().pos(i), inA.getSparseBlock().size(i), inB.getSparseBlock().size(i));
 
 				if(sparse) {
 					int[] indexes = retX.indexes();

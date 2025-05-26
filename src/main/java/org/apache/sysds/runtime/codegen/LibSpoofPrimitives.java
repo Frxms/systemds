@@ -2851,10 +2851,10 @@ public class LibSpoofPrimitives
 		//fill vector
 		if(fill) {
 			//todo: do i need to copy these arrays?
-//			System.arraycopy(values, 0, vect.values(), 0, len);
-//			System.arraycopy(indexes, 0, vect.indexes(), 0, len);
-			vect.setValues(values);
-			vect.setIndexes(indexes);
+			System.arraycopy(values, 0, vect.values(), 0, len);
+			System.arraycopy(indexes, 0, vect.indexes(), 0, len);
+//			vect.setValues(values);
+//			vect.setIndexes(indexes);
 			vect.setSize(len);
 		//indexes copy
 		} else if(indexCopy) {
