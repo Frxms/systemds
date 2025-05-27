@@ -842,71 +842,71 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 	//vector - vector
 
 	@Test
-	public void testVectorVectorMultSparseSparse() {
+	public void testVectorVectorMultSparseToSparse() {
 		testVectorBinarySparsePrimitive(BinType.VECT_MULT, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 
 	@Test
-	public void testVectorVectorDivSparseSparse() {
+	public void testVectorVectorDivSparseToSparse() {
 		testVectorBinarySparsePrimitive(BinType.VECT_DIV, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 
 	@Test
-	public void testVectorVectorPlusSparseSparse() {
+	public void testVectorVectorPlusSparseToSparse() {
 		testVectorBinarySparsePrimitive(BinType.VECT_PLUS, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 
 	@Test
-	public void testVectorVectorMinusSparseSparse() {
+	public void testVectorVectorMinusSparseToSparse() {
 		testVectorBinarySparsePrimitive(BinType.VECT_MINUS, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 
 	@Test
-	public void testVectorVectorMinSparseSparse() {
+	public void testVectorVectorMinSparseToSparse() {
 		testVectorBinarySparsePrimitive(BinType.VECT_MIN, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 	@Test
-	public void testVectorVectorMaxSparseSparse() {
+	public void testVectorVectorMaxSparseToSparse() {
 		testVectorBinarySparsePrimitive(BinType.VECT_MAX, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 
 	@Test
-	public void testVectorVectorEqualSparseSparse() {
+	public void testVectorVectorEqualSparseToSparse() {
 		testVectorBinarySparsePrimitive(BinType.VECT_EQUAL, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 
 	@Test
-	public void testVectorVectorNotEqualSparseSparse() {
+	public void testVectorVectorNotEqualSparseToSparse() {
 		testVectorBinarySparsePrimitive(BinType.VECT_NOTEQUAL, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 
 	@Test
-	public void testVectorVectorLessSparseSparse() {
+	public void testVectorVectorLessSparseToSparse() {
 		testVectorBinarySparsePrimitive(BinType.VECT_LESS, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 
 	@Test
-	public void testVectorVectorLessEqualSparseSparse() {
+	public void testVectorVectorLessEqualSparseToSparse() {
 		testVectorBinarySparsePrimitive(BinType.VECT_LESSEQUAL, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 
 	@Test
-	public void testVectorVectorGreaterSparseSparse() {
+	public void testVectorVectorGreaterSparseToSparse() {
 		testVectorBinarySparsePrimitive(BinType.VECT_GREATER, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 
 	@Test
-	public void testVectorVectorGreaterEqualSparseSparse() {
+	public void testVectorVectorGreaterEqualSparseToSparse() {
 		testVectorBinarySparsePrimitive(BinType.VECT_GREATEREQUAL, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 
 	@Test
-	public void testVectorVectorXorSparseSparse() {
+	public void testVectorVectorXorSparseToSparse() {
 		testVectorBinarySparsePrimitive(BinType.VECT_XOR, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 
 	@Test
-	public void testVectorVectorBitwAndSparseSparse() {
+	public void testVectorVectorBitwAndSparseToSparse() {
 		testVectorBinarySparsePrimitive(BinType.VECT_BITWAND, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 
