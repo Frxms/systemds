@@ -98,7 +98,9 @@ public class SparseVectorAllocTest extends AutomatedTestBase
 		SparseRowVector sparseVec = LibSpoofPrimitives.allocSparseVector(values.length, values, indexes);
 
 		Assert.assertEquals("Vector size should match input array length", values.length, sparseVec.size());
-		Assert.assertEquals("Value array should match input array", values, sparseVec.values());
+		for(int j = 0; j < sparseVec.size(); j++) {
+			Assert.assertEquals("Value array should match input array", values[j], sparseVec.get(indexes[j]), 0.001);
+		}
 
 		LibSpoofPrimitives.cleanupSparseThreadLocalMemory();
 	}
@@ -146,7 +148,9 @@ public class SparseVectorAllocTest extends AutomatedTestBase
 		SparseRowVector vec3 = LibSpoofPrimitives.allocSparseVector(values.length, values, indexes);
 
 		Assert.assertEquals("Vector size should match input", values.length, vec3.size());
-		Assert.assertEquals("Value array should match input array", values, vec3.values());
+		for(int j = 0; j < vec3.size(); j++) {
+			Assert.assertEquals("Value array should match input array", values[j], vec3.get(indexes[j]), 0.001);
+		}
 
 		LibSpoofPrimitives.cleanupSparseThreadLocalMemory();
 	}
