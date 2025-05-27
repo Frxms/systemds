@@ -839,6 +839,18 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 		testVectorBinarySparsePrimitive(BinType.VECT_BITWAND_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE);
 	}
 
+	//special binary
+
+//	@Test
+//	public void testVectorPow2SparseToSparse() {
+//		testVectorUnarySparsePrimitive(UnaryType.VECT_POW2, InputType.VECTOR_SPARSE);
+//	}
+//
+//	@Test
+//	public void testVectorMult2SparseToSparse() {
+//		testVectorUnarySparsePrimitive(UnaryType.VECT_MULT2, InputType.VECTOR_SPARSE);
+//	}
+
 	//vector - vector
 
 	@Test
@@ -910,6 +922,11 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 		testVectorBinarySparsePrimitive(BinType.VECT_BITWAND, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 
+//	@Test
+//	public void testVectorVectorMatrixMultSparseToSparse() {
+//		testVectorBinarySparsePrimitive(BinType.VECT_MATRIXMULT, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
+//	}
+
 	//unary primitives with sparse intermediates
 
 	@Test
@@ -971,7 +988,6 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 	public void testVectorSignSparseToSparse() {
 		testVectorUnarySparsePrimitive(UnaryType.VECT_SIGN, InputType.VECTOR_SPARSE);
 	}
-
 
 	@SuppressWarnings("incomplete-switch")
 	private static void testVectorAggPrimitive(UnaryType aggtype, InputType type1)
