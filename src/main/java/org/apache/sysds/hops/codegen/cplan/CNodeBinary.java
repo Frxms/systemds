@@ -175,15 +175,7 @@ public class CNodeBinary extends CNode {
 					&& _inputs.get(1).getDataType().isMatrix());
 			boolean vectorVector = _inputs.get(0).getDataType().isMatrix()
 					&& _inputs.get(1).getDataType().isMatrix();
-			//todo this might need to be changed be implemented in Binary/Unary
-			boolean sparseOutput = lsparseLhs && !lsparseRhs ?
-					!(_type.name().contains("VECT_MINUS_SCALAR") || _type.name().contains("VECT_PLUS_SCALAR")) :
-			!lsparseLhs && lsparseRhs ?
-					!(_type.name().contains("VECT_MINUS_SCALAR") || _type.name().contains("VECT_PLUS_SCALAR")
-							|| _type.name().contains("VECT_DIV_SCALAR") || _type.name().contains("VECT_MULT_SCALAR")) :
-					lsparseLhs && lsparseRhs ? !(_type.name().contains("VECT_DIV")) : false;
-			//todo this evaluates to true even though it should be sparse when using b
-			String var = createVarname(sparseOutput);
+			String var = createVarname(sparse && (lsparseLhs || lsparseRhs) && getOutputType(scalarVector));
 			String tmp = getLanguageTemplateClass(this, api)
 					.getTemplate(_type, lsparseLhs, lsparseRhs, scalarVector, scalarInput, vectorVector);
 
@@ -297,7 +289,39 @@ public class CNodeBinary extends CNode {
 			if( getInput().get(i).getDataType().isMatrix() )
 				return getInput().get(i);
 		return null;
-	} 
+	}
+
+	public boolean getOutputType(boolean scalarVector) {
+		switch(_type) {
+			case VECT_MULT_SCALAR:
+			case VECT_DIV_SCALAR:
+			case VECT_POW_SCALAR: return !scalarVector;
+			case VECT_XOR_SCALAR:
+			case VECT_MIN_SCALAR:
+			case VECT_MAX_SCALAR:
+			case VECT_EQUAL_SCALAR:
+			case VECT_NOTEQUAL_SCALAR:
+			case VECT_LESS_SCALAR:
+			case VECT_LESSEQUAL_SCALAR:
+			case VECT_GREATER_SCALAR:
+			case VECT_GREATEREQUAL_SCALAR:
+			case VECT_BITWAND_SCALAR:
+			case VECT_MULT:
+			case VECT_DIV:
+			case VECT_MINUS:
+			case VECT_PLUS:
+			case VECT_XOR:
+			case VECT_BITWAND:
+			case VECT_BIASADD:
+			case VECT_BIASMULT:
+			case VECT_MIN:
+			case VECT_MAX:
+			case VECT_NOTEQUAL:
+			case VECT_LESS:
+			case VECT_GREATER: return true;
+			default: return false;
+		}
+	}
 	
 	@Override
 	public String toString() {

@@ -70,7 +70,8 @@ public class Binary extends CodeTemplate {
 
 			//vector-scalar operations
 			case VECT_MULT_SCALAR:
-			case VECT_DIV_SCALAR:{
+			case VECT_DIV_SCALAR:
+			case VECT_POW_SCALAR: {
 				String vectName = type.getVectorPrimitiveName();
 				if( scalarVector )
 					return sparseRhs ? "    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1%, %IN2v%, %IN2i%, %POS2%, alen, %LEN%);\n" :
@@ -83,7 +84,16 @@ public class Binary extends CodeTemplate {
 								"    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1%, %IN2%, %POS1%, %LEN%);\n";
 					}
 			}
-			case VECT_BITWAND_SCALAR:{
+			case VECT_XOR_SCALAR:
+			case VECT_MIN_SCALAR:
+			case VECT_MAX_SCALAR:
+			case VECT_EQUAL_SCALAR:
+			case VECT_NOTEQUAL_SCALAR:
+			case VECT_LESS_SCALAR:
+			case VECT_LESSEQUAL_SCALAR:
+			case VECT_GREATER_SCALAR:
+			case VECT_GREATEREQUAL_SCALAR:
+			case VECT_BITWAND_SCALAR: {
 				String vectName = type.getVectorPrimitiveName();
 				if(scalarVector) {
 					if(sparseRhs)
@@ -97,17 +107,7 @@ public class Binary extends CodeTemplate {
 				return 	"    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1%, %IN2%, %POS1%, %LEN%);\n";
 			}
 			case VECT_MINUS_SCALAR:
-			case VECT_PLUS_SCALAR:
-			case VECT_POW_SCALAR:
-			case VECT_XOR_SCALAR:
-			case VECT_MIN_SCALAR:
-			case VECT_MAX_SCALAR:
-			case VECT_EQUAL_SCALAR:
-			case VECT_NOTEQUAL_SCALAR:
-			case VECT_LESS_SCALAR:
-			case VECT_LESSEQUAL_SCALAR:
-			case VECT_GREATER_SCALAR:
-			case VECT_GREATEREQUAL_SCALAR: {
+			case VECT_PLUS_SCALAR: {
 				String vectName = type.getVectorPrimitiveName();
 				if( scalarVector )
 					return sparseRhs ? "    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1%, %IN2v%, %IN2i%, %POS2%, alen, %LEN%);\n" :
@@ -131,6 +131,7 @@ public class Binary extends CodeTemplate {
 
 				//vector-vector operations
 			case VECT_MULT:
+			case VECT_DIV:
 			case VECT_MINUS:
 			case VECT_PLUS:
 			case VECT_XOR:
@@ -153,7 +154,6 @@ public class Binary extends CodeTemplate {
 									"    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1%, %IN2%, %POS1%, %POS2%, %LEN%);\n";
 				}
 			}
-			case VECT_DIV:
 			case VECT_EQUAL:
 			case VECT_LESSEQUAL:
 			case VECT_GREATEREQUAL:{
