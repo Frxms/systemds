@@ -83,8 +83,7 @@ public abstract class CNode
 		if(!sparse) {
 			return createVarname();
 		} else {
-			_genVar = "STMP"+_seqID.getNextID();
-			return _genVar;
+			return _genVar = "S" + createVarname();
 		}
 	}
 	
@@ -241,8 +240,8 @@ public abstract class CNode
 	protected String replaceUnaryPlaceholders(String tmp, String varj, boolean vectIn, GeneratorAPI api) {
 		//replace sparse and dense inputs
 		if(DMLScript.SPARSE_INTERMEDIATE) {
-			tmp = tmp.replace("%IN1v%", (TemplateUtils.isMatrix(_inputs.get(0)) && varj.startsWith("STMP")) ? varj+".values()" : varj+"vals");
-			tmp = tmp.replace("%IN1i%", (TemplateUtils.isMatrix(_inputs.get(0)) && varj.startsWith("STMP")) ? varj+".indexes()" :varj+"ix");
+			tmp = tmp.replace("%IN1v%", varj.startsWith("STMP") ? varj+".values()" : varj+"vals");
+			tmp = tmp.replace("%IN1i%", varj.startsWith("STMP") ? varj+".indexes()" :varj+"ix");
 		} else {
 			tmp = tmp.replace("%IN1v%", varj+"vals");
 			tmp = tmp.replace("%IN1i%", varj+"ix");

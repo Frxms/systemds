@@ -160,6 +160,10 @@ public class CNodeBinary extends CNode {
 		sb.append(_inputs.get(0).codegen(sparse, api));
 		sb.append(_inputs.get(1).codegen(sparse, api));
 
+		/**
+		 * todo: remember that only certain primitives will be called through this method,
+		 *  because the optimizer will choose which primitive functions should be calculated sparse and which not
+		 */
 		if(DMLScript.SPARSE_INTERMEDIATE) {
 			//generate binary operation (use sparse template, if data input)
 			boolean lsparseLhs = sparse ? _inputs.get(0) instanceof CNodeData
@@ -175,7 +179,7 @@ public class CNodeBinary extends CNode {
 					&& _inputs.get(1).getDataType().isMatrix());
 			boolean vectorVector = _inputs.get(0).getDataType().isMatrix()
 					&& _inputs.get(1).getDataType().isMatrix();
-			String var = createVarname(sparse && (lsparseLhs || lsparseRhs) && getOutputType(scalarVector));
+			String var = createVarname(sparse && getOutputType(scalarVector, lsparseLhs, lsparseRhs));
 			String tmp = getLanguageTemplateClass(this, api)
 					.getTemplate(_type, lsparseLhs, lsparseRhs, scalarVector, scalarInput, vectorVector);
 
@@ -187,12 +191,8 @@ public class CNodeBinary extends CNode {
 				//todo check in on the following lsparseLhs checks.
 				// When there is an STMP doesnt that imply, that this is sparse, so the check should be unnecessary
 				//replace sparse and dense inputs
-				tmp = tmp.replace("%IN"+(j+1)+"v%",
-						varj.startsWith("STMP") && (lsparseLhs && j == 0 || lsparseRhs && j == 1) ?
-										varj+".values()" : varj+"vals");
-				tmp = tmp.replace("%IN"+(j+1)+"i%",
-						varj.startsWith("STMP") && (lsparseLhs && j == 0 || lsparseRhs && j == 1) ?
-									varj+".indexes()" : varj+"ix");
+				tmp = tmp.replace("%IN"+(j+1)+"v%", varj.startsWith("STMP") ? varj+".values()" : varj+"vals");
+				tmp = tmp.replace("%IN"+(j+1)+"i%", varj.startsWith("STMP") ? varj+".indexes()" : varj+"ix");
 				tmp = tmp.replace("%IN"+(j+1)+"%",
 						varj.startsWith("a") ? (api == GeneratorAPI.JAVA ? varj :
 								(_inputs.get(j).getDataType() == DataType.MATRIX ? varj + ".vals(0)" : varj)) :
@@ -200,7 +200,7 @@ public class CNodeBinary extends CNode {
 										(_type == BinType.VECT_MATRIXMULT ? varj : varj + ".vals(0)")) :
 										_inputs.get(j).getDataType() == DataType.MATRIX ? (api == GeneratorAPI.JAVA ? varj : varj + ".vals(0)") : varj);
 
-				tmp = tmp.replace("%"+(j+1)+"Len%", varj.startsWith("STMP") ? varj+".size()" : j ==  0 ? "alen" : "blen");
+				tmp = tmp.replace("%LEN"+(j+1)+"%", varj.startsWith("STMP") ? varj+".size()" : j ==  0 ? "alen" : "blen");
 
 				//replace start position of main input
 				tmp = tmp.replace("%POS"+(j+1)+"%", (_inputs.get(j) instanceof CNodeData
@@ -209,8 +209,9 @@ public class CNodeBinary extends CNode {
 								&& TemplateUtils.isColVector(_inputs.get(j)))) && _type!=BinType.VECT_MATRIXMULT) ?
 								varj + ".pos(rix)" : "0" : "0");
 			}
+			//todo: the following if else block could be simplified, because the first condition won't be true
 			//replace length information (e.g., after matrix mult)
-			if( _type == BinType.VECT_OUTERMULT_ADD || (_type == BinType.VECT_CBIND && vectorVector) ) {
+			if( _type == BinType.VECT_OUTERMULT_ADD || (_type == BinType.VECT_CBIND && vectorVector)) {
 				for( int j=0; j<2; j++ )
 					tmp = tmp.replace("%LEN"+(j+1)+"%", _inputs.get(j).getVectorLength(api));
 			}
@@ -291,11 +292,11 @@ public class CNodeBinary extends CNode {
 		return null;
 	}
 
-	public boolean getOutputType(boolean scalarVector) {
+	public boolean getOutputType(boolean scalarVector, boolean lsparseLhs, boolean lsparseRhs) {
 		switch(_type) {
 			case VECT_MULT_SCALAR:
 			case VECT_DIV_SCALAR:
-			case VECT_POW_SCALAR: return !scalarVector;
+			case VECT_POW_SCALAR: return !scalarVector && lsparseLhs;
 			case VECT_XOR_SCALAR:
 			case VECT_MIN_SCALAR:
 			case VECT_MAX_SCALAR:
@@ -305,7 +306,7 @@ public class CNodeBinary extends CNode {
 			case VECT_LESSEQUAL_SCALAR:
 			case VECT_GREATER_SCALAR:
 			case VECT_GREATEREQUAL_SCALAR:
-			case VECT_BITWAND_SCALAR:
+			case VECT_BITWAND_SCALAR: return lsparseLhs || lsparseRhs;
 			case VECT_MULT:
 			case VECT_DIV:
 			case VECT_MINUS:
@@ -318,7 +319,7 @@ public class CNodeBinary extends CNode {
 			case VECT_MAX:
 			case VECT_NOTEQUAL:
 			case VECT_LESS:
-			case VECT_GREATER: return true;
+			case VECT_GREATER: return lsparseLhs && lsparseRhs;
 			default: return false;
 		}
 	}

@@ -116,11 +116,9 @@ private static final String TEMPLATE_ROWAGG_OUT_CUDA  = "\t\tif(threadIdx.x == 0
 		String tmp = getLanguageTemplate(this, api);
 
 		//generate dense/sparse bodies
-		String tmpDense = _output.codegen(false, api) + getOutputStatement(_output.getVarname(), false);
+		String tmpDense = _output.codegen(false, api) + getOutputStatement(_output.getVarname());
 		_output.resetGenerated();
-		String tmpSparse = DMLScript.SPARSE_INTERMEDIATE ?
-				_output.codegen(true, api) + getOutputStatement(_output.getVarname(), true) :
-				_output.codegen(true, api) + getOutputStatement(_output.getVarname(), false);
+		String tmpSparse = _output.codegen(true, api) + getOutputStatement(_output.getVarname());
 		_output.resetGenerated();
 		String varName = createVarname();
 		tmp = tmp.replace(api.isJava()?"%TMP%":"//%TMP%", varName);
@@ -158,7 +156,7 @@ private static final String TEMPLATE_ROWAGG_OUT_CUDA  = "\t\tif(threadIdx.x == 0
 	}
 	
 	@SuppressWarnings("fallthrough")
-	private String getOutputStatement(String varName, boolean sparse) {
+	private String getOutputStatement(String varName) {
 		switch( _type ) {
 			case NO_AGG:
 				if(api == GeneratorAPI.CUDA)
@@ -167,7 +165,7 @@ private static final String TEMPLATE_ROWAGG_OUT_CUDA  = "\t\tif(threadIdx.x == 0
 			case NO_AGG_CONST:
 				if(api == GeneratorAPI.JAVA)
 					return TEMPLATE_NOAGG_OUT.replace("%IN%", varName).replace("%LEN%",
-							_output.getVarname().startsWith("STMP") && _output.getDataType().isMatrix() && sparse ? _output.getVarname()+".size()" : _output.getVarname()+".length");
+							_output.getVarname().startsWith("STMP") ? _output.getVarname()+".size()" : _output.getVarname()+".length");
 				else
 					return TEMPLATE_NOAGG_CONST_OUT_CUDA.replace("%IN%", varName + ".vals(0)").replaceAll("%LEN%", _output.getVarname()+".length");
 			case FULL_AGG:
