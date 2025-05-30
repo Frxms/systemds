@@ -2191,19 +2191,19 @@ public class LibSpoofPrimitives
 	}
 
 	public static SparseRowVector vectDivWrite(int len, double[] a, double bval, int[] aix, int ai, int alen) {
-		double init = 0;
-		if (bval != 0) {
+		//todo: can i just do nothing, when deviding through zero?
+//		if (bval != 0) {
 			SparseRowVector c = allocSparseVector(alen);
 			for( int j = ai; j < ai+alen; j++ )
 				c.set(aix[j], a[j] / bval);
 			return c;
-		} else {
-			init = Double.NaN;
-			double[] c = allocVector(len, true, init);
-			for( int j = ai; j < ai+alen; j++ )
-				c[aix[j]] = a[j] / bval;
-			return new SparseRowVector(c);
-		}
+//		} else {
+//			double init = Double.NaN;
+//			double[] c = allocVector(len, true, init);
+//			for( int j = ai; j < ai+alen; j++ )
+//				c[aix[j]] = a[j] / bval;
+//			return new SparseRowVector(c);
+//		}
 	}
 
 	public static SparseRowVector vectDivWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
