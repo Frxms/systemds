@@ -1278,12 +1278,12 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 		}
 	}
 
+
 	/**
-	 *
 	 * @param type
-	 * @return true, when the matching method has a sparse return
+	 * @return {@code true}, when the matching method has a sparse return
 	 */
-	public static boolean getOutputType(BinType type) {
+	private static boolean getOutputType(BinType type) {
 		switch(type) {
 			case VECT_EQUAL:
 			case VECT_LESSEQUAL:
@@ -1295,13 +1295,12 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 	}
 
 	/**
-	 *
 	 * @param type
-	 * @return returns -1, for normal testing;<br>
-	 *         returns 0, for testing with 0 and non-zeros;<br>
-	 *         returns 1, for testing with negative and positive numbers;
+	 * @return returns {@code -1}, for normal testing;<br>
+	 *         returns {@code 0}, for testing with 0 and non-zeros;<br>
+	 *         returns {@code 1}, for testing with negative and positive numbers;
 	 */
-	public static int getTestType(BinType type) {
+	private static int getTestType(BinType type) {
 		switch(type) {
 			case VECT_DIV_SCALAR:
 			case VECT_EQUAL_SCALAR:
