@@ -37,16 +37,7 @@ public class SparseRowPerfTest {
 		for(int k = 0; k < testSize; k++) {
 			PrimitivesTest tester = new PrimitivesTest(m, n, sparsityVals[k]);
 			System.out.println("Sparsity: " + sparsityVals[k] + "; rl: " + m + "; cl: " + n);
-
-
-
-			TimingUtils.time(() -> tester.sparseTest(BinType.VECT_DIV, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE), warmupRuns);
-			TimingUtils.time(() -> tester.denseTest(BinType.VECT_DIV, InputType.VECTOR_SPARSE, InputType.VECTOR_DENSE), warmupRuns);
-
-			double[] sparseResults = TimingUtils.time(() -> tester.sparseTest(BinType.VECT_DIV, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE), repetitions);
-			double[] denseResults = TimingUtils.time(() -> tester.denseTest(BinType.VECT_DIV, InputType.VECTOR_SPARSE, InputType.VECTOR_DENSE), repetitions);
-			System.out.println("Sparse calculation: " + TimingUtils.stats(sparseResults));
-			System.out.println("Dense calculation " + TimingUtils.stats(denseResults));
+			tester.primitiveTester(BinType.VECT_DIV_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR, warmupRuns, repetitions);
 		}
 	}
 
