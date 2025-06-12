@@ -1,14 +1,11 @@
 package org.apache.sysds.performance.primitives;
 
 import org.apache.sysds.hops.codegen.cplan.CNodeBinary.BinType;
-import org.apache.sysds.performance.TimingUtils;
-import org.apache.sysds.runtime.data.SparseBlockMCSR;
-import org.apache.sysds.runtime.matrix.data.MatrixBlock;
-import org.apache.sysds.runtime.util.DataConverter;
-import org.apache.sysds.test.TestUtils;
 import org.apache.sysds.test.component.codegen.CPlanVectorPrimitivesTest.InputType;
 
-import static org.apache.sysds.runtime.codegen.LibSpoofPrimitives.vectDivWrite;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 public class SparseRowPerfTest {
 
@@ -20,7 +17,7 @@ public class SparseRowPerfTest {
 	private final double maxSparsity;
 
 	public SparseRowPerfTest() {
-		this(1000, 10000, 50, 1000, 0.39, 5);
+		this(1000, 10000, 100, 1000, 0.1, 5);
 	}
 
 	public SparseRowPerfTest(int rl, int cl, int warmupRuns, int repetitions, double sparsity, int testSize) {
@@ -33,15 +30,20 @@ public class SparseRowPerfTest {
 	}
 
 	private void testPrimitivePerf() {
-		double[] sparsityVals = sparsityValues(false);
+		double[] sparsityVals = sparsityValues(false, true);
+		String[] sparseResults = new String[testSize];
+		String[] denseResults = new String[testSize];
 		for(int k = 0; k < testSize; k++) {
 			PrimitivesTest tester = new PrimitivesTest(m, n, sparsityVals[k]);
-			System.out.println("Sparsity: " + sparsityVals[k] + "; rl: " + m + "; cl: " + n);
-			tester.primitiveTester(BinType.VECT_DIV_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR, warmupRuns, repetitions);
+			String[] results = tester.primitiveTester(BinType.VECT_DIV_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR, warmupRuns, repetitions);
+			sparseResults[k] = results[0];
+			denseResults[k] = results[1];
 		}
+		logResults(sparsityVals, sparseResults, true);
+		logResults(sparsityVals, denseResults, false);
 	}
 
-	private double[] sparsityValues(boolean exp) {
+	private double[] sparsityValues(boolean exp, boolean linear) {
 		double[] sparsity = new double[testSize];
 		double currVal = maxSparsity;
 		if(exp) {
@@ -50,13 +52,37 @@ public class SparseRowPerfTest {
 				currVal = currVal * Math.exp(-1*i);
 			}
 			sparsity[testSize-1] = currVal * Math.exp(-1*testSize-1);
-		}else {
+		}else if(linear){
+			for(int i = 0; i < testSize; i++) {
+				sparsity[i] = currVal;
+				currVal -= 0.01;
+			}
+		} else {
 			for(int i = 0; i < testSize; i++) {
 				sparsity[i] = currVal;
 				currVal /= 3;
 			}
 		}
 		return sparsity;
+	}
+
+	public void logResults(double[] sparsityVals, String[] result, boolean sparse) {
+		String fileName = sparse ? "linearGrading_sparse_" : "linearGrading_dense_";
+		PrintWriter writer = null;
+		try {
+			writer = new PrintWriter(new FileWriter("C:\\Users\\tomok\\OneDrive - Technische Universität Berlin\\Bachelorarbeit\\performance\\results\\"
+				+ fileName + BinType.VECT_DIV_SCALAR.name() + ".csv"));
+		}
+		catch(IOException e) {
+			throw new RuntimeException(e);
+		}
+		writer.printf("Repetitions: %1$2s, rl: %2$2s, cl: %3$2s%n", repetitions, m, n);
+		writer.printf("%1$2s;%2$2s%n", "Sparsity", "time in ms");
+		for(int i = 0; i < testSize; i++) {
+			writer.printf("%.3f;%2$2s%n", sparsityVals[i], result[i]);
+		}
+		writer.flush();
+		writer.close();
 	}
 
 	public static void main(String[] args) {

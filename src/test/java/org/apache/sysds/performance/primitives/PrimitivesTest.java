@@ -30,8 +30,9 @@ public class PrimitivesTest {
 		this.sparsity2 = sparsity;
 	}
 
-	public void primitiveTester(BinType binType, InputType inputType1, InputType inputType2, int warmupRuns, int repetitions) {
+	public String[] primitiveTester(BinType binType, InputType inputType1, InputType inputType2, int warmupRuns, int repetitions) {
 		getMatrices(inputType1, inputType2);
+		System.out.println("Sparsity: " + sparsity2 + "; rl: " + m + "; cl: " + n);
 
 		TimingUtils.time(() -> sparseTest(binType, inputType1, inputType2), warmupRuns);
 		TimingUtils.time(() -> denseTest(binType, inputType1, inputType2), warmupRuns);
@@ -39,8 +40,12 @@ public class PrimitivesTest {
 		double[] sparseResults = TimingUtils.time(() -> sparseTest(binType, inputType1, inputType2), repetitions);
 		double[] denseResults = TimingUtils.time(() -> denseTest(binType, inputType1, inputType2), repetitions);
 
+		String sparseTime = TimingUtils.stats(sparseResults).split("\\+-")[0];
+		String denseTime = TimingUtils.stats(denseResults).split("\\+-")[0];
+
 		System.out.println("Sparse calculation: " + TimingUtils.stats(sparseResults));
 		System.out.println("Dense calculation " + TimingUtils.stats(denseResults));
+		return new String[] {sparseTime, denseTime};
 	}
 
 	private void sparseTest(BinType binType, InputType inputType1, InputType inputType2) {
