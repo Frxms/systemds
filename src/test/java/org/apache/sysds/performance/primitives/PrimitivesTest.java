@@ -35,6 +35,9 @@ public class PrimitivesTest {
 		getMatrices(inputType1, inputType2);
 		System.out.println("Sparsity: " + sparsity2 + "; rl: " + m + "; cl: " + n);
 
+		setupThreadLocalMemory(1, n);
+		setupSparseThreadLocalMemory(1, (int) (n*sparsity2), -1);
+
 		TimingUtils.time(() -> sparseTest(binType, inputType1, inputType2), warmupRuns);
 		TimingUtils.time(() -> denseTest(binType, inputType1, inputType2), warmupRuns);
 
@@ -43,6 +46,9 @@ public class PrimitivesTest {
 
 		String sparseTime = TimingUtils.stats(sparseResults).split("\\+-")[0];
 		String denseTime = TimingUtils.stats(denseResults).split("\\+-")[0];
+
+		cleanupThreadLocalMemory();
+		cleanupSparseThreadLocalMemory();
 
 		System.out.println("Sparse calculation: " + TimingUtils.stats(sparseResults));
 		System.out.println("Dense calculation " + TimingUtils.stats(denseResults));
