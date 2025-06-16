@@ -1,5 +1,6 @@
 package org.apache.sysds.performance.primitives;
 
+import com.esotericsoftware.kryo.io.Input;
 import org.apache.sysds.hops.codegen.cplan.CNodeBinary.BinType;
 import org.apache.sysds.performance.TimingUtils;
 import org.apache.sysds.runtime.data.DenseBlock;
@@ -8,7 +9,7 @@ import org.apache.sysds.runtime.matrix.data.MatrixBlock;
 import org.apache.sysds.runtime.util.DataConverter;
 import org.apache.sysds.test.TestUtils;
 import org.apache.sysds.test.component.codegen.CPlanVectorPrimitivesTest.InputType;
-import static org.apache.sysds.runtime.codegen.LibSpoofPrimitives.vectDivWrite;
+import static org.apache.sysds.runtime.codegen.LibSpoofPrimitives.*;
 
 public class PrimitivesTest {
 
@@ -51,14 +52,21 @@ public class PrimitivesTest {
 	private void sparseTest(BinType binType, InputType inputType1, InputType inputType2) {
 		switch(binType) {
 			case VECT_DIV_SCALAR -> {
-				if((inputType1 == InputType.SCALAR)) {
-					runSparseDivTest(inputType2, true);
-				}
-				else {
-					runSparseDivTest(inputType1, false);
+				if(inputType1 == InputType.SCALAR) {
+					runSparseDivTestSV();
+				}else {
+					runSparseDivTestVS();
 				}
 			}
-			case VECT_DIV -> {runSparseDivTest(inputType1, inputType2);}
+			case VECT_DIV -> {runSparseDivTest();}
+			case VECT_MULT_SCALAR -> {
+				if(inputType1 == InputType.SCALAR) {
+					break;
+				}else {
+					runSparseMultTestVS();
+				}
+			}
+			case VECT_MULT -> {runSparseMultTest();}
 		}
 	}
 
@@ -66,47 +74,79 @@ public class PrimitivesTest {
 		switch(binType) {
 			case VECT_DIV_SCALAR -> {
 				if((inputType1 == InputType.SCALAR)) {
-					runDenseDivTest(inputType2, true);
+					runDenseDivTestSV();
 				}
 				else {
-					runDenseDivTest(inputType1, false);
+					runDenseDivTestVS();
 				}
 			}
-			case VECT_DIV -> {runDenseDivTest(inputType1, inputType2);}
+			case VECT_DIV -> {runDenseDivTest();}
+			case VECT_MULT_SCALAR -> {
+				if(inputType1 == InputType.SCALAR) {
+					break;
+				} else {
+					runDenseMultTestVS();
+				}
+			}
+			case VECT_MULT -> {runDenseMultTest();}
 		}
 	}
 
-	private void runSparseDivTest(InputType inputType1, InputType inputType2) {
+	private void runSparseDivTest() {
 		for(int j = 0; j < m; j++)
 			vectDivWrite(n, sparseInA.values(j), sparseInB.values(j),
 				sparseInA.indexes(j), sparseInB.indexes(j), sparseInA.pos(j),
 				sparseInB.pos(j), sparseInA.size(j), sparseInB.size(j));
 	}
 
-	private void runSparseDivTest(InputType inputType, boolean scalarVector) {
-		if(scalarVector) {
-			for(int j = 0; j < m; j++)
-				vectDivWrite(n, scalar, sparseInB.values(j), sparseInB.indexes(j), sparseInB.pos(j), sparseInB.size(j));
-		}else {
-			for(int j = 0; j < m; j++)
-				vectDivWrite(n, sparseInA.values(j), scalar, sparseInA.indexes(j), sparseInA.pos(j), sparseInA.size(j));
+	private void runSparseMultTest() {
+		for(int j = 0; j < m; j++) {
+			vectMultWrite(n, sparseInA.values(j), sparseInB.values(j),
+				sparseInA.indexes(j), sparseInB.indexes(j), sparseInA.pos(j),
+				sparseInB.pos(j), sparseInA.size(j), sparseInB.size(j));
 		}
 	}
 
-	private void runDenseDivTest(InputType inputType1, InputType inputType2) {
+	private void runSparseDivTestSV() {
+		for(int j = 0; j < m; j++)
+			vectDivWrite(n, scalar, sparseInB.values(j), sparseInB.indexes(j), sparseInB.pos(j), sparseInB.size(j));
+	}
+
+	public void runSparseDivTestVS() {
+		for(int j = 0; j < m; j++)
+			vectDivWrite(n, sparseInA.values(j), scalar, sparseInA.indexes(j), sparseInA.pos(j), sparseInA.size(j));
+	}
+
+	private void runSparseMultTestVS() {
+		for(int j = 0; j < m; j++)
+			vectMultWrite(n, sparseInA.values(j), scalar, sparseInA.indexes(j), sparseInA.pos(j), sparseInA.size(j));
+	}
+
+	private void runDenseDivTest() {
 		for(int j = 0; j < m; j++)
 			vectDivWrite(sparseInA.values(j), denseIn.values(j),
 				sparseInA.indexes(j), sparseInA.pos(j), 0, sparseInA.size(j), n);
 	}
 
-	private void runDenseDivTest(InputType inputType, boolean scalarVector) {
-		if(scalarVector) {
-			for(int j = 0; j < m; j++)
-				vectDivWrite(scalar, sparseInB.values(j), sparseInB.indexes(j), sparseInB.pos(j), sparseInB.size(j), n);
-		}else {
-			for(int j = 0; j < m; j++)
-				vectDivWrite(sparseInA.values(j), scalar,
-					sparseInA.indexes(j), sparseInA.pos(j), sparseInA.size(j), n);
+	private void runDenseMultTest() {
+		for(int j = 0; j < m; j++)
+			vectMultWrite(sparseInA.values(j), denseIn.values(j),
+				sparseInA.indexes(j), sparseInA.pos(j), 0, sparseInA.size(j), n);
+	}
+
+	private void runDenseDivTestSV() {
+		for(int j = 0; j < m; j++)
+			vectDivWrite(scalar, sparseInB.values(j), sparseInB.indexes(j), sparseInB.pos(j), sparseInB.size(j), n);
+	}
+
+	private void runDenseDivTestVS() {
+		for(int j = 0; j < m; j++)
+			vectDivWrite(sparseInA.values(j), scalar, sparseInA.indexes(j), sparseInA.pos(j), sparseInA.size(j), n);
+	}
+
+	private void runDenseMultTestVS() {
+		for(int j = 0; j < m; j++) {
+			vectMultWrite(sparseInA.values(j), scalar, sparseInA.indexes(j), sparseInA.pos(j), sparseInA.size(j), n);
 		}
 	}
 
