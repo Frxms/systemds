@@ -67,6 +67,14 @@ public class PrimitivesTest {
 				}
 			}
 			case VECT_MULT -> {runSparseMultTest();}
+			case VECT_MIN_SCALAR -> {
+				if(inputType1 == InputType.SCALAR) {
+					runSparseMinTestSV();
+				}else {
+					runSparseMinTestVS();
+				}
+			}
+			case VECT_MIN -> {runSparseMinTest();}
 		}
 	}
 
@@ -89,6 +97,14 @@ public class PrimitivesTest {
 				}
 			}
 			case VECT_MULT -> {runDenseMultTest();}
+			case VECT_MIN_SCALAR -> {
+				if(inputType1 == InputType.SCALAR) {
+					runDenseMinTestSV();
+				}else {
+					runDenseMinTestVS();
+				}
+			}
+			case VECT_MIN -> {runDenseMinTest();}
 		}
 	}
 
@@ -100,16 +116,27 @@ public class PrimitivesTest {
 	}
 
 	private void runSparseMultTest() {
-		for(int j = 0; j < m; j++) {
+		for(int j = 0; j < m; j++)
 			vectMultWrite(n, sparseInA.values(j), sparseInB.values(j),
 				sparseInA.indexes(j), sparseInB.indexes(j), sparseInA.pos(j),
 				sparseInB.pos(j), sparseInA.size(j), sparseInB.size(j));
-		}
+	}
+
+	private void runSparseMinTest() {
+		for(int j = 0; j < m; j++)
+			vectMinWrite(n, sparseInA.values(j), sparseInB.values(j),
+				sparseInA.indexes(j), sparseInB.indexes(j), sparseInA.pos(j),
+				sparseInB.pos(j), sparseInA.size(j), sparseInB.size(j));
 	}
 
 	private void runSparseDivTestSV() {
 		for(int j = 0; j < m; j++)
 			vectDivWrite(n, scalar, sparseInB.values(j), sparseInB.indexes(j), sparseInB.pos(j), sparseInB.size(j));
+	}
+
+	private void runSparseMinTestSV() {
+		for(int j = 0; j < m; j++)
+			vectMinWrite(n, scalar, sparseInB.values(j), sparseInB.indexes(j), sparseInB.pos(j), sparseInB.size(j));
 	}
 
 	public void runSparseDivTestVS() {
@@ -120,6 +147,11 @@ public class PrimitivesTest {
 	private void runSparseMultTestVS() {
 		for(int j = 0; j < m; j++)
 			vectMultWrite(n, sparseInA.values(j), scalar, sparseInA.indexes(j), sparseInA.pos(j), sparseInA.size(j));
+	}
+
+	private void runSparseMinTestVS() {
+		for(int j = 0; j < m; j++)
+			vectMinWrite(n, sparseInA.values(j), scalar, sparseInA.indexes(j), sparseInA.pos(j), sparseInA.size(j));
 	}
 
 	private void runDenseDivTest() {
@@ -134,9 +166,20 @@ public class PrimitivesTest {
 				sparseInA.indexes(j), sparseInA.pos(j), 0, sparseInA.size(j), n);
 	}
 
+	private void runDenseMinTest() {
+		for(int j = 0; j < m; j++)
+			vectMinWrite(sparseInA.values(j), denseIn.values(j),
+				sparseInA.indexes(j), sparseInA.pos(j), 0, sparseInA.size(j), n);
+	}
+
 	private void runDenseDivTestSV() {
 		for(int j = 0; j < m; j++)
 			vectDivWrite(scalar, sparseInB.values(j), sparseInB.indexes(j), sparseInB.pos(j), sparseInB.size(j), n);
+	}
+
+	private void runDenseMinTestSV() {
+		for(int j = 0; j < m; j++)
+			vectMinWrite(scalar, sparseInB.values(j), sparseInB.indexes(j), sparseInB.pos(j), sparseInB.size(j), n);
 	}
 
 	private void runDenseDivTestVS() {
@@ -145,9 +188,13 @@ public class PrimitivesTest {
 	}
 
 	private void runDenseMultTestVS() {
-		for(int j = 0; j < m; j++) {
+		for(int j = 0; j < m; j++)
 			vectMultWrite(sparseInA.values(j), scalar, sparseInA.indexes(j), sparseInA.pos(j), sparseInA.size(j), n);
-		}
+	}
+
+	private void runDenseMinTestVS() {
+		for(int j = 0; j < m; j++)
+			vectMultWrite(sparseInA.values(j), scalar, sparseInA.indexes(j), sparseInA.pos(j), sparseInA.size(j), n);
 	}
 
 	public void getMatrices(InputType inputType1, InputType inputType2) {
@@ -155,10 +202,10 @@ public class PrimitivesTest {
 		double sparsityB = (inputType2 == InputType.VECTOR_DENSE) ? sparsity1 : sparsity2;
 		double[][] A = TestUtils.generateTestMatrix(m, n, -5, 5, sparsityA, 1251);
 		double[][] B = TestUtils.generateTestMatrix(m, n, -5, 5, sparsityB, 532);
+		double[][] D = TestUtils.generateTestMatrix(m, n, -5, 5, sparsityA, 1251);
 		MatrixBlock mA = DataConverter.convertToMatrixBlock(A);
 		MatrixBlock mB = DataConverter.convertToMatrixBlock(B);
-		MatrixBlock mC = DataConverter.convertToMatrixBlock(A);
-		MatrixBlock mD = DataConverter.convertToMatrixBlock(B);
+		MatrixBlock mD = DataConverter.convertToMatrixBlock(D);
 
 		if(inputType1 == InputType.SCALAR)
 			scalar = mA.max();
@@ -172,6 +219,8 @@ public class PrimitivesTest {
 			mB.denseToSparse(true);
 		sparseInB = new SparseBlockMCSR(mB.getSparseBlock());
 
+		if(mD.isInSparseFormat())
+			mD.sparseToDense();
 		denseIn = mD.getDenseBlock();
 	}
 }
