@@ -36,7 +36,7 @@ public class PrimitivesTest {
 		System.out.println("Sparsity: " + sparsity2 + "; rl: " + m + "; cl: " + n);
 
 		setupThreadLocalMemory(1, n);
-		setupSparseThreadLocalMemory(1, (int) (n*sparsity2), -1);
+		setupSparseThreadLocalMemory(1, (int) (n*sparsity2 + 100*sparsity2), -1);
 
 		TimingUtils.time(() -> sparseTest(binType, inputType1, inputType2), warmupRuns);
 		TimingUtils.time(() -> denseTest(binType, inputType1, inputType2), warmupRuns);

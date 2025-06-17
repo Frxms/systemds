@@ -77,7 +77,7 @@ public class SparseRowPerfTest {
 		PrintWriter writer = null;
 		try {
 			writer = new PrintWriter(new FileWriter("C:\\Users\\tomok\\OneDrive - Technische Universität Berlin\\Bachelorarbeit\\performance\\results\\"
-				+ "afterAlloc" + (sparse ? "sparse" : "dense") + sparsityType + binType.name() + ".csv"));
+				+ currDate + "_" + (sparse ? "sparse" : "dense") + "_" + sparsityType + "_" + binType.name() + ".csv"));
 		}
 		catch(IOException e) {
 			throw new RuntimeException(e);
