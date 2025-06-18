@@ -92,8 +92,6 @@ public class SparseRowPerfTest {
 	}
 
 	public static void main(String[] args) {
-		new SparseRowPerfTest().testPrimitivePerf(BinType.VECT_XOR_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR);
-		new SparseRowPerfTest().testPrimitivePerf(BinType.VECT_XOR_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE);
-		new SparseRowPerfTest().testPrimitivePerf(BinType.VECT_XOR, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
+		new SparseRowPerfTest().testPrimitivePerf(BinType.VECT_POW_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR);
 	}
 }

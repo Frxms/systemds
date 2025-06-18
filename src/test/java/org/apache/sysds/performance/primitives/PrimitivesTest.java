@@ -91,6 +91,7 @@ public class PrimitivesTest {
 			case VECT_XOR -> {runSparseXorTest();}
 			case VECT_MINUS  -> runSparseMinusTest();
 			case VECT_PLUS -> runSparsePlusTest();
+			case VECT_POW_SCALAR -> runSparsePowTest();
 		}
 	}
 
@@ -131,6 +132,7 @@ public class PrimitivesTest {
 			case VECT_XOR -> {runDenseXorTest();}
 			case VECT_MINUS  -> runDenseMinusTest();
 			case VECT_PLUS -> runDensePlusTest();
+			case VECT_POW_SCALAR -> runDensePowTest();
 		}
 	}
 
@@ -211,6 +213,11 @@ public class PrimitivesTest {
 			vectXorWrite(n, sparseInA.values(j), scalar, sparseInA.indexes(j), sparseInA.pos(j), sparseInA.size(j));
 	}
 
+	private void runSparsePowTest() {
+		for(int j = 0; j < m; j++)
+			vectPowWrite(n, sparseInA.values(j), scalar, sparseInA.indexes(j), sparseInA.pos(j), sparseInA.size(j));
+	}
+
 	private void runDenseDivTest() {
 		for(int j = 0; j < m; j++)
 			vectDivWrite(sparseInA.values(j), denseIn.values(j),
@@ -280,6 +287,11 @@ public class PrimitivesTest {
 	private void runDenseXorTestVS() {
 		for(int j = 0; j < m; j++)
 			vectXorWrite(sparseInA.values(j), scalar, sparseInA.indexes(j), sparseInA.pos(j), sparseInA.size(j), n);
+	}
+
+	private void runDensePowTest() {
+		for(int j = 0; j < m; j++)
+			vectPowWrite(sparseInA.values(j), scalar, sparseInA.indexes(j), sparseInA.pos(j), sparseInA.size(j), n);
 	}
 
 	public void getMatrices(InputType inputType1, InputType inputType2) {
