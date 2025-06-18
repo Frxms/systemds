@@ -20,7 +20,7 @@ public class SparseRowPerfTest {
 	private String sparsityType;
 
 	public SparseRowPerfTest() {
-		this(500, 10000, 100, 2500, 0.1, 1);
+		this(750, 10000, 100, 100, 0.1, 1);
 	}
 
 	public SparseRowPerfTest(int rl, int cl, int warmupRuns, int repetitions, double sparsity, int testSize) {
@@ -92,6 +92,8 @@ public class SparseRowPerfTest {
 	}
 
 	public static void main(String[] args) {
-		new SparseRowPerfTest().testPrimitivePerf(BinType.VECT_POW_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR);
+		new SparseRowPerfTest().testPrimitivePerf(BinType.VECT_NOTEQUAL_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR);
+		new SparseRowPerfTest().testPrimitivePerf(BinType.VECT_NOTEQUAL_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE);
+		new SparseRowPerfTest().testPrimitivePerf(BinType.VECT_NOTEQUAL, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 	}
 }
