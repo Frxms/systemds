@@ -81,6 +81,7 @@ public class PrimitivesTest {
 				}
 			}
 			case VECT_MIN -> {runSparseMinTest();}
+			case VECT_MINUS  -> runSparseMinusTest();
 		}
 	}
 
@@ -111,28 +112,36 @@ public class PrimitivesTest {
 				}
 			}
 			case VECT_MIN -> {runDenseMinTest();}
+			case VECT_MINUS  -> runDenseMinusTest();
 		}
 	}
 
 	private void runSparseDivTest() {
 		for(int j = 0; j < m; j++)
-			vectDivWrite(n, sparseInA.values(j), sparseInB.values(j),
-				sparseInA.indexes(j), sparseInB.indexes(j), sparseInA.pos(j),
-				sparseInB.pos(j), sparseInA.size(j), sparseInB.size(j));
+			vectDivWrite(n,
+				sparseInA.values(j), sparseInB.values(j), sparseInA.indexes(j), sparseInB.indexes(j),
+				sparseInA.pos(j), sparseInB.pos(j), sparseInA.size(j), sparseInB.size(j));
 	}
 
 	private void runSparseMultTest() {
 		for(int j = 0; j < m; j++)
-			vectMultWrite(n, sparseInA.values(j), sparseInB.values(j),
-				sparseInA.indexes(j), sparseInB.indexes(j), sparseInA.pos(j),
-				sparseInB.pos(j), sparseInA.size(j), sparseInB.size(j));
+			vectMultWrite(n,
+				sparseInA.values(j), sparseInB.values(j), sparseInA.indexes(j), sparseInB.indexes(j),
+				sparseInA.pos(j), sparseInB.pos(j), sparseInA.size(j), sparseInB.size(j));
 	}
 
 	private void runSparseMinTest() {
 		for(int j = 0; j < m; j++)
-			vectMinWrite(n, sparseInA.values(j), sparseInB.values(j),
-				sparseInA.indexes(j), sparseInB.indexes(j), sparseInA.pos(j),
-				sparseInB.pos(j), sparseInA.size(j), sparseInB.size(j));
+			vectMinWrite(n,
+				sparseInA.values(j), sparseInB.values(j), sparseInA.indexes(j), sparseInB.indexes(j),
+				sparseInA.pos(j), sparseInB.pos(j), sparseInA.size(j), sparseInB.size(j));
+	}
+
+	private void runSparseMinusTest() {
+		for(int j = 0; j < m; j++)
+			vectMinusWrite(n,
+				sparseInA.values(j), sparseInB.values(j), sparseInA.indexes(j), sparseInB.indexes(j),
+				sparseInA.pos(j), sparseInB.pos(j), sparseInA.size(j), sparseInB.size(j));
 	}
 
 	private void runSparseDivTestSV() {
@@ -175,6 +184,12 @@ public class PrimitivesTest {
 	private void runDenseMinTest() {
 		for(int j = 0; j < m; j++)
 			vectMinWrite(sparseInA.values(j), denseIn.values(j),
+				sparseInA.indexes(j), sparseInA.pos(j), 0, sparseInA.size(j), n);
+	}
+
+	private void runDenseMinusTest() {
+		for(int j = 0; j < m; j++)
+			vectMinusWrite(sparseInA.values(j), denseIn.values(j),
 				sparseInA.indexes(j), sparseInA.pos(j), 0, sparseInA.size(j), n);
 	}
 
