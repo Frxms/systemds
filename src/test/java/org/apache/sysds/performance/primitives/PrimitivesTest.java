@@ -357,7 +357,7 @@ public class PrimitivesTest {
 			scalar = mA.max();
 		else if(inputType2 == InputType.SCALAR)
 			scalar = mB.max();
-//		scalar = 0;
+//		scalar = -1;
 
 		if(!mA.isInSparseFormat())
 			mA.denseToSparse(true);
