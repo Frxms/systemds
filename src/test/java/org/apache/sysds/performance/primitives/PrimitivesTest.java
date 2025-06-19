@@ -100,6 +100,14 @@ public class PrimitivesTest {
 				}
 			}
 			case VECT_NOTEQUAL -> runSparseNotequalTest();
+			case VECT_LESS_SCALAR -> {
+				if(inputType1 == InputType.SCALAR) {
+					runSparseLessTestSV();
+				}else {
+					runSparseLessTestVS();
+				}
+			}
+			case VECT_LESS -> runSparseLessTest();
 		}
 	}
 
@@ -149,6 +157,14 @@ public class PrimitivesTest {
 				}
 			}
 			case VECT_NOTEQUAL -> runDenseNotequalTest();
+			case VECT_LESS_SCALAR -> {
+				if(inputType1 == InputType.SCALAR) {
+					runDenseLessTestSV();
+				}else {
+					runDenseLessTestVS();
+				}
+			}
+			case VECT_LESS -> runDenseLessTest();
 		}
 	}
 
@@ -201,6 +217,13 @@ public class PrimitivesTest {
 				sparseInA.pos(j), sparseInB.pos(j), sparseInA.size(j), sparseInB.size(j));
 	}
 
+	private void runSparseLessTest() {
+		for(int j = 0; j < m; j++)
+			vectLessWrite(n,
+				sparseInA.values(j), sparseInB.values(j), sparseInA.indexes(j), sparseInB.indexes(j),
+				sparseInA.pos(j), sparseInB.pos(j), sparseInA.size(j), sparseInB.size(j));
+	}
+
 	private void runSparseDivTestSV() {
 		for(int j = 0; j < m; j++)
 			vectDivWrite(n, scalar, sparseInB.values(j), sparseInB.indexes(j), sparseInB.pos(j), sparseInB.size(j));
@@ -219,6 +242,11 @@ public class PrimitivesTest {
 	private void runSparseNotequalTestSV() {
 		for(int j = 0; j < m; j++)
 			vectNotequalWrite(n, scalar, sparseInB.values(j), sparseInB.indexes(j), sparseInB.pos(j), sparseInB.size(j));
+	}
+
+	private void runSparseLessTestSV() {
+		for(int j = 0; j < m; j++)
+			vectLessWrite(n, scalar, sparseInB.values(j), sparseInB.indexes(j), sparseInB.pos(j), sparseInB.size(j));
 	}
 
 	public void runSparseDivTestVS() {
@@ -244,6 +272,11 @@ public class PrimitivesTest {
 	private void runSparseNotequalTestVS() {
 		for(int j = 0; j < m; j++)
 			vectNotequalWrite(n, sparseInA.values(j), scalar, sparseInA.indexes(j), sparseInA.pos(j), sparseInA.size(j));
+	}
+
+	private void runSparseLessTestVS() {
+		for(int j = 0; j < m; j++)
+			vectLessWrite(n, sparseInA.values(j), scalar, sparseInA.indexes(j), sparseInA.pos(j), sparseInA.size(j));
 	}
 
 	private void runSparsePowTest() {
@@ -293,6 +326,12 @@ public class PrimitivesTest {
 				sparseInA.indexes(j), sparseInA.pos(j), 0, sparseInA.size(j), n);
 	}
 
+	private void runDenseLessTest() {
+		for(int j = 0; j < m; j++)
+			vectLessWrite(sparseInA.values(j), denseIn.values(j),
+				sparseInA.indexes(j), sparseInA.pos(j), 0, sparseInA.size(j), n);
+	}
+
 	private void runDenseDivTestSV() {
 		for(int j = 0; j < m; j++)
 			vectDivWrite(scalar, sparseInB.values(j), sparseInB.indexes(j), sparseInB.pos(j), sparseInB.size(j), n);
@@ -311,6 +350,11 @@ public class PrimitivesTest {
 	private void runDenseNotequalTestSV() {
 		for(int j = 0; j < m; j++)
 			vectNotequalWrite(scalar, sparseInB.values(j), sparseInB.indexes(j), sparseInB.pos(j), sparseInB.size(j), n);
+	}
+
+	private void runDenseLessTestSV() {
+		for(int j = 0; j < m; j++)
+			vectLessWrite(scalar, sparseInB.values(j), sparseInB.indexes(j), sparseInB.pos(j), sparseInB.size(j), n);
 	}
 
 	private void runDenseDivTestVS() {
@@ -336,6 +380,11 @@ public class PrimitivesTest {
 	private void runDenseNotequalTestVS() {
 		for(int j = 0; j < m; j++)
 			vectNotequalWrite(sparseInA.values(j), scalar, sparseInA.indexes(j), sparseInA.pos(j), sparseInA.size(j), n);
+	}
+
+	private void runDenseLessTestVS() {
+		for(int j = 0; j < m; j++)
+			vectLessWrite(sparseInA.values(j), scalar, sparseInA.indexes(j), sparseInA.pos(j), sparseInA.size(j), n);
 	}
 
 	private void runDensePowTest() {
