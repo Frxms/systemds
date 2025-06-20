@@ -20,7 +20,7 @@ public class SparseRowPerfTest {
 	private String sparsityType;
 
 	public SparseRowPerfTest() {
-		this(2000, 10000, 100, 2500, 0.23, 21);
+		this(2000, 10000, 100, 2500, 0.1, 4);
 	}
 
 	public SparseRowPerfTest(int rl, int cl, int warmupRuns, int repetitions, double sparsity, int testSize) {
@@ -33,7 +33,7 @@ public class SparseRowPerfTest {
 	}
 
 	private void testPrimitivePerf(BinType binType, InputType input1, InputType input2) {
-		double[] sparsityVals = sparsityValues(false, true);
+		double[] sparsityVals = sparsityValues(false, false);
 		String[] sparseResults = new String[testSize];
 		String[] denseResults = new String[testSize];
 		for(int k = 0; k < testSize; k++) {
@@ -92,9 +92,9 @@ public class SparseRowPerfTest {
 	}
 
 	public static void main(String[] args) {
-//		new SparseRowPerfTest().testPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR);
-//		new SparseRowPerfTest().testPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE);
-//		new SparseRowPerfTest().testPrimitivePerf(BinType.VECT_DIV, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
+		new SparseRowPerfTest().testPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR);
+		new SparseRowPerfTest().testPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE);
+		new SparseRowPerfTest().testPrimitivePerf(BinType.VECT_DIV, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 		new SparseRowPerfTest().testPrimitivePerf(BinType.VECT_MINUS, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
 		new SparseRowPerfTest().testPrimitivePerf(BinType.VECT_MIN_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR);
 		new SparseRowPerfTest().testPrimitivePerf(BinType.VECT_MIN_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE);
