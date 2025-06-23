@@ -224,6 +224,14 @@ public class PrimitivesTest {
 				sparseInA.pos(j), sparseInB.pos(j), sparseInA.size(j), sparseInB.size(j));
 	}
 
+	public void runSparseDivBranchTest() {
+		for(int j = 0; j < m; j++) {
+			vectDivWriteB(n,
+				sparseInA.values(j), sparseInB.values(j), sparseInA.indexes(j), sparseInB.indexes(j),
+				sparseInA.pos(j), sparseInB.pos(j), sparseInA.size(j), sparseInB.size(j));
+		}
+	}
+
 	private void runSparseDivTestSV() {
 		for(int j = 0; j < m; j++)
 			vectDivWrite(n, scalar, sparseInB.values(j), sparseInB.indexes(j), sparseInB.pos(j), sparseInB.size(j));
