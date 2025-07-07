@@ -1,6 +1,7 @@
 package org.apache.sysds.performance.primitives;
 
 import org.apache.sysds.hops.codegen.cplan.CNodeBinary.BinType;
+import org.apache.sysds.hops.codegen.cplan.CNodeUnary.UnaryType;
 import org.apache.sysds.test.component.codegen.CPlanVectorPrimitivesTest.InputType;
 
 import java.io.FileWriter;
@@ -20,7 +21,7 @@ public class SparseRowPerfTest {
 	private String sparsityType;
 
 	public SparseRowPerfTest() {
-		this(2000, 10000, 100, 2500, 1, 7);
+		this(2000, 10000, 100, 2500, 0.4, 10);
 	}
 
 	public SparseRowPerfTest(int rl, int cl, int warmupRuns, int repetitions, double sparsity, int testSize) {
@@ -32,18 +33,32 @@ public class SparseRowPerfTest {
 		this.testSize = testSize;
 	}
 
-	private void testPrimitivePerf(BinType binType, InputType input1, InputType input2) {
+	private void testBinaryPrimitivePerf(BinType binType, InputType input1, InputType input2) {
 		double[] sparsityVals = sparsityValues(false, false);
 		String[] sparseResults = new String[testSize];
 		String[] denseResults = new String[testSize];
 		for(int k = 0; k < testSize; k++) {
-			PrimitivesTest tester = new PrimitivesTest(m, n, sparsityVals[k]);
+			BinaryPrimitivesTest tester = new BinaryPrimitivesTest(m, n, sparsityVals[k]);
 			String[] results = tester.primitiveTester(binType, input1, input2, warmupRuns, repetitions);
 			sparseResults[k] = results[0];
 			denseResults[k] = results[1];
 		}
 		logResults(sparsityVals, sparseResults, true, binType);
 		logResults(sparsityVals, denseResults, false, binType);
+	}
+
+	public void testUnaryPrimitivePerf(UnaryType uType, InputType input1) {
+		double[] sparsityVals = sparsityValues(false, true);
+		String[] sparseResults = new String[testSize];
+		String[] denseResults = new String[testSize];
+		for(int k = 0; k < testSize; k++) {
+			UnaryPrimitivesTest tester = new UnaryPrimitivesTest(m, n, sparsityVals[k]);
+			String[] results = tester.primitiveTester(uType, input1, warmupRuns, repetitions);
+			sparseResults[k] = results[0];
+			denseResults[k] = results[1];
+		}
+		logResults(sparsityVals, sparseResults, true, uType);
+		logResults(sparsityVals, denseResults, false, uType);
 	}
 
 	private double[] sparsityValues(boolean exp, boolean linear) {
@@ -91,8 +106,28 @@ public class SparseRowPerfTest {
 		writer.close();
 	}
 
+	public void logResults(double[] sparsityVals, String[] result, boolean sparse, UnaryType uType) {
+		String currDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyy_HHmmss"));
+		PrintWriter writer = null;
+		try {
+			writer = new PrintWriter(new FileWriter("C:\\Users\\tomok\\OneDrive - Technische Universität Berlin\\Bachelorarbeit\\performance\\results\\"
+				+ currDate + "_" + (sparse ? "sparse" : "dense") + "_" + sparsityType + "_" + uType.name() + ".csv"));
+		}
+		catch(IOException e) {
+			throw new RuntimeException(e);
+		}
+		writer.printf("%4$s Repetitions: %1$2s, rl: %2$2s, cl: %3$2s%n", repetitions, m, n, uType.name());
+		writer.printf("%1$2s;%2$2s%n", "Sparsity", "time in ms");
+		for(int i = 0; i < testSize; i++) {
+			writer.printf("%.3f;%2$2s%n", sparsityVals[i], result[i]);
+		}
+		writer.flush();
+		writer.close();
+	}
+
 	public static void main(String[] args) {
-		new SparseRowPerfTest().testPrimitivePerf(BinType.VECT_DIV, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
-		new SparseRowPerfTest().testPrimitivePerf(BinType.VECT_MULT, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
+//		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
+//		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_MULT, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE);
+		new SparseRowPerfTest().testUnaryPrimitivePerf(UnaryType.VECT_SQRT, InputType.VECTOR_SPARSE);
 	}
 }
