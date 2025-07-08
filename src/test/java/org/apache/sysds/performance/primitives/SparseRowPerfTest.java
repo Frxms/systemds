@@ -87,6 +87,22 @@ public class SparseRowPerfTest {
 		return sparsity;
 	}
 
+	private int[] rowsValues() {
+		int[] rows = new int[3];
+		rows[0] = m;
+		rows[1] = (int) Math.sqrt(m*n);
+		rows[2] = n;
+		return rows;
+	}
+
+	private int[] colsValues() {
+		int[] cols = new int[3];
+		cols[0] = n;
+		cols[1] = (int) Math.sqrt(m*n);
+		cols[2] = m;
+		return cols;
+	}
+
 	public void logResults(double[] sparsityVals, String[] result, boolean sparse, BinType binType) {
 		String currDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyy_HHmmss"));
 		PrintWriter writer = null;
