@@ -61,7 +61,11 @@ public class TypicalExpressionTest extends AutomatedTestBase {
 
 			String HOME = SCRIPT_DIR + TEST_DIR;
 			fullDMLScriptName = HOME + TEST_NAME + ".dml";
-			programArgs = new String[]{"-explain","-args", input("A"), input("B"), output("C")};
+			if(sparseRowVec)
+				programArgs = new String[]{"-explain", "codegen", "-sparseIntermediate", "-args", input("A"), input("B"), output("C")};
+			else
+				programArgs = new String[]{"-explain", "codegen", "-args", input("A"), input("B"), output("C")};
+
 
 			fullRScriptName = HOME + TEST_NAME + ".R";
 			rCmd = "Rscript" + " " + fullRScriptName + " " + inputDir() + " " + expectedDir();
@@ -69,8 +73,10 @@ public class TypicalExpressionTest extends AutomatedTestBase {
 			//get a random matrix of values with
 			double[][] A = getRandomMatrix(rows, cols, 1, 31, sparse ? sparsity1 : sparsity2, 1234);
 			double[][] B = getRandomMatrix(rows, cols, 1, 31, sparse ? sparsity1 : sparsity2, 5678);
+			double[][] C = getRandomMatrix(1, cols, 1, 31, sparse ? sparsity1 : sparsity2, 9876);
 			writeInputMatrixWithMTD("A", A, true);
 			writeInputMatrixWithMTD("B", B, true);
+			writeInputMatrixWithMTD("v", C, true);
 
 			//run tests
 			runTest(true, false, null, -1);
