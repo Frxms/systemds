@@ -23,10 +23,10 @@ A = read($1);
 B = read($2);
 v = read($3);
 
-# C = A*rowSums(A*B)
-# C = A*rowSums(B*v)*A
-C = (A*v)/rowSums(A*v)
-# C = abs((A*v)/rowSums(A*v))
+# S = A*rowSums(A*B)
+# S = A*rowSums(B*v)*A
+# S = (A*v)/rowSums(A*v)
+S = abs((A*v)/rowSums(A*v))
 
-write(C, $4);
+write(S, $4);
 
