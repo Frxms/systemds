@@ -23,7 +23,8 @@ A = read($1);
 B = read($2);
 v = read($3);
 
-C = X*rowSums(B*v)*A
+# C = A*rowSums(A*B)
+C = A*rowSums(B*v)*A
 # C = (A*v)/rowSums(A*v)
 # C = abs((A*v)/rowSums(A*v))
 

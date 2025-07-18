@@ -7,7 +7,6 @@ import org.apache.sysds.runtime.matrix.data.MatrixValue;
 import org.apache.sysds.test.AutomatedTestBase;
 import org.apache.sysds.test.TestConfiguration;
 import org.apache.sysds.test.TestUtils;
-import org.apache.sysds.test.functions.binary.matrix.ElementwiseBitwLogicalTest;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -19,11 +18,11 @@ public class TypicalExpressionTest extends AutomatedTestBase {
 	private static final String TEST_NAME = "expression";
 	private static final String TEST_NAME1 = TEST_NAME+"1";
 
-	private static final String TEST_DIR = "functions/binary/matrix/";
-	private static final String TEST_CLASS_DIR = TEST_DIR + ElementwiseBitwLogicalTest.class.getSimpleName() + "/";
+	private static final String TEST_DIR = "performance/primitives/";
+	private static final String TEST_CLASS_DIR = TEST_DIR + TypicalExpressionTest.class.getSimpleName() + "/";
 
-	private final static int rows = 2000;
-	private final static int cols = 10000;
+	private final static int rows = 500;
+	private final static int cols = 1000;
 	private final static double sparsity1 = 0.9;
 	private final static double sparsity2 = 0.1;
 	private final static double eps = 1e-10;
@@ -62,9 +61,11 @@ public class TypicalExpressionTest extends AutomatedTestBase {
 			String HOME = SCRIPT_DIR + TEST_DIR;
 			fullDMLScriptName = HOME + TEST_NAME + ".dml";
 			if(sparseRowVec)
-				programArgs = new String[]{"-explain", "codegen", "-sparseIntermediate", "-args", input("A"), input("B"), output("C")};
+				programArgs = new String[]{"-explain", "codegen", "-sparseIntermediate", "-args",
+					input("A"), input("B"), input("v"), output("C")};
 			else
-				programArgs = new String[]{"-explain", "codegen", "-args", input("A"), input("B"), output("C")};
+				programArgs = new String[]{"-explain", "codegen", "-args",
+					input("A"), input("B"), input("v"), output("C")};
 
 
 			fullRScriptName = HOME + TEST_NAME + ".R";
@@ -73,10 +74,10 @@ public class TypicalExpressionTest extends AutomatedTestBase {
 			//get a random matrix of values with
 			double[][] A = getRandomMatrix(rows, cols, 1, 31, sparse ? sparsity1 : sparsity2, 1234);
 			double[][] B = getRandomMatrix(rows, cols, 1, 31, sparse ? sparsity1 : sparsity2, 5678);
-			double[][] C = getRandomMatrix(1, cols, 1, 31, sparse ? sparsity1 : sparsity2, 9876);
+			double[][] V = getRandomMatrix(1, cols, 1, 31, sparse ? sparsity1 : sparsity2, 9876);
 			writeInputMatrixWithMTD("A", A, true);
 			writeInputMatrixWithMTD("B", B, true);
-			writeInputMatrixWithMTD("v", C, true);
+			writeInputMatrixWithMTD("V", V, true);
 
 			//run tests
 			runTest(true, false, null, -1);
