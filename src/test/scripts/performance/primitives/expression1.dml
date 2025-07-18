@@ -24,9 +24,9 @@ B = read($2);
 v = read($3);
 
 # C = A*rowSums(A*B)
-C = A*rowSums(B*v)*A
-# C = (A*v)/rowSums(A*v)
+# C = A*rowSums(B*v)*A
+C = (A*v)/rowSums(A*v)
 # C = abs((A*v)/rowSums(A*v))
 
-write(C, $3);
+write(C, $4);
 

@@ -26,11 +26,11 @@ library("Matrix")
 
 A <- readMM(paste(args[1], "A.mtx", sep=""))
 B <- readMM(paste(args[1], "B.mtx", sep=""))
-v <- readMM(paste(args[1], "v.mtx", sep=""))
+v <- readMM(paste(args[1], "v.mtx", sep=""))[1]
 
 # C = A*rowSums(A*B)
-C = A*rowSums(B*v[1])*A
-# C = (A*v)/rowSums(A*v)
+# C = A*rowSums(B*v)*A
+C = (A*v)/rowSums(A*v)
 # C = abs((A*v)/rowSums(A*v))
 
 writeMM(as(C, "CsparseMatrix"), paste(args[2], "C", sep=""));
