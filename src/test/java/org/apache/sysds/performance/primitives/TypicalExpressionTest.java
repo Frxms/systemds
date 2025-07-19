@@ -61,13 +61,13 @@ public class TypicalExpressionTest extends AutomatedTestBase {
 			fullDMLScriptName = HOME + TEST_NAME1 + ".dml";
 			if(sparseRowVec)
 				programArgs = new String[]{"-explain", "codegen", "-sparseIntermediate", "-args",
-					input("A"), input("B"), input("v"), output("S")};
+					input("A"), input("B"), input("V"), output("S")};
 			else
 				programArgs = new String[]{"-explain", "codegen", "-args",
-					input("A"), input("B"), input("v"), output("S")};
+					input("A"), input("B"), input("V"), output("S")};
 
 
-			fullRScriptName = HOME + TEST_NAME + ".R";
+			fullRScriptName = HOME + TEST_NAME1 + ".R";
 			rCmd = "Rscript" + " " + fullRScriptName + " " + inputDir() + " " + expectedDir();
 
 			//get a random matrix of values with

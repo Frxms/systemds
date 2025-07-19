@@ -21,12 +21,11 @@
 
 args <- commandArgs(TRUE)
 options(digits=22)
-
 library("Matrix")
 
 A <- as.matrix(readMM(paste(args[1], "A.mtx", sep="")))
 B <- as.matrix(readMM(paste(args[1], "B.mtx", sep="")))
-v <- as.vector(readMM(paste(args[1], "v.mtx", sep="")))
+v <- as.vector(readMM(paste(args[1], "V.mtx", sep="")))
 
 # S = A*rowSums(A*B)
 # S = A*rowSums(B*v)*A
