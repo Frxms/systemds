@@ -30,8 +30,8 @@ v <- as.vector(readMM(paste(args[1], "v.mtx", sep="")))
 
 # S = A*rowSums(A*B)
 # S = A*rowSums(B*v)*A
-# S = (A*v)/rowSums(A*v)
-S = abs((A*v)/rowSums(A*v))
+S = (A*v)/rowSums(A*v)
+# S = abs((A*v)/rowSums(A*v))
 
 writeMM(as(S, "CsparseMatrix"), paste(args[2], "S", sep=""));
 

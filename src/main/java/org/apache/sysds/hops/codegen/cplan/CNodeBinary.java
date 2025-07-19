@@ -244,8 +244,8 @@ public class CNodeBinary extends CNode {
 	}
 
 	private boolean getTemplateType(double sparsityEst, double scalarVal) {
-		if(!DMLScript.SPARSE_INTERMEDIATE)
-			return false;
+		if(DMLScript.SPARSE_INTERMEDIATE)
+			return true;
 		else {
 			switch(_type) {
 				case VECT_MULT: return sparsityEst < 0.008;

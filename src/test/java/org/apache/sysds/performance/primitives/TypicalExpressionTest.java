@@ -71,9 +71,9 @@ public class TypicalExpressionTest extends AutomatedTestBase {
 			rCmd = "Rscript" + " " + fullRScriptName + " " + inputDir() + " " + expectedDir();
 
 			//get a random matrix of values with
-			double[][] A = getRandomMatrix(rows, cols, 1, 31, sparse ? sparsity1 : sparsity2, 1234);
-			double[][] B = getRandomMatrix(rows, cols, 1, 31, sparse ? sparsity1 : sparsity2, 5678);
-			double[][] V = getRandomMatrix(1, cols, 1, 31, sparse ? sparsity1 : sparsity2, 9876);
+			double[][] A = getRandomMatrix(rows, cols, 1, 31, sparse ? sparsity2 : sparsity1, 1234);
+			double[][] B = getRandomMatrix(rows, cols, 1, 31, sparse ? sparsity2 : sparsity1, 5678);
+			double[][] V = getRandomMatrix(rows, 1, 1, 31, sparse ? sparsity2 : sparsity1, 9876);
 			writeInputMatrixWithMTD("A", A, true);
 			writeInputMatrixWithMTD("B", B, true);
 			writeInputMatrixWithMTD("V", V, true);
