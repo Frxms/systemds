@@ -21,14 +21,15 @@
 
 args <- commandArgs(TRUE)
 options(digits=22)
-
 library("Matrix")
 
-A <- readMM(paste(args[1], "A.mtx", sep=""))
-B <- readMM(paste(args[1], "B.mtx", sep=""))
+A <- as.matrix(readMM(paste(args[1], "A.mtx", sep="")))
+B <- as.matrix(readMM(paste(args[1], "B.mtx", sep="")))
+v <- as.vector(readMM(paste(args[1], "V.mtx", sep="")))
 
-C = bitwShiftL(as.vector(A), as.vector(B));
-C = matrix(C, nrow(A), ncol(A));
+# S = A*rowSums(A*B)
+# S = A*rowSums(B*v)*A
+S = (A*v)/rowSums(A*v)
+# S = abs((A*v)/rowSums(A*v))
 
-writeMM(as(C, "CsparseMatrix"), paste(args[2], "C", sep=""));
 

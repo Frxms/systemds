@@ -124,7 +124,7 @@ public class CNodeUnary extends CNode
 			((_inputs.get(0) instanceof CNodeData
 				&& _inputs.get(0).getVarname().startsWith("a")
 				&& !_inputs.get(0).isLiteral())
-				|| (sparseTemplate && _inputs.get(0).getVarname().startsWith("STMP")));
+				|| _inputs.get(0).getVarname().startsWith("STMP"));
 		String var = createVarname(sparseTemplate && lsparse && getOutputType());
 		String tmp = getLanguageTemplateClass(this, api).getTemplate(_type, lsparse);
 		tmp = tmp.replaceAll("%TMP%", var);
@@ -143,8 +143,8 @@ public class CNodeUnary extends CNode
 	}
 
 	public boolean getTemplateType(double sparsity) {
-		if(!DMLScript.SPARSE_INTERMEDIATE)
-			return false;
+		if(DMLScript.SPARSE_INTERMEDIATE)
+			return true;
 		else {
 			switch(_type) {
 				case VECT_SQRT:
