@@ -833,6 +833,11 @@ public class RowAggTmplTest extends AutomatedTestBase
 		testCodegenIntegration( TEST_NAME49, false, ExecType.CP );
 	}
 
+	@Test
+	public void testCodegenRowAgg49SP() {
+		testCodegenIntegration( TEST_NAME49, false, ExecType.SPARK );
+	}
+
 	private void testCodegenIntegration( String testname, boolean rewrites, ExecType instType )
 	{
 		boolean oldFlag = OptimizerUtils.ALLOW_ALGEBRAIC_SIMPLIFICATION;

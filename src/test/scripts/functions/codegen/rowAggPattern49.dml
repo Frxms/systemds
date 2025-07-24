@@ -48,5 +48,7 @@ S = X*rowSums(K*v)*X
 # S = X*rowSums(X*K)
 # S = rowSums((X*v)/K)*v
 # S = (K*v)/(rowSums(X*v))
+# test ternary impl
+# R = X*rowSums(K*v)*X - K[,1] - rowSums(K);
 
 write(S,$1)
