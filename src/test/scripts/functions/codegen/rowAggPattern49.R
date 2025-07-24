@@ -49,6 +49,8 @@ S = X*rowSums(K*v)*X
 # S = X*rowSums(X*K)
 # S = rowSums((X*v)/K)*v
 # S = (K*v)/(rowSums(X*v))
+# test ternary impl
+# R = X*rowSums(K*v)*X - K[,1] - rowSums(K);
 
 
 writeMM(as(S, "CsparseMatrix"), paste(args[2], "S", sep=""));

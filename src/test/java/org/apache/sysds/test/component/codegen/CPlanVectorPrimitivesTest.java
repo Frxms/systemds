@@ -46,7 +46,7 @@ public class CPlanVectorPrimitivesTest extends AutomatedTestBase
 	private static final double sparsity2 = 0.09;
 	private static final double eps = Math.pow(10, -10);
 	
-	private enum InputType {
+	public enum InputType {
 		SCALAR,
 		VECTOR_DENSE,
 		VECTOR_SPARSE,

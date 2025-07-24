@@ -19,36 +19,17 @@
 #
 #-------------------------------------------------------------
 
-W = matrix(seq(28,29), 1, 2)
-J = matrix(0, 1, 8)
-Z= cbind(J, W, J)
-Y = matrix(0, 10, 18)
-X = rbind(Z, Y, Y, Y, Y, Y, Y, Y, Y)
-v = seq(1,81)
-v1 = seq(20, 37)
-W = matrix(seq(13,14), 1, 2)
-J = matrix(0, 1, 8)
-Z= cbind(J, W, J)
-Y = matrix(0, 10, 18)
-K = rbind(Z, Y, Y, Y, Y, Y, Y, Y, Y)
+args <- commandArgs(TRUE)
+options(digits=22)
+library("Matrix")
 
-# B = X < rowSums(X*K)
-# S = abs(21) * B
-# S = B * rowSums(v)
+A <- as.matrix(readMM(paste(args[1], "A.mtx", sep="")))
+B <- as.matrix(readMM(paste(args[1], "B.mtx", sep="")))
+v <- as.vector(readMM(paste(args[1], "V.mtx", sep="")))
 
-# S = (X < rowSums(X*K))
-# S = X*(k>1)*X
-S = X*rowSums(K*v)*X
-# S = (X*v)/rowSums(X*v)
-# S = abs((X*v)/rowSums(X*v))
-# S = (X/v)+rowMeans(X-v)
-# S = (X*v)+rowSums(X*v)
-# S = (X*rowSums(X*v))/(X*v)
+# S = A*rowSums(A*B)
+# S = A*rowSums(B*v)*A
+S = (A*v)/rowSums(A*v)
+# S = abs((A*v)/rowSums(A*v))
 
-# S = X*rowSums(X*K)
-# S = rowSums((X*v)/K)*v
-# S = (K*v)/(rowSums(X*v))
-# test ternary impl
-# R = X*rowSums(K*v)*X - K[,1] - rowSums(K);
 
-write(S,$1)
