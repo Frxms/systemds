@@ -829,7 +829,9 @@ public class RowAggTmplTest extends AutomatedTestBase
 	}
 
 	@Test
-	public void testCodegenRowAgg49CP() {testCodegenIntegration( TEST_NAME49, false, ExecType.CP );}
+	public void testCodegenRowAgg49CP() {
+		testCodegenIntegration( TEST_NAME49, false, ExecType.CP );
+	}
 
 	private void testCodegenIntegration( String testname, boolean rewrites, ExecType instType )
 	{
