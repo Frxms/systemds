@@ -76,7 +76,7 @@ public class Binary extends CodeTemplate {
 					return sparseRhs ? "    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1%, %IN2v%, %IN2i%, %POS2%, alen, %LEN%);\n" :
 						"    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1%, %IN2%, %POS2%, %LEN%);\n";
 				else if(sparseTemplate) {
-					return sparseLhs ? "    SparseRowVector %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%LEN%, %IN1v%, %IN2%, %IN1i%, %POS1%, %LEN1%);\n" :
+					return sparseLhs ? "    SparseRowVector %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%LEN%, %IN1v%, %IN2%, %IN1i%, %POS1%, %SLEN1%);\n" :
 						"    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1%, %IN2%, %POS1%, %LEN%);\n";
 				} else {
 					return sparseLhs ? "    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1v%, %IN2%, %IN1i%, %POS1%, alen, %LEN%);\n" :
@@ -97,11 +97,11 @@ public class Binary extends CodeTemplate {
 				String vectName = type.getVectorPrimitiveName();
 				if(scalarVector) {
 					if(sparseRhs)
-						return sparseTemplate ? "    SparseRowVector %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%LEN%, %IN1%, %IN2v%, %IN2i%, %POS2%, %LEN1%);\n" :
+						return sparseTemplate ? "    SparseRowVector %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%LEN%, %IN1%, %IN2v%, %IN2i%, %POS2%, %SLEN1%);\n" :
 							"    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1%, %IN2v%, %IN2i%, %POS2%, alen, %LEN%);\n";
 				} else {
 					if(sparseLhs)
-						return sparseTemplate ? "    SparseRowVector %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%LEN%, %IN1v%, %IN2%, %IN1i%, %POS1%, %LEN1%);\n" :
+						return sparseTemplate ? "    SparseRowVector %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%LEN%, %IN1v%, %IN2%, %IN1i%, %POS1%, %SLEN1%);\n" :
 							"    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1v%, %IN2%, %IN1i%, %POS1%, alen, %LEN%);\n";
 				}
 				return 	"    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1%, %IN2%, %POS1%, %LEN%);\n";
@@ -145,7 +145,7 @@ public class Binary extends CodeTemplate {
 			case VECT_GREATER:{
 				String vectName = type.getVectorPrimitiveName();
 				if(sparseTemplate && sparseLhs && sparseRhs) {
-					return "    SparseRowVector %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%LEN%, %IN1v%, %IN2v%, %IN1i%, %IN2i%, %POS1%, %POS2%, %LEN1%, %LEN2%);\n";
+					return "    SparseRowVector %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%LEN%, %IN1v%, %IN2v%, %IN1i%, %IN2i%, %POS1%, %POS2%, %SLEN1%, %SLEN2%);\n";
 				} else {
 					return sparseLhs ?
 						"    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1v%, %IN2%, %IN1i%, %POS1%, %POS2%, alen, %LEN%);\n" :
@@ -159,7 +159,7 @@ public class Binary extends CodeTemplate {
 			case VECT_GREATEREQUAL: {
 				String vectName = type.getVectorPrimitiveName();
 				if(sparseTemplate && sparseLhs && sparseRhs) {
-					return "    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%LEN%, %IN1v%, %IN2v%, %IN1i%, %IN2i%, %POS1%, %POS2%, %LEN1%, %LEN2%);\n";
+					return "    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%LEN%, %IN1v%, %IN2v%, %IN1i%, %IN2i%, %POS1%, %POS2%, %SLEN1%, %SLEN2%);\n";
 				} else {
 					return sparseLhs ?
 						"    double[] %TMP% = LibSpoofPrimitives.vect"+vectName+"Write(%IN1v%, %IN2%, %IN1i%, %POS1%, %POS2%, alen, %LEN%);\n" :
