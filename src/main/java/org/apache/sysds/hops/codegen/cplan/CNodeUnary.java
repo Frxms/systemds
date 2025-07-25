@@ -143,7 +143,7 @@ public class CNodeUnary extends CNode
 	}
 
 	public boolean getTemplateType(double sparsity) {
-		if(!DMLScript.SPARSE_INTERMEDIATE)
+		if(DMLScript.SPARSE_INTERMEDIATE)
 			return true;
 		else {
 			switch(_type) {
