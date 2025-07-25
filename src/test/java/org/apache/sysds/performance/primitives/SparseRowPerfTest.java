@@ -53,8 +53,8 @@ public class SparseRowPerfTest {
 			sparseResults[k] = results[0];
 			denseResults[k] = results[1];
 		}
-		logResults(testType, sparseResults, true, binType);
-		logResults(testType, denseResults, false, binType);
+//		logResults(testType, sparseResults, true, binType);
+//		logResults(testType, denseResults, false, binType);
 	}
 
 	public void testUnaryPrimitivePerf(UnaryType uType, InputType input1) {

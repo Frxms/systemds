@@ -66,7 +66,7 @@ public class BinaryPrimitivesTest {
 			case VECT_DIV -> {runSparseDivTest();}
 			case VECT_MULT_SCALAR -> {
 				if(inputType1 == InputType.SCALAR) {
-					break;
+					runSparseMultTestSV();
 				}else {
 					runSparseMultTestVS();
 				}
@@ -234,6 +234,11 @@ public class BinaryPrimitivesTest {
 	private void runSparseDivTestSV() {
 		for(int i = 0; i < m; i++)
 			vectDivWrite(n, scalar, sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i));
+	}
+
+	private void runSparseMultTestSV() {
+		for(int i = 0; i < m; i++)
+			vectMultWrite(n, scalar, sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i));
 	}
 
 	private void runSparseMinTestSV() {
