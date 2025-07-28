@@ -25,7 +25,7 @@ public class SparseRowPerfTest {
 	boolean testType;
 
 	public SparseRowPerfTest() {
-		this(2000, 4000, 100, 2500, 0.1, 3, false);
+		this(5000, 10000, 100, 2500, 1, 7, true);
 	}
 
 	public SparseRowPerfTest(int rl, int cl, int warmupRuns, int repetitions, double sparsity, int testSize, boolean testType) {
@@ -38,16 +38,16 @@ public class SparseRowPerfTest {
 		this.testType = testType;
 	}
 
-	private void testBinaryPrimitivePerf(BinType binType, InputType input1, InputType input2) {
+	private void testBinaryPrimitivePerf(BinType binType, InputType input1, InputType input2, boolean branching) {
 		chooseTestType(testType);
 		String[] sparseResults = new String[testSize];
 		String[] denseResults = new String[testSize];
 		for(int k = 0; k < testSize; k++) {
 			BinaryPrimitivesTest tester;
 			if(testType)
-				 tester = new BinaryPrimitivesTest(m, n, sparsityVals[k]);
+				 tester = new BinaryPrimitivesTest(m, n, sparsityVals[k], branching);
 			else
-				tester = new BinaryPrimitivesTest(rows[k], cols[k], maxSparsity);
+				tester = new BinaryPrimitivesTest(rows[k], cols[k], maxSparsity, branching);
 
 			String[] results = tester.primitiveTester(binType, input1, input2, warmupRuns, repetitions);
 			sparseResults[k] = results[0];
@@ -168,8 +168,8 @@ public class SparseRowPerfTest {
 	}
 
 	public static void main(String[] args) {
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_MULT_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR);
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR);
+		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, true);
+		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, false);
 //		new SparseRowPerfTest().testUnaryPrimitivePerf(UnaryType.VECT_SQRT, InputType.VECTOR_SPARSE);
 	}
 }

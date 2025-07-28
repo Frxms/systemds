@@ -17,6 +17,7 @@ public class BinaryPrimitivesTest {
 	private final double sparsity2;
 	private final int m;
 	private final int n;
+	private final boolean branching;
 
 	private SparseBlockMCSR sparseInA;
 	private SparseBlockMCSR sparseInB;
@@ -24,10 +25,11 @@ public class BinaryPrimitivesTest {
 	private double scalar;
 
 
-	public BinaryPrimitivesTest(int rl, int cl, double sparsity) {
+	public BinaryPrimitivesTest(int rl, int cl, double sparsity, boolean branching) {
 		m = rl;
 		n = cl;
 		this.sparsity2 = sparsity;
+		this.branching = branching;
 	}
 
 	public String[] primitiveTester(BinType binType, InputType inputType1, InputType inputType2, int warmupRuns, int repetitions) {
@@ -63,7 +65,12 @@ public class BinaryPrimitivesTest {
 					runSparseDivTestVS();
 				}
 			}
-			case VECT_DIV -> {runSparseDivTest();}
+			case VECT_DIV -> {
+				if(branching)
+					runSparseDivBranchingTest();
+				else
+					runSparseDivTest();
+			}
 			case VECT_MULT_SCALAR -> {
 				if(inputType1 == InputType.SCALAR) {
 					runSparseMultTestSV();
@@ -107,6 +114,7 @@ public class BinaryPrimitivesTest {
 				}
 			}
 			case VECT_LESS -> runSparseLessTest();
+			case VECT_EQUAL -> runSparseEqualTest();
 		}
 	}
 
@@ -164,6 +172,7 @@ public class BinaryPrimitivesTest {
 				}
 			}
 			case VECT_LESS -> runDenseLessTest();
+			case VECT_EQUAL -> runSparseEqualTest();
 		}
 	}
 
@@ -223,12 +232,19 @@ public class BinaryPrimitivesTest {
 				sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
 	}
 
-	public void runSparseDivBranchTest() {
+	public void runSparseDivBranchingTest() {
 		for(int i = 0; i < m; i++) {
 			vectDivWriteB(n,
 				sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
 				sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
 		}
+	}
+
+	private void runSparseEqualTest() {
+		for(int i = 0; i < m; i++)
+			vectEqualWrite(n,
+				sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
+				sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
 	}
 
 	private void runSparseDivTestSV() {
