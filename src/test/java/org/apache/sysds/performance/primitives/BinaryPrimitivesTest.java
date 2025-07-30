@@ -174,253 +174,311 @@ public class BinaryPrimitivesTest {
 
 	private void runSparseDivTest() {
 		for(int i = 0; i < m; i++)
-			vectDivWrite(n,
-				sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
-				sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
+			if(!sparseInA.isEmpty(i))
+				vectDivWrite(n,
+					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
+					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
 	}
 
 	private void runSparseMultTest() {
 		for(int i = 0; i < m; i++)
-			vectMultWrite(n,
-				sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
-				sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
+			if(!sparseInA.isEmpty(i))
+				vectMultWrite(n,
+					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
+					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
 	}
 
 	private void runSparseMinTest() {
 		for(int i = 0; i < m; i++)
-			vectMinWrite(n,
-				sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
-				sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
+			if(!sparseInA.isEmpty(i))
+				vectMinWrite(n,
+					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
+					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
 	}
 
 	private void runSparseMinusTest() {
 		for(int i = 0; i < m; i++)
-			vectMinusWrite(n,
-				sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
-				sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
+			if(!sparseInA.isEmpty(i))
+				vectMinusWrite(n,
+					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
+					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
 	}
 
 	private void runSparsePlusTest() {
 		for(int i = 0; i < m; i++)
-			vectPlusWrite(n,
-				sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
-				sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
+			if(!sparseInA.isEmpty(i))
+				vectPlusWrite(n,
+					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
+					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
 	}
 
 	private void runSparseXorTest() {
 		for(int i = 0; i < m; i++)
-			vectXorWrite(n,
-				sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
-				sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
+			if(!sparseInA.isEmpty(i))
+				vectXorWrite(n,
+					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
+					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
 	}
 
 	private void runSparseNotequalTest() {
 		for(int i = 0; i < m; i++)
-			vectNotequalWrite(n,
-				sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
-				sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
+			if(!sparseInA.isEmpty(i))
+				vectNotequalWrite(n,
+					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
+					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
 	}
 
 	private void runSparseLessTest() {
 		for(int i = 0; i < m; i++)
-			vectLessWrite(n,
-				sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
-				sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
+			if(!sparseInA.isEmpty(i))
+				vectLessWrite(n,
+					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
+					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
 	}
 
 	public void runSparseDivBranchingTest() {
 		for(int i = 0; i < m; i++) {
-			vectDivWriteB(n,
-				sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
-				sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
+			if(!sparseInA.isEmpty(i))
+				vectDivWriteB(n,
+					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
+					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
 		}
 	}
 
 	private void runSparseEqualTest() {
 		for(int i = 0; i < m; i++)
-			vectEqualWrite(n,
-				sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
-				sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
+			if(!sparseInA.isEmpty(i))
+				vectEqualWrite(n,
+					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
+					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
 	}
 
 	private void runSparseDivTestSV() {
 		for(int i = 0; i < m; i++)
-			vectDivWrite(n, scalar, sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i));
+			if(!sparseInB.isEmpty(i))
+				vectDivWrite(n, scalar,
+					sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i));
 	}
 
 	private void runSparseMultTestSV() {
 		for(int i = 0; i < m; i++)
-			vectMultWrite(n, scalar, sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i));
+			if(!sparseInB.isEmpty(i))
+				vectMultWrite(n, scalar,
+					sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i));
 	}
 
 	private void runSparseMinTestSV() {
 		for(int i = 0; i < m; i++)
-			vectMinWrite(n, scalar, sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i));
+			if(!sparseInB.isEmpty(i))
+				vectMinWrite(n, scalar,
+					sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i));
 	}
 
 	private void runSparseXorTestSV() {
 		for(int i = 0; i < m; i++)
-			vectXorWrite(n, scalar, sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i));
+			if(!sparseInB.isEmpty(i))
+				vectXorWrite(n, scalar,
+					sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i));
 	}
 
 	private void runSparseNotequalTestSV() {
 		for(int i = 0; i < m; i++)
-			vectNotequalWrite(n, scalar, sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i));
+			if(!sparseInB.isEmpty(i))
+				vectNotequalWrite(n, scalar,
+					sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i));
 	}
 
 	private void runSparseLessTestSV() {
 		for(int i = 0; i < m; i++)
-			vectLessWrite(n, scalar, sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i));
+			if(!sparseInB.isEmpty(i))
+				vectLessWrite(n, scalar,
+					sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i));
 	}
 
 	public void runSparseDivTestVS() {
 		for(int i = 0; i < m; i++)
-			vectDivWrite(n, sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i));
+			if(!sparseInA.isEmpty(i))
+				vectDivWrite(n,
+					sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i));
 	}
 
 	private void runSparseMultTestVS() {
 		for(int i = 0; i < m; i++)
-			vectMultWrite(n, sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i));
+			if(!sparseInA.isEmpty(i))
+				vectMultWrite(n,
+					sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i));
 	}
 
 	private void runSparseMinTestVS() {
 		for(int i = 0; i < m; i++)
-			vectMinWrite(n, sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i));
+			if(!sparseInA.isEmpty(i))
+				vectMinWrite(n,
+					sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i));
 	}
 
 	private void runSparseXorTestVS() {
 		for(int i = 0; i < m; i++)
-			vectXorWrite(n, sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i));
+			if(!sparseInA.isEmpty(i))
+				vectXorWrite(n,
+					sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i));
 	}
 
 	private void runSparseNotequalTestVS() {
 		for(int i = 0; i < m; i++)
-			vectNotequalWrite(n, sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i));
+			if(!sparseInA.isEmpty(i))
+				vectNotequalWrite(n,
+					sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i));
 	}
 
 	private void runSparseLessTestVS() {
 		for(int i = 0; i < m; i++)
-			vectLessWrite(n, sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i));
+			if(!sparseInA.isEmpty(i))
+				vectLessWrite(n,
+					sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i));
 	}
 
 	private void runSparsePowTest() {
 		for(int i = 0; i < m; i++)
-			vectPowWrite(n, sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i));
+			if(!sparseInA.isEmpty(i))
+				vectPowWrite(n,
+					sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i));
 	}
 
 	private void runDenseDivTest() {
 		for(int i = 0; i < m; i++)
-			vectDivWrite(sparseInA.values(i), denseIn.values(i),
-				sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
+			if(!sparseInA.isEmpty(i))
+				vectDivWrite(sparseInA.values(i), denseIn.values(i),
+					sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
 	}
 
 	private void runDenseMultTest() {
 		for(int i = 0; i < m; i++)
-			vectMultWrite(sparseInA.values(i), denseIn.values(i),
-				sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
+			if(!sparseInA.isEmpty(i))
+				vectMultWrite(sparseInA.values(i), denseIn.values(i),
+					sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
 	}
 
 	private void runDenseMinTest() {
 		for(int i = 0; i < m; i++)
-			vectMinWrite(sparseInA.values(i), denseIn.values(i),
-				sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
+			if(!sparseInA.isEmpty(i))
+				vectMinWrite(sparseInA.values(i), denseIn.values(i),
+					sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
 	}
 
 	private void runDenseMinusTest() {
 		for(int i = 0; i < m; i++)
-			vectMinusWrite(sparseInA.values(i), denseIn.values(i),
-				sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
+			if(!sparseInA.isEmpty(i))
+				vectMinusWrite(sparseInA.values(i), denseIn.values(i),
+					sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
 	}
 
 	private void runDensePlusTest() {
 		for(int i = 0; i < m; i++)
-			vectPlusWrite(sparseInA.values(i), denseIn.values(i),
-				sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
+			if(!sparseInA.isEmpty(i))
+				vectPlusWrite(sparseInA.values(i), denseIn.values(i),
+					sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
 	}
 
 	private void runDenseXorTest() {
 		for(int i = 0; i < m; i++)
-			vectXorWrite(sparseInA.values(i), denseIn.values(i),
-				sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
+			if(!sparseInA.isEmpty(i))
+				vectXorWrite(sparseInA.values(i), denseIn.values(i),
+					sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
 	}
 
 	private void runDenseNotequalTest() {
 		for(int i = 0; i < m; i++)
-			vectNotequalWrite(sparseInA.values(i), denseIn.values(i),
-				sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
+			if(!sparseInA.isEmpty(i))
+				vectNotequalWrite(sparseInA.values(i), denseIn.values(i),
+					sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
 	}
 
 	private void runDenseLessTest() {
 		for(int i = 0; i < m; i++)
-			vectLessWrite(sparseInA.values(i), denseIn.values(i),
-				sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
+			if(!sparseInA.isEmpty(i))
+				vectLessWrite(sparseInA.values(i), denseIn.values(i),
+					sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
 	}
 
 	private void runDenseEqualTest() {
 		for(int i = 0; i < m; i++)
-			vectEqualWrite(sparseInA.values(i), denseIn.values(i),
-				sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
+			if(!sparseInA.isEmpty(i))
+				vectEqualWrite(sparseInA.values(i), denseIn.values(i),
+					sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
 	}
 
 	private void runDenseDivTestSV() {
 		for(int i = 0; i < m; i++)
-			vectDivWrite(scalar, sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i), n);
+			if(!sparseInB.isEmpty(i))
+				vectDivWrite(scalar, sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i), n);
 	}
 
 	private void runDenseMinTestSV() {
 		for(int i = 0; i < m; i++)
-			vectMinWrite(scalar, sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i), n);
+			if(!sparseInB.isEmpty(i))
+				vectMinWrite(scalar, sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i), n);
 	}
 
 	private void runDenseXorTestSV() {
 		for(int i = 0; i < m; i++)
-			vectXorWrite(scalar, sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i), n);
+			if(!sparseInB.isEmpty(i))
+				vectXorWrite(scalar, sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i), n);
 	}
 
 	private void runDenseNotequalTestSV() {
 		for(int i = 0; i < m; i++)
-			vectNotequalWrite(scalar, sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i), n);
+			if(!sparseInB.isEmpty(i))
+				vectNotequalWrite(scalar, sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i), n);
 	}
 
 	private void runDenseLessTestSV() {
 		for(int i = 0; i < m; i++)
-			vectLessWrite(scalar, sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i), n);
+			if(!sparseInB.isEmpty(i))
+				vectLessWrite(scalar, sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i), n);
 	}
 
 	private void runDenseDivTestVS() {
 		for(int i = 0; i < m; i++)
-			vectDivWrite(sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i), n);
+			if(!sparseInA.isEmpty(i))
+				vectDivWrite(sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i), n);
 	}
 
 	private void runDenseMultTestVS() {
 		for(int i = 0; i < m; i++)
-			vectMultWrite(sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i), n);
+			if(!sparseInA.isEmpty(i))
+				vectMultWrite(sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i), n);
 	}
 
 	private void runDenseMinTestVS() {
 		for(int i = 0; i < m; i++)
-			vectMultWrite(sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i), n);
+			if(!sparseInA.isEmpty(i))
+				vectMinWrite(sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i), n);
 	}
 
 	private void runDenseXorTestVS() {
 		for(int i = 0; i < m; i++)
-			vectXorWrite(sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i), n);
+			if(!sparseInA.isEmpty(i))
+				vectXorWrite(sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i), n);
 	}
 
 	private void runDenseNotequalTestVS() {
 		for(int i = 0; i < m; i++)
-			vectNotequalWrite(sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i), n);
+			if(!sparseInA.isEmpty(i))
+				vectNotequalWrite(sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i), n);
 	}
 
 	private void runDenseLessTestVS() {
 		for(int i = 0; i < m; i++)
-			vectLessWrite(sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i), n);
+			if(!sparseInA.isEmpty(i))
+				vectLessWrite(sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i), n);
 	}
 
 	private void runDensePowTest() {
 		for(int i = 0; i < m; i++)
-			vectPowWrite(sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i), n);
+			if(!sparseInA.isEmpty(i))
+				vectPowWrite(sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i), n);
 	}
+
 
 	public void getMatrices(InputType inputType1, InputType inputType2) {
 		double sparsityA = (inputType1 == InputType.VECTOR_DENSE) ? sparsity1 : sparsity2;
