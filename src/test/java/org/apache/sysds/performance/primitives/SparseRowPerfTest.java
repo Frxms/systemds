@@ -222,7 +222,7 @@ public class SparseRowPerfTest {
 //		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR, TestType.HYBRID, SparsityType.SET);
 //		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE, TestType.HYBRID, SparsityType.SET);
 		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_EQUAL, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.HYBRID, SparsityType.SET);
-
+//		new BinaryPrimitivesTest().primitiveTester(5000, 10000, 0.0011, false, BinType.VECT_EQUAL, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, 100, 500);
 
 //		new SparseRowPerfTest().testUnaryPrimitivePerf(UnaryType.VECT_SQRT, InputType.VECTOR_SPARSE);
 	}
