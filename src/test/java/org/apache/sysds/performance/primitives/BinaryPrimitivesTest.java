@@ -33,7 +33,7 @@ public class BinaryPrimitivesTest {
 		System.out.println("Sparsity: " + sparsity2 + "; rl: " + m + "; cl: " + n);
 
 		setupThreadLocalMemory(1, n);
-		setupSparseThreadLocalMemory(1, (int) (n*sparsity2 + 100*sparsity2), -1);
+		setupSparseThreadLocalMemory(1, n, -1);
 
 		TimingUtils.time(() -> sparseTest(binType, inputType1, inputType2), warmupRuns);
 		TimingUtils.time(() -> denseTest(binType, inputType1, inputType2), warmupRuns);
@@ -52,6 +52,7 @@ public class BinaryPrimitivesTest {
 		return new String[] {sparseTime, denseTime};
 	}
 
+	//todo: change methods to receive all the necessary
 	private void sparseTest(BinType binType, InputType inputType1, InputType inputType2) {
 		switch(binType) {
 			case VECT_DIV_SCALAR -> {
@@ -174,7 +175,7 @@ public class BinaryPrimitivesTest {
 
 	private void runSparseDivTest() {
 		for(int i = 0; i < m; i++)
-			if(!sparseInA.isEmpty(i))
+			if(!sparseInA.isEmpty(i) && !sparseInB.isEmpty(i))
 				vectDivWrite(n,
 					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
 					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
@@ -182,7 +183,7 @@ public class BinaryPrimitivesTest {
 
 	private void runSparseMultTest() {
 		for(int i = 0; i < m; i++)
-			if(!sparseInA.isEmpty(i))
+			if(!sparseInA.isEmpty(i) && !sparseInB.isEmpty(i))
 				vectMultWrite(n,
 					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
 					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
@@ -190,7 +191,7 @@ public class BinaryPrimitivesTest {
 
 	private void runSparseMinTest() {
 		for(int i = 0; i < m; i++)
-			if(!sparseInA.isEmpty(i))
+			if(!sparseInA.isEmpty(i) && !sparseInB.isEmpty(i))
 				vectMinWrite(n,
 					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
 					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
@@ -198,7 +199,7 @@ public class BinaryPrimitivesTest {
 
 	private void runSparseMinusTest() {
 		for(int i = 0; i < m; i++)
-			if(!sparseInA.isEmpty(i))
+			if(!sparseInA.isEmpty(i) && !sparseInB.isEmpty(i))
 				vectMinusWrite(n,
 					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
 					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
@@ -206,7 +207,7 @@ public class BinaryPrimitivesTest {
 
 	private void runSparsePlusTest() {
 		for(int i = 0; i < m; i++)
-			if(!sparseInA.isEmpty(i))
+			if(!sparseInA.isEmpty(i) && !sparseInB.isEmpty(i))
 				vectPlusWrite(n,
 					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
 					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
@@ -214,7 +215,7 @@ public class BinaryPrimitivesTest {
 
 	private void runSparseXorTest() {
 		for(int i = 0; i < m; i++)
-			if(!sparseInA.isEmpty(i))
+			if(!sparseInA.isEmpty(i) && !sparseInB.isEmpty(i))
 				vectXorWrite(n,
 					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
 					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
@@ -222,7 +223,7 @@ public class BinaryPrimitivesTest {
 
 	private void runSparseNotequalTest() {
 		for(int i = 0; i < m; i++)
-			if(!sparseInA.isEmpty(i))
+			if(!sparseInA.isEmpty(i) && !sparseInB.isEmpty(i))
 				vectNotequalWrite(n,
 					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
 					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
@@ -230,7 +231,7 @@ public class BinaryPrimitivesTest {
 
 	private void runSparseLessTest() {
 		for(int i = 0; i < m; i++)
-			if(!sparseInA.isEmpty(i))
+			if(!sparseInA.isEmpty(i) && !sparseInB.isEmpty(i))
 				vectLessWrite(n,
 					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
 					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
@@ -238,19 +239,33 @@ public class BinaryPrimitivesTest {
 
 	public void runSparseDivBranchingTest() {
 		for(int i = 0; i < m; i++) {
-			if(!sparseInA.isEmpty(i))
+			if(!sparseInA.isEmpty(i) && !sparseInB.isEmpty(i))
 				vectDivWriteB(n,
 					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
 					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
 		}
 	}
 
+	private static final double[] EMPTY_D = new double[0];
+	private static final int[]    EMPTY_I = new int[0];
+
 	private void runSparseEqualTest() {
 		for(int i = 0; i < m; i++)
-			if(!sparseInA.isEmpty(i))
+			if(!sparseInA.isEmpty(i) || !sparseInB.isEmpty(i)) {
+				double[] aVals = sparseInA.isEmpty(i) ? EMPTY_D : sparseInA.values(i);
+				double[] bVals = sparseInB.isEmpty(i) ? EMPTY_D : sparseInB.values(i);
+				int[] aIx   = sparseInA.isEmpty(i) ? EMPTY_I : sparseInA.indexes(i);
+				int[] bIx   = sparseInB.isEmpty(i) ? EMPTY_I : sparseInB.indexes(i);
+				int apos    = sparseInA.isEmpty(i) ? 0       : sparseInA.pos(i);
+				int bpos    = sparseInB.isEmpty(i) ? 0       : sparseInB.pos(i);
+				int asz     = sparseInA.isEmpty(i) ? 0       : sparseInA.size(i);
+				int bsz     = sparseInB.isEmpty(i) ? 0       : sparseInB.size(i);
 				vectEqualWrite(n,
-					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
-					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
+					aVals, bVals, aIx, bIx,
+					apos,  bpos,  asz,  bsz);
+			}
+		//		vectEqualWrite(n,sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i),
+		//			sparseInB.indexes(i), sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
 	}
 
 	private void runSparseDivTestSV() {
@@ -484,7 +499,7 @@ public class BinaryPrimitivesTest {
 		double sparsityA = (inputType1 == InputType.VECTOR_DENSE) ? sparsity1 : sparsity2;
 		double sparsityB = (inputType2 == InputType.VECTOR_DENSE) ? sparsity1 : sparsity2;
 		double[][] A = TestUtils.generateTestMatrix(m, n, -5, 5, sparsityA, 1251);
-		double[][] B = TestUtils.generateTestMatrix(m, n, -5, 5, sparsityB, 532);
+		double[][] B = TestUtils.generateTestMatrix(m, n, -5, 5, sparsityB, 1345);
 		double[][] D = TestUtils.generateTestMatrix(m, n, -5, 5, sparsityA, 1251);
 		MatrixBlock mA = DataConverter.convertToMatrixBlock(A);
 		MatrixBlock mB = DataConverter.convertToMatrixBlock(B);

@@ -219,8 +219,8 @@ public class SparseRowPerfTest {
 	}
 
 	public static void main(String[] args) {
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR, TestType.HYBRID, SparsityType.SET);
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE, TestType.HYBRID, SparsityType.SET);
+//		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR, TestType.HYBRID, SparsityType.SET);
+//		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE, TestType.HYBRID, SparsityType.SET);
 		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_EQUAL, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.HYBRID, SparsityType.SET);
 
 
