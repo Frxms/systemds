@@ -14,25 +14,21 @@ public class BinaryPrimitivesTest {
 
 	private static final double sparsity1 = 0.9;
 
-	private final double sparsity2;
-	private final int m;
-	private final int n;
-	private final boolean branching;
+	private double sparsity2;
+	private int m;
+	private int n;
+	private boolean branching;
 
 	private SparseBlockMCSR sparseInA;
 	private SparseBlockMCSR sparseInB;
 	private DenseBlock denseIn;
 	private double scalar;
 
-
-	public BinaryPrimitivesTest(int rl, int cl, double sparsity, boolean branching) {
+	public String[] primitiveTester(int rl, int cl, double sparsity, boolean branching, BinType binType, InputType inputType1, InputType inputType2, int warmupRuns, int repetitions) {
 		m = rl;
 		n = cl;
 		this.sparsity2 = sparsity;
 		this.branching = branching;
-	}
-
-	public String[] primitiveTester(BinType binType, InputType inputType1, InputType inputType2, int warmupRuns, int repetitions) {
 		getMatrices(inputType1, inputType2);
 		System.out.println("Sparsity: " + sparsity2 + "; rl: " + m + "; cl: " + n);
 
@@ -172,7 +168,7 @@ public class BinaryPrimitivesTest {
 				}
 			}
 			case VECT_LESS -> runDenseLessTest();
-			case VECT_EQUAL -> runSparseEqualTest();
+			case VECT_EQUAL -> runDenseEqualTest();
 		}
 	}
 
@@ -357,6 +353,12 @@ public class BinaryPrimitivesTest {
 	private void runDenseLessTest() {
 		for(int i = 0; i < m; i++)
 			vectLessWrite(sparseInA.values(i), denseIn.values(i),
+				sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
+	}
+
+	private void runDenseEqualTest() {
+		for(int i = 0; i < m; i++)
+			vectEqualWrite(sparseInA.values(i), denseIn.values(i),
 				sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
 	}
 

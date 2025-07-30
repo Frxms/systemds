@@ -18,47 +18,83 @@ public class SparseRowPerfTest {
 	private final int repetitions;
 	private final int testSize;
 	private final double maxSparsity;
-	private String sparsityType;
+	private SparsityType sparsityType;
 	double[] sparsityVals;
 	int[] cols;
 	int[] rows;
-	boolean testType;
+
+	public enum TestType{HYBRID, SPARSITY, MATRIX, B_HYBRID, B_SPARSITY, B_MATRIX}
+
+	public enum SparsityType{GEO, LIN, DIV}
 
 	public SparseRowPerfTest() {
-		this(5000, 10000, 100, 2500, 1, 7, true);
+		this(1000, 1000, 100, 2500, 1, 7);
 	}
 
-	public SparseRowPerfTest(int rl, int cl, int warmupRuns, int repetitions, double sparsity, int testSize, boolean testType) {
+	public SparseRowPerfTest(int rl, int cl, int warmupRuns, int repetitions, double sparsity, int testSize) {
 		m = rl;
 		n = cl;
 		this.warmupRuns = warmupRuns;
 		this.repetitions = repetitions;
 		this.maxSparsity = sparsity;
 		this.testSize = testSize;
-		this.testType = testType;
 	}
 
-	private void testBinaryPrimitivePerf(BinType binType, InputType input1, InputType input2, boolean branching) {
-		chooseTestType(testType);
-		String[] sparseResults = new String[testSize];
-		String[] denseResults = new String[testSize];
-		for(int k = 0; k < testSize; k++) {
-			BinaryPrimitivesTest tester;
-			if(testType)
-				 tester = new BinaryPrimitivesTest(m, n, sparsityVals[k], branching);
-			else
-				tester = new BinaryPrimitivesTest(rows[k], cols[k], maxSparsity, branching);
+	public void testBinaryPrimitivePerf(BinType binType, InputType input1, InputType input2, TestType testType, SparsityType sparsityType) {
+		chooseTestType(testType, sparsityType);
+		String[] sparseResults = new String[testSize*3];
+		String[] denseResults = new String[testSize*3];
 
-			String[] results = tester.primitiveTester(binType, input1, input2, warmupRuns, repetitions);
-			sparseResults[k] = results[0];
-			denseResults[k] = results[1];
-		}
-//		logResults(testType, sparseResults, true, binType);
-//		logResults(testType, denseResults, false, binType);
+			BinaryPrimitivesTest tester = new BinaryPrimitivesTest();
+			if(testType == TestType.SPARSITY)
+				for(int k = 0; k < testSize; k++) {
+					String[] results = tester.primitiveTester(m, n, sparsityVals[k], false, binType, input1, input2, warmupRuns, repetitions);
+					sparseResults[k] = results[0];
+					denseResults[k] = results[1];
+				}
+			else if(testType == TestType.MATRIX)
+				for(int k = 0; k < 3; k++) {
+					String[] results = tester.primitiveTester(rows[k], cols[k], maxSparsity, false, binType, input1, input2, warmupRuns, repetitions);
+					sparseResults[k] = results[0];
+					denseResults[k] = results[1];
+				}
+			else if(testType == TestType.B_SPARSITY)
+				for(int k = 0; k < testSize; k++) {
+					String[] results = tester.primitiveTester(m, n, sparsityVals[k], true, binType, input1, input2, warmupRuns, repetitions);
+					sparseResults[k] = results[0];
+					denseResults[k] = results[1];
+				}
+			else if(testType == TestType.B_MATRIX)
+				for(int k = 0; k < 3; k++) {
+					String[] results = tester.primitiveTester(rows[k], cols[k], maxSparsity, true, binType, input1, input2, warmupRuns, repetitions);
+					sparseResults[k] = results[0];
+					denseResults[k] = results[1];
+				}
+			else if(testType == TestType.HYBRID)
+				for(int k = 0; k < 3; k++) {
+					for(int l = 0; l < testSize; l++) {
+						String[] results = tester.primitiveTester(rows[k], cols[k], sparsityVals[l], false, binType, input1, input2, warmupRuns, repetitions);
+						sparseResults[k] = results[0];
+						denseResults[k] = results[1];
+					}
+				}
+			else if(testType == TestType.B_HYBRID)
+				for(int k = 0; k < 3; k++) {
+					for(int l = 0; l < testSize; l++) {
+						String[] results = tester.primitiveTester(rows[k], cols[k], sparsityVals[l], false, binType, input1, input2, warmupRuns, repetitions);
+						sparseResults[k] = results[0];
+						denseResults[k] = results[1];
+					}
+				}
+			else
+				System.out.println("no matching TestType found");
+
+			logResults(testType, sparseResults, true, binType);
+			logResults(testType, denseResults, false, binType);
 	}
 
 	public void testUnaryPrimitivePerf(UnaryType uType, InputType input1) {
-		double[] sparsityVals = sparsityValues(false, true);
+		double[] sparsityVals = sparsityValues(SparsityType.DIV);
 		String[] sparseResults = new String[testSize];
 		String[] denseResults = new String[testSize];
 		for(int k = 0; k < testSize; k++) {
@@ -71,37 +107,38 @@ public class SparseRowPerfTest {
 		logResults(sparsityVals, denseResults, false, uType);
 	}
 
-	private void chooseTestType(boolean type) {
-		if(type) {
-			sparsityVals = sparsityValues(false, false);
-		} else {
+	private void chooseTestType(TestType testType, SparsityType sparsityType) {
+		if(testType == TestType.B_SPARSITY || testType == TestType.SPARSITY) {
+			sparsityVals = sparsityValues(sparsityType);
+		} else if (testType == TestType.B_MATRIX || testType == TestType.MATRIX){
+			cols = colsValues();
+			rows = rowsValues();
+		} else if(testType == TestType.B_HYBRID || testType == TestType.HYBRID) {
+			sparsityVals = sparsityValues(sparsityType);
 			cols = colsValues();
 			rows = rowsValues();
 		}
 	}
 
-	private double[] sparsityValues(boolean exp, boolean linear) {
+	private double[] sparsityValues(SparsityType sparsityType) {
 		double[] sparsity = new double[testSize];
 		double currVal = maxSparsity;
-		if(exp) {
+		if(sparsityType == SparsityType.GEO) {
 			for(int i = 1; i < testSize; i++) {
 				sparsity[i-1] = currVal;
 				currVal = currVal * Math.exp(-1*i);
 			}
 			sparsity[testSize-1] = currVal * Math.exp(-1*testSize-1);
-			sparsityType = "exp";
-		}else if(linear){
+		}else if(sparsityType == SparsityType.LIN){
 			for(int i = 0; i < testSize; i++) {
 				sparsity[i] = currVal;
 				currVal -= 0.01;
 			}
-			sparsityType = "lin";
-		} else {
+		} else if(sparsityType == SparsityType.DIV) {
 			for(int i = 0; i < testSize; i++) {
 				sparsity[i] = currVal;
 				currVal /= 3;
 			}
-			sparsityType = "geo";
 		}
 		return sparsity;
 	}
@@ -122,7 +159,7 @@ public class SparseRowPerfTest {
 		return cols;
 	}
 
-	public void logResults(boolean type, String[] result, boolean sparse, BinType binType) {
+	public void logResults(TestType testType, String[] result, boolean sparse, BinType binType) {
 		String currDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyy_HHmmss"));
 		PrintWriter writer = null;
 		try {
@@ -134,13 +171,19 @@ public class SparseRowPerfTest {
 		}
 		writer.printf("%4$s Repetitions: %1$2s, rl: %2$2s, cl: %3$2s%n", repetitions, m, n, binType.name());
 		writer.printf("%1$2s;%2$2s;%3$2s;%4$2s%n", "Sparsity", "rows", "cols","time in ms");
-		if(type) {
-			for(int i = 0; i < testSize; i++) {
+		if(testType == TestType.B_SPARSITY || testType == TestType.SPARSITY) {
+			for(int i = 0; i < sparsityVals.length; i++) {
 				writer.printf("%1$2s;%2$2s;%3$2s;%4$2s%n", sparsityVals[i], m, n, result[i]);
 			}
-		} else {
-			for(int i = 0; i < testSize; i++) {
+		} else if(testType == TestType.B_MATRIX || testType == TestType.MATRIX){
+			for(int i = 0; i < rows.length; i++) {
 				writer.printf("%1$2s;%2$2s;%3$2s;%4$2s%n", maxSparsity, rows[i], cols[i], result[i]);
+			}
+		} else if(testType == TestType.B_HYBRID || testType == TestType.HYBRID){
+			for(int i = 0; i < rows.length; i++) {
+				for(int j = 0; j < sparsityVals.length; j++) {
+					writer.printf("%1$2s;%2$2s;%3$2s;%4$2s%n", sparsityVals[i], rows[i], cols[i], result[i]);
+				}
 			}
 		}
 
@@ -168,8 +211,9 @@ public class SparseRowPerfTest {
 	}
 
 	public static void main(String[] args) {
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, true);
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, false);
+		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR, TestType.SPARSITY, SparsityType.DIV);
+//		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE, TestType.HYBRID, SparsityType.DIV);
+
 //		new SparseRowPerfTest().testUnaryPrimitivePerf(UnaryType.VECT_SQRT, InputType.VECTOR_SPARSE);
 	}
 }
