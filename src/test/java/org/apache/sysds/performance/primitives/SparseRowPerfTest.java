@@ -28,7 +28,7 @@ public class SparseRowPerfTest {
 	public enum SparsityType{GEO, LIN, DIV, SET}
 
 	public SparseRowPerfTest() {
-		this(500, 1000, 100, 2500, 1, 7);
+		this(5000, 10000, 100, 2500, 1, 7);
 	}
 
 	public SparseRowPerfTest(int rl, int cl, int warmupRuns, int repetitions, double sparsity, int testSize) {
@@ -219,8 +219,10 @@ public class SparseRowPerfTest {
 	}
 
 	public static void main(String[] args) {
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR, TestType.HYBRID, SparsityType.DIV);
-//		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE, TestType.HYBRID, SparsityType.DIV);
+		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR, TestType.HYBRID, SparsityType.SET);
+		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE, TestType.HYBRID, SparsityType.SET);
+		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_EQUAL, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.HYBRID, SparsityType.SET);
+
 
 //		new SparseRowPerfTest().testUnaryPrimitivePerf(UnaryType.VECT_SQRT, InputType.VECTOR_SPARSE);
 	}
