@@ -75,7 +75,11 @@ public class BinaryPrimitivesTest {
 					runSparseMultTestVS();
 				}
 			}
-			case VECT_MULT -> {runSparseMultTest();}
+			case VECT_MULT -> {
+				if(branching)
+					runSparseMultBranchingTest();
+				else
+					runSparseMultTest();}
 			case VECT_MIN_SCALAR -> {
 				if(inputType1 == InputType.SCALAR) {
 					runSparseMinTestSV();
@@ -262,6 +266,15 @@ public class BinaryPrimitivesTest {
 				int bsz = sparseInB.isEmpty(i) ? 0 : sparseInB.size(i);
 				vectEqualWrite(n, aVals, bVals, aIx, bIx, apos, bpos, asz, bsz);
 			}
+		}
+	}
+
+	public void runSparseMultBranchingTest() {
+		for(int i = 0; i < m; i++) {
+			if(!sparseInA.isEmpty(i) && !sparseInB.isEmpty(i))
+				vectMultWriteB(n,
+					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
+					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
 		}
 	}
 
