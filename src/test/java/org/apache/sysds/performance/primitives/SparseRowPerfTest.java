@@ -175,7 +175,7 @@ public class SparseRowPerfTest {
 		catch(IOException e) {
 			throw new RuntimeException(e);
 		}
-		writer.printf("%4$s Repetitions: %1$2s, rl: %2$2s, cl: %3$2s%n", repetitions, m, n, binType.name());
+		writer.printf("%4$s Repetitions: %1$2s, rl: %2$2s, cl: %3$2s with %5$2s%n", repetitions, m, n, binType.name(), testType.name());
 		writer.printf("%1$2s;%2$2s;%3$2s;%4$2s%n", "Sparsity", "rows", "cols","time in ms");
 		if(testType == TestType.B_SPARSITY || testType == TestType.SPARSITY) {
 			for(int i = 0; i < testSize; i++) {
@@ -219,9 +219,10 @@ public class SparseRowPerfTest {
 	}
 
 	public static void main(String[] args) {
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_EQUAL, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.HYBRID, SparsityType.SET);
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_MULT, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.HYBRID, SparsityType.SET);
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_MULT, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.B_HYBRID, SparsityType.SET);
+		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_MULT, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.SPARSITY, SparsityType.SET);
+		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_MULT, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.B_SPARSITY, SparsityType.SET);
+		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.SPARSITY, SparsityType.SET);
+		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.B_SPARSITY, SparsityType.SET);
 
 //		new SparseRowPerfTest().testUnaryPrimitivePerf(UnaryType.VECT_SQRT, InputType.VECTOR_SPARSE);
 	}

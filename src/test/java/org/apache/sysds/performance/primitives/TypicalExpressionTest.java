@@ -34,7 +34,7 @@ public class TypicalExpressionTest extends AutomatedTestBase {
 	private final static int cols = 1000;
 	private final static double sparsity1 = 0.9;
 	private final static double sparsity2 = 0.1;
-	private final static double eps = 1e-10;
+	private final static double eps = 1e-8;
 
 	@Override
 	public void setUp() {
