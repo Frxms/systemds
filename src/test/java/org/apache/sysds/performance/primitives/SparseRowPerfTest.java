@@ -28,7 +28,7 @@ public class SparseRowPerfTest {
 	public enum SparsityType{GEO, LIN, DIV, SET1, SET2}
 
 	public SparseRowPerfTest() {
-		this(5000, 10000, 100, 500, 1, 7);
+		this(2000, 10000, 100, 500, 1, 7);
 	}
 
 	public SparseRowPerfTest(int rl, int cl, int warmupRuns, int repetitions, double sparsity, int testSize) {
@@ -144,7 +144,7 @@ public class SparseRowPerfTest {
 			}
 		} else if(sparsityType == SparsityType.SET1) {
 			sparsity = new double[] {1, 0.3333, 0.1111, 0.0333, 0.0111, 0.0033, 0.0011};
-			testSize = 7;
+			testSize = sparsity.length;
 		} else if(sparsityType == SparsityType.SET2) {
 			sparsity = new double[] {1, 0.33, 0.11, 0,03};
 			testSize = sparsity.length;
