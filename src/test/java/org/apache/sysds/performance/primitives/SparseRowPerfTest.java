@@ -25,7 +25,7 @@ public class SparseRowPerfTest {
 
 	public enum TestType{HYBRID, SPARSITY, MATRIX, B_HYBRID, B_SPARSITY, B_MATRIX}
 
-	public enum SparsityType{GEO, LIN, DIV, SET}
+	public enum SparsityType{GEO, LIN, DIV, SET1, SET2}
 
 	public SparseRowPerfTest() {
 		this(5000, 10000, 100, 2500, 1, 7);
@@ -142,9 +142,12 @@ public class SparseRowPerfTest {
 				sparsity[i] = currVal;
 				currVal /= 3;
 			}
-		} else if(sparsityType == SparsityType.SET) {
+		} else if(sparsityType == SparsityType.SET1) {
 			sparsity = new double[] {1, 0.3333, 0.1111, 0.0333, 0.0111, 0.0033, 0.0011};
 			testSize = 7;
+		} else if(sparsityType == SparsityType.SET2) {
+			sparsity = new double[] {1, 0.33, 0.11, 0,03};
+			testSize = sparsity.length;
 		}
 		return sparsity;
 	}
@@ -188,7 +191,7 @@ public class SparseRowPerfTest {
 		} else if(testType == TestType.B_HYBRID || testType == TestType.HYBRID){
 			int incr = 0;
 			for(int i = 0; i < 3; i++) {
-				for(int j = 0; j < testSize; j++) {
+				for(int j = 0; j < sparsityVals.length; j++) {
 					writer.printf("%1$2s;%2$2s;%3$2s;%4$2s%n", sparsityVals[j], rows[i], cols[i], result[incr]);
 					incr++;
 				}
@@ -219,10 +222,7 @@ public class SparseRowPerfTest {
 	}
 
 	public static void main(String[] args) {
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_MULT, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.SPARSITY, SparsityType.SET);
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_MULT, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.B_SPARSITY, SparsityType.SET);
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.SPARSITY, SparsityType.SET);
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.B_SPARSITY, SparsityType.SET);
+		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR, TestType.SPARSITY, SparsityType.SET1);
 
 //		new SparseRowPerfTest().testUnaryPrimitivePerf(UnaryType.VECT_SQRT, InputType.VECTOR_SPARSE);
 	}
