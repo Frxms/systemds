@@ -322,7 +322,7 @@ public class BinaryPrimitivesTest {
 
 	public void runSparseDivTestVS() {
 		for(int i = 0; i < m; i++)
-//			if(!sparseInA.isEmpty(i))
+			if(!sparseInA.isEmpty(i))
 				vectDivWrite(n,
 					sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i));
 	}
@@ -464,7 +464,7 @@ public class BinaryPrimitivesTest {
 
 	private void runDenseDivTestVS() {
 		for(int i = 0; i < m; i++)
-//			if(!sparseInA.isEmpty(i))
+			if(!sparseInA.isEmpty(i))
 				vectDivWrite(sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i), n);
 	}
 

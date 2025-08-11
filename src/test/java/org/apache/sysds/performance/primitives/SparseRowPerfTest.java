@@ -2,6 +2,7 @@ package org.apache.sysds.performance.primitives;
 
 import org.apache.sysds.hops.codegen.cplan.CNodeBinary.BinType;
 import org.apache.sysds.hops.codegen.cplan.CNodeUnary.UnaryType;
+import org.apache.sysds.runtime.data.SparseRowVector;
 import org.apache.sysds.test.component.codegen.CPlanVectorPrimitivesTest.InputType;
 
 import java.io.FileWriter;
@@ -28,7 +29,7 @@ public class SparseRowPerfTest {
 	public enum SparsityType{GEO, LIN, DIV, SET1, SET2}
 
 	public SparseRowPerfTest() {
-		this(2000, 10000, 100, 500, 1, 7);
+		this(2000, 10000, 100, 2500, 1, 7);
 	}
 
 	public SparseRowPerfTest(int rl, int cl, int warmupRuns, int repetitions, double sparsity, int testSize) {
@@ -38,6 +39,15 @@ public class SparseRowPerfTest {
 		this.repetitions = repetitions;
 		this.maxSparsity = sparsity;
 		this.testSize = testSize;
+	}
+
+	public SparseRowPerfTest(int rl, int cl) {
+		m = rl;
+		n = cl;
+		this.warmupRuns = 100;
+		this.repetitions = 2500;
+		this.maxSparsity = 1;
+		this.testSize = 7;
 	}
 
 	public void testBinaryPrimitivePerf(BinType binType, InputType input1, InputType input2, TestType testType, SparsityType sparsityType) {
@@ -222,8 +232,22 @@ public class SparseRowPerfTest {
 	}
 
 	public static void main(String[] args) {
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR, TestType.SPARSITY, SparsityType.SET1);
+		new SparseRowPerfTest(100, 200000).testBinaryPrimitivePerf(BinType.VECT_MULT_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE, TestType.HYBRID, SparsityType.SET1);
+		new SparseRowPerfTest(100, 200000).testBinaryPrimitivePerf(BinType.VECT_MULT_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR, TestType.HYBRID, SparsityType.SET1);
+		new SparseRowPerfTest(100, 200000).testBinaryPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE, TestType.HYBRID, SparsityType.SET1);
+		new SparseRowPerfTest(100, 200000).testBinaryPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR, TestType.HYBRID, SparsityType.SET1);
 
-//		new SparseRowPerfTest().testUnaryPrimitivePerf(UnaryType.VECT_SQRT, InputType.VECTOR_SPARSE);
+		new SparseRowPerfTest(2000, 10000).testBinaryPrimitivePerf(BinType.VECT_MULT_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR, TestType.SPARSITY, SparsityType.SET1);
+		new SparseRowPerfTest(2000, 10000).testBinaryPrimitivePerf(BinType.VECT_MULT_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE, TestType.SPARSITY, SparsityType.SET1);
+		new SparseRowPerfTest(2000, 10000).testBinaryPrimitivePerf(BinType.VECT_MULT, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.SPARSITY, SparsityType.SET1);
+
+		new SparseRowPerfTest(2000, 10000).testBinaryPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR, TestType.SPARSITY, SparsityType.SET1);
+		new SparseRowPerfTest(2000, 10000).testBinaryPrimitivePerf(BinType.VECT_DIV_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE, TestType.SPARSITY, SparsityType.SET1);
+		new SparseRowPerfTest(2000, 10000).testBinaryPrimitivePerf(BinType.VECT_DIV, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.SPARSITY, SparsityType.SET1);
+
+		new SparseRowPerfTest(2000, 10000).testBinaryPrimitivePerf(BinType.VECT_POW_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR, TestType.SPARSITY, SparsityType.SET1);
+
+		new SparseRowPerfTest(2000, 10000).testBinaryPrimitivePerf(BinType.VECT_XOR_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR, TestType.SPARSITY, SparsityType.SET1);
+		new SparseRowPerfTest(2000, 10000).testBinaryPrimitivePerf(BinType.VECT_XOR_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE, TestType.SPARSITY, SparsityType.SET1);
 	}
 }
