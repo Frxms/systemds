@@ -41,8 +41,8 @@ public class TypicalExpressionTest extends AutomatedTestBase {
 	private int rows = 500;
 	private int cols = 1000;
 	double[] sparsities = new double[] {1, 0.3333, 0.1111, 0.0333, 0.0111, 0.0033, 0.0011};
-	int warmupRuns = 100;
-	int repetitions = 100;
+	int warmupRuns = 1;
+	int repetitions = 2;
 
 	@Override
 	public void setUp() {
@@ -64,7 +64,10 @@ public class TypicalExpressionTest extends AutomatedTestBase {
 	public void testOldSparseImpl2CP() {runSparseExpression(TEST_NAME2, true, false, ExecType.CP);}
 
 	public static void main(String[] args) {
-		new TypicalExpressionTest().runBenchmark(TEST_NAME2);
+		TypicalExpressionTest t = new TypicalExpressionTest();
+		t.setUpBase();
+		t.runBenchmark(TEST_NAME2);
+		t.tearDown();
 	}
 
 	public void runBenchmark(String testname) {
@@ -140,10 +143,14 @@ public class TypicalExpressionTest extends AutomatedTestBase {
 			String HOME = SCRIPT_DIR + TEST_DIR;
 			fullDMLScriptName = HOME + testname + ".dml";
 			if(sparseRowVec)
-				programArgs = new String[]{"-explain", "codegen", "-sparseIntermediate", "-args",
+//				programArgs = new String[]{"-explain", "codegen", "-sparseIntermediate", "-args",
+//					input("A"), input("B"), input("V"), output("S")};
+				programArgs = new String[]{"-sparseIntermediate", "-args",
 					input("A"), input("B"), input("V"), output("S")};
 			else
-				programArgs = new String[]{"-explain", "codegen", "-args",
+//				programArgs = new String[]{"-explain", "codegen", "-args",
+//					input("A"), input("B"), input("V"), output("S")};
+				programArgs = new String[]{"-args",
 					input("A"), input("B"), input("V"), output("S")};
 
 
@@ -179,16 +186,16 @@ public class TypicalExpressionTest extends AutomatedTestBase {
 		String currDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyy_HHmmss"));
 		PrintWriter writer = null;
 		try {
-			writer = new PrintWriter(new FileWriter("C:\\Users\\tomok\\OneDrive - Technische Universität Berlin\\Bachelorarbeit\\performance\\expression_testing"
+			writer = new PrintWriter(new FileWriter("C:\\Users\\tomok\\OneDrive - Technische Universität Berlin\\Bachelorarbeit\\performance\\expression_testing\\"
 				+ "expressionTest_"+ currDate + "_" + (sparseInterm ? "sparseInterm" : "denseInterm") + "_" + ".csv"));
 		}
 		catch(IOException e) {
 			throw new RuntimeException(e);
 		}
-		writer.printf("%4$s Repetitions: %1$2s, rl: %2$2s, cl: %3$2s with %5$2s%n", repetitions, rows, cols);
-		writer.printf("%1$2s;%2$2s;%3$2s;%4$2s%n", "Sparsity", "rows", "cols","time in ms");
+		writer.printf("Repetitions: %1$2s, rl: %2$2s, cl: %3$2s%n", repetitions, rows, cols);
+		writer.printf("%1$2s;%2$2s%n", "Sparsity", "time in ms");
 		for(int i = 0; i < sparsities.length; i++) {
-			writer.printf("%1$2s;%2$2s;%3$2s;%4$2s%n", result[i]);
+			writer.printf("%1$2s;%2$2s%n",  sparsities[i], result[i]);
 		}
 
 		writer.flush();
