@@ -232,6 +232,7 @@ public class SparseRowPerfTest {
 	}
 
 	public static void main(String[] args) {
+		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_MINUS, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.B_SPARSITY, SparsityType.SET1);
 		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_MINUS, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.SPARSITY, SparsityType.SET1);
 	}
 }
