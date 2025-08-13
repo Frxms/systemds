@@ -119,6 +119,14 @@ public class BinaryPrimitivesTest {
 				}
 			}
 			case VECT_LESS -> runSparseLessTest();
+			case VECT_GREATER -> runSparseGreaterTest();
+			case VECT_GREATER_SCALAR -> {
+				if(inputType1 == InputType.SCALAR) {
+					runSparseGreaterSV();
+				}else {
+					runSparseGreaterVS();
+				}
+			}
 			case VECT_EQUAL -> runSparseEqualTest();
 		}
 	}
@@ -174,6 +182,14 @@ public class BinaryPrimitivesTest {
 					runDenseLessTestSV();
 				}else {
 					runDenseLessTestVS();
+				}
+			}
+			case VECT_GREATER -> runDenseGreaterTest();
+			case VECT_GREATER_SCALAR -> {
+				if(inputType1 == InputType.SCALAR) {
+					runDenseGreaterSV();
+				}else {
+					runDenseGreaterVS();
 				}
 			}
 			case VECT_LESS -> runDenseLessTest();
@@ -264,6 +280,16 @@ public class BinaryPrimitivesTest {
 		}
 	}
 
+	public void runSparseGreaterTest() {
+		for(int i = 0; i < m; i++) {
+			if(!sparseInA.isEmpty(i) || !sparseInB.isEmpty(i)) {
+				vectGreaterWrite(n,
+					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
+					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
+			}
+		}
+	}
+
 	public void runSparseMultBranchingTest() {
 		for(int i = 0; i < m; i++) {
 			if(!sparseInA.isEmpty(i) && !sparseInB.isEmpty(i))
@@ -310,6 +336,13 @@ public class BinaryPrimitivesTest {
 					sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i));
 	}
 
+	public void runSparseGreaterSV() {
+		for(int i = 0; i < m; i++)
+			if(!sparseInB.isEmpty(i))
+				vectGreaterWrite(n, scalar,
+					sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i));
+	}
+
 	private void runSparseNotequalTestSV() {
 		for(int i = 0; i < m; i++)
 			if(!sparseInB.isEmpty(i))
@@ -342,6 +375,13 @@ public class BinaryPrimitivesTest {
 		for(int i = 0; i < m; i++)
 			if(!sparseInA.isEmpty(i))
 				vectMinWrite(n,
+					sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i));
+	}
+
+	public void runSparseGreaterVS() {
+		for(int i = 0; i < m; i++)
+			if(!sparseInA.isEmpty(i))
+				vectGreaterWrite(n,
 					sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i));
 	}
 
@@ -401,6 +441,13 @@ public class BinaryPrimitivesTest {
 					sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
 	}
 
+	private void runDenseGreaterTest() {
+		for(int i = 0; i < m; i++)
+			if(!sparseInA.isEmpty(i))
+				vectGreaterWrite(sparseInA.values(i), denseIn.values(i),
+					sparseInA.indexes(i), sparseInA.pos(i), 0, sparseInA.size(i), n);
+	}
+
 	private void runDensePlusTest() {
 		for(int i = 0; i < m; i++)
 			if(!sparseInA.isEmpty(i))
@@ -448,6 +495,12 @@ public class BinaryPrimitivesTest {
 				vectMinWrite(scalar, sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i), n);
 	}
 
+	private void runDenseGreaterSV() {
+		for(int i = 0; i < m; i++)
+			if(!sparseInB.isEmpty(i))
+				vectGreaterWrite(scalar, sparseInB.values(i), sparseInB.indexes(i), sparseInB.pos(i), sparseInB.size(i), n);
+	}
+
 	private void runDenseXorTestSV() {
 		for(int i = 0; i < m; i++)
 			if(!sparseInB.isEmpty(i))
@@ -482,6 +535,12 @@ public class BinaryPrimitivesTest {
 		for(int i = 0; i < m; i++)
 			if(!sparseInA.isEmpty(i))
 				vectMinWrite(sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i), n);
+	}
+
+	private void runDenseGreaterVS() {
+		for(int i = 0; i < m; i++)
+			if(!sparseInA.isEmpty(i))
+				vectGreaterWrite(sparseInA.values(i), scalar, sparseInA.indexes(i), sparseInA.pos(i), sparseInA.size(i), n);
 	}
 
 	private void runDenseXorTestVS() {
