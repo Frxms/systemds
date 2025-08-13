@@ -2183,7 +2183,7 @@ public class LibSpoofPrimitives
 		if( a == null ) return c;
 		int[] indexes = c.indexes();
 		double[] values = c.values();
-		for(int j = 0; j < ai+alen; j++) {
+		for(int j = ai; j < ai+alen; j++) {
 			indexes[j] = aix[j];
 			values[j] = a[j]*bval;
 		}
@@ -2251,7 +2251,7 @@ public class LibSpoofPrimitives
 
 	public static void vectWrite(double[] a, double[] c, int[] aix, int ai, int ci, int alen) {
 		if( a == null ) return;
-		for(int j = 0; j < ai+alen; j++)
+		for(int j = ai; j < ai+alen; j++)
 			c[ci+aix[j]] = a[j];
 	}
 
@@ -2259,7 +2259,7 @@ public class LibSpoofPrimitives
 		SparseRowVector c = allocSparseVector(alen);
 		int[] indexes = c.indexes();
 		double[] values = c.values();
-		for( int j = 0; j < ai+alen; j++ ) {
+		for( int j = ai; j < ai+alen; j++ ) {
 			indexes[j] = aix[j];
 			values[j] = a[j] / bval;
 		}
@@ -2271,7 +2271,7 @@ public class LibSpoofPrimitives
 		SparseRowVector c = allocSparseVector(alen);
 		int[] indexes = c.indexes();
 		double[] values = c.values();
-		for(int j = 0; j < ai+alen; j++) {
+		for(int j = ai; j < ai+alen; j++) {
 			indexes[j] = aix[j];
 			values[j] = bval / a[j];
 		}
@@ -2330,7 +2330,7 @@ public class LibSpoofPrimitives
 		return c;
 	}
 
-	public static SparseRowVector vectMinusWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
+	public static SparseRowVector vectMinusWriteB(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
 		SparseRowVector c = allocSparseVector(alen+blen);
 		int aItr = ai;
 		int bItr = bi;
@@ -2367,6 +2367,43 @@ public class LibSpoofPrimitives
 			indexes[index] = bix[bItr];
 			values[index] = -b[bItr];
 			index++;
+		}
+		c.setSize(index);
+		return c;
+	}
+
+	public static SparseRowVector vectMinusWrite(int len, double[] a, double[] b, int[] aix, int[] bix, int ai, int bi, int alen, int blen) {
+		SparseRowVector c = allocSparseVector(alen+blen);
+		int aEnd = ai+alen;
+		int bEnd = bi+blen;
+		int aItr = ai;
+		int bItr = bi;
+		int index = 0;
+		int[] indexes = c.indexes();
+		double[] values = c.values();
+		while (aItr < aEnd && bItr < bEnd) {
+			int aIdx = aix[aItr];
+			int bIdx = bix[bItr];
+
+			int useA = (aIdx <= bIdx) ? 1 : 0;
+			int useB = (aIdx >= bIdx) ? 1 : 0;
+
+			indexes[index] = (useA == 1) ? aIdx : bIdx;
+			double av = (useA == 1) ? a[aItr] : 0.0;
+			double bv = (useB == 1) ? b[bItr] : 0.0;
+			values[index] = av - bv;
+
+			aItr += useA;
+			bItr += useB;
+			index++;
+		}
+		for (; aItr < aEnd; aItr++, index++) {
+			indexes[index] = aix[aItr];
+			values[index] = a[aItr];
+		}
+		for (; bItr < bEnd; bItr++, index++) {
+			indexes[index] = bix[bItr];
+			values[index] = -b[bItr];
 		}
 		c.setSize(index);
 		return c;
@@ -2441,7 +2478,7 @@ public class LibSpoofPrimitives
 			SparseRowVector c = allocSparseVector(alen);
 			int[] indexes = c.indexes();
 			double[] values = c.values();
-			for(int j = 0; j < ai+alen; j++) {
+			for(int j = ai; j < ai+alen; j++) {
 				indexes[j] = aix[j];
 				values[j] = (a[j] != 0) ? 1 : 0;
 			}
@@ -2523,7 +2560,7 @@ public class LibSpoofPrimitives
 			SparseRowVector c = allocSparseVector(alen);
 			int[] indexes = c.indexes();
 			double[] values = c.values();
-			for(int j = 0; j < ai+alen; j++) {
+			for(int j = ai; j < ai+alen; j++) {
 				indexes[j] = aix[j];
 				values[j] = Math.pow(a[j], bval);
 			}
@@ -2559,7 +2596,7 @@ public class LibSpoofPrimitives
 			SparseRowVector c = allocSparseVector(alen);
 			int[] indexes = c.indexes();
 			double[] values = c.values();
-			for(int j = 0; j < ai+alen; j++) {
+			for(int j = ai; j < ai+alen; j++) {
 				indexes[j] = aix[j];
 				values[j] = Math.min(a[j], bval);
 			}
@@ -2641,7 +2678,7 @@ public class LibSpoofPrimitives
 			SparseRowVector c = allocSparseVector(alen);
 			int[] indexes = c.indexes();
 			double[] values = c.values();
-			for(int j = 0; j < ai+alen; j++) {
+			for(int j = ai; j < ai+alen; j++) {
 				indexes[j] = aix[j];
 				values[j] = Math.max(a[j], bval);
 			}
@@ -2723,7 +2760,7 @@ public class LibSpoofPrimitives
 			SparseRowVector c = allocSparseVector(alen);
 			int[] indexes = c.indexes();
 			double[] values = c.values();
-			for(int j = 0; j < ai+alen; j++) {
+			for(int j = ai; j < ai+alen; j++) {
 				indexes[j] = aix[j];
 				values[j] = a[j] == bval ? 1 : 0;
 			}
@@ -2788,7 +2825,7 @@ public class LibSpoofPrimitives
 			SparseRowVector c = allocSparseVector(alen);
 			int[] indexes = c.indexes();
 			double[] values = c.values();
-			for(int j = 0; j < ai+alen; j++) {
+			for(int j = ai; j < ai+alen; j++) {
 				indexes[j] = aix[j];
 				values[j] = a[j] != bval ? 1 : 0;
 			}
@@ -2870,7 +2907,7 @@ public class LibSpoofPrimitives
 			SparseRowVector c = allocSparseVector(alen);
 			int[] indexes = c.indexes();
 			double[] values = c.values();
-			for(int j = 0; j < ai+alen; j++) {
+			for(int j = ai; j < ai+alen; j++) {
 				indexes[j] = aix[j];
 				values[j] = a[j] < bval ? 1 : 0;
 			}
@@ -2952,7 +2989,7 @@ public class LibSpoofPrimitives
 			SparseRowVector c = allocSparseVector(alen);
 			int[] indexes = c.indexes();
 			double[] values = c.values();
-			for(int j = 0; j < ai+alen; j++) {
+			for(int j = ai; j < ai+alen; j++) {
 				indexes[j] = aix[j];
 				values[j] = a[j] <= bval ? 1 : 0;
 			}
@@ -3017,7 +3054,7 @@ public class LibSpoofPrimitives
 			SparseRowVector c = allocSparseVector(alen);
 			int[] indexes = c.indexes();
 			double[] values = c.values();
-			for(int j = 0; j < ai+alen; j++) {
+			for(int j = ai; j < ai+alen; j++) {
 				indexes[j] = aix[j];
 				values[j] = a[j] > bval ? 1 : 0;
 			}
@@ -3099,7 +3136,7 @@ public class LibSpoofPrimitives
 			SparseRowVector c = allocSparseVector(alen);
 			int[] indexes = c.indexes();
 			double[] values = c.values();
-			for(int j = 0; j < ai+alen; j++) {
+			for(int j = ai; j < ai+alen; j++) {
 				indexes[j] = aix[j];
 				values[j] = a[j] >= bval ? 1 : 0;
 			}
@@ -3184,7 +3221,7 @@ public class LibSpoofPrimitives
 		SparseRowVector c = allocSparseVector(alen);
 		int[] indexes = c.indexes();
 		double[] values = c.values();
-		for(int j = 0; j < ai+alen; j++) {
+		for(int j = ai; j < ai+alen; j++) {
 			indexes[j] = aix[j];
 			values[j] = Math.sqrt(a[j]);
 		}
@@ -3196,7 +3233,7 @@ public class LibSpoofPrimitives
 		SparseRowVector c = allocSparseVector(alen);
 		int[] indexes = c.indexes();
 		double[] values = c.values();
-		for(int j = 0; j < ai+alen; j++) {
+		for(int j = ai; j < ai+alen; j++) {
 			indexes[j] = aix[j];
 			values[j] = Math.abs(a[j]);
 		}
@@ -3208,7 +3245,7 @@ public class LibSpoofPrimitives
 		SparseRowVector c = allocSparseVector(alen);
 		int[] indexes = c.indexes();
 		double[] values = c.values();
-		for(int j = 0; j < ai+alen; j++) {
+		for(int j = ai; j < ai+alen; j++) {
 			indexes[j] = aix[j];
 			values[j] = Math.round(a[j]);
 		}
@@ -3220,7 +3257,7 @@ public class LibSpoofPrimitives
 		SparseRowVector c = allocSparseVector(alen);
 		int[] indexes = c.indexes();
 		double[] values = c.values();
-		for(int j = 0; j < ai+alen; j++) {
+		for(int j = ai; j < ai+alen; j++) {
 			indexes[j] = aix[j];
 			values[j] = Math.ceil(a[j]);
 		}
@@ -3232,7 +3269,7 @@ public class LibSpoofPrimitives
 		SparseRowVector c = allocSparseVector(alen);
 		int[] indexes = c.indexes();
 		double[] values = c.values();
-		for(int j = 0; j < ai+alen; j++) {
+		for(int j = ai; j < ai+alen; j++) {
 			indexes[j] = aix[j];
 			values[j] = Math.floor(a[j]);
 		}
@@ -3244,7 +3281,7 @@ public class LibSpoofPrimitives
 		SparseRowVector c = allocSparseVector(alen);
 		int[] indexes = c.indexes();
 		double[] values = c.values();
-		for(int j = 0; j < ai+alen; j++) {
+		for(int j = ai; j < ai+alen; j++) {
 			indexes[j] = aix[j];
 			values[j] = Math.sin(a[j]);
 		}
@@ -3256,7 +3293,7 @@ public class LibSpoofPrimitives
 		SparseRowVector c = allocSparseVector(alen);
 		int[] indexes = c.indexes();
 		double[] values = c.values();
-		for(int j = 0; j < ai+alen; j++) {
+		for(int j = ai; j < ai+alen; j++) {
 			indexes[j] = aix[j];
 			values[j] = Math.tan(a[j]);
 		}
@@ -3268,7 +3305,7 @@ public class LibSpoofPrimitives
 		SparseRowVector c = allocSparseVector(alen);
 		int[] indexes = c.indexes();
 		double[] values = c.values();
-		for(int j = 0; j < ai+alen; j++) {
+		for(int j = ai; j < ai+alen; j++) {
 			indexes[j] = aix[j];
 			values[j] = Math.asin(a[j]);
 		}
@@ -3280,7 +3317,7 @@ public class LibSpoofPrimitives
 		SparseRowVector c = allocSparseVector(alen);
 		int[] indexes = c.indexes();
 		double[] values = c.values();
-		for(int j = 0; j < ai+alen; j++) {
+		for(int j = ai; j < ai+alen; j++) {
 			indexes[j] = aix[j];
 			values[j] = Math.atan(a[j]);
 		}
@@ -3292,7 +3329,7 @@ public class LibSpoofPrimitives
 		SparseRowVector c = allocSparseVector(alen);
 		int[] indexes = c.indexes();
 		double[] values = c.values();
-		for(int j = 0; j < ai+alen; j++) {
+		for(int j = ai; j < ai+alen; j++) {
 			indexes[j] = aix[j];
 			values[j] = Math.sinh(a[j]);
 		}
@@ -3304,7 +3341,7 @@ public class LibSpoofPrimitives
 		SparseRowVector c = allocSparseVector(alen);
 		int[] indexes = c.indexes();
 		double[] values = c.values();
-		for(int j = 0; j < ai+alen; j++) {
+		for(int j = ai; j < ai+alen; j++) {
 			indexes[j] = aix[j];
 			values[j] = Math.tanh(a[j]);
 		}
@@ -3316,7 +3353,7 @@ public class LibSpoofPrimitives
 		SparseRowVector c = allocSparseVector(alen);
 		int[] indexes = c.indexes();
 		double[] values = c.values();
-		for(int j = 0; j < ai+alen; j++) {
+		for(int j = ai; j < ai+alen; j++) {
 			indexes[j] = aix[j];
 			values[j] = Math.signum(a[j]);
 		}
