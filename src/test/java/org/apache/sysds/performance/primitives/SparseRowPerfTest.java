@@ -232,16 +232,6 @@ public class SparseRowPerfTest {
 	}
 
 	public static void main(String[] args) {
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_MIN_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR, TestType.SPARSITY, SparsityType.SET1);
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_MIN_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE, TestType.SPARSITY, SparsityType.SET1);
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_MIN, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.SPARSITY, SparsityType.SET1);
-
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_PLUS_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR, TestType.SPARSITY, SparsityType.SET1);
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_PLUS_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE, TestType.SPARSITY, SparsityType.SET1);
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_PLUS, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.SPARSITY, SparsityType.SET1);
-
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_LESS_SCALAR, InputType.VECTOR_SPARSE, InputType.SCALAR, TestType.SPARSITY, SparsityType.SET1);
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_LESS_SCALAR, InputType.SCALAR, InputType.VECTOR_SPARSE, TestType.SPARSITY, SparsityType.SET1);
-		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_LESS, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.SPARSITY, SparsityType.SET1);
+		new SparseRowPerfTest().testBinaryPrimitivePerf(BinType.VECT_MINUS, InputType.VECTOR_SPARSE, InputType.VECTOR_SPARSE, TestType.SPARSITY, SparsityType.SET1);
 	}
 }

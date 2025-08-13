@@ -96,7 +96,11 @@ public class BinaryPrimitivesTest {
 				}
 			}
 			case VECT_XOR -> {runSparseXorTest();}
-			case VECT_MINUS  -> runSparseMinusTest();
+			case VECT_MINUS  -> {
+				if(branching)
+					runSparseMinusBranchingTest();
+				else
+					runSparseMinusTest();}
 			case VECT_PLUS -> runSparsePlusTest();
 			case VECT_POW_SCALAR -> runSparsePowTest();
 			case VECT_NOTEQUAL_SCALAR -> {
@@ -250,21 +254,12 @@ public class BinaryPrimitivesTest {
 		}
 	}
 
-	private static final double[] EMPTY_D = new double[0];
-	private static final int[]    EMPTY_I = new int[0];
-
 	private void runSparseEqualTest() {
 		for(int i = 0; i < m; i++) {
 			if(!sparseInA.isEmpty(i) || !sparseInB.isEmpty(i)) {
-				double[] aVals = sparseInA.isEmpty(i) ? EMPTY_D : sparseInA.values(i);
-				double[] bVals = sparseInB.isEmpty(i) ? EMPTY_D : sparseInB.values(i);
-				int[] aIx = sparseInA.isEmpty(i) ? EMPTY_I : sparseInA.indexes(i);
-				int[] bIx = sparseInB.isEmpty(i) ? EMPTY_I : sparseInB.indexes(i);
-				int apos = sparseInA.isEmpty(i) ? 0 : sparseInA.pos(i);
-				int bpos = sparseInB.isEmpty(i) ? 0 : sparseInB.pos(i);
-				int asz = sparseInA.isEmpty(i) ? 0 : sparseInA.size(i);
-				int bsz = sparseInB.isEmpty(i) ? 0 : sparseInB.size(i);
-				vectEqualWrite(n, aVals, bVals, aIx, bIx, apos, bpos, asz, bsz);
+				vectEqualWrite(n,
+					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
+					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
 			}
 		}
 	}
@@ -273,6 +268,15 @@ public class BinaryPrimitivesTest {
 		for(int i = 0; i < m; i++) {
 			if(!sparseInA.isEmpty(i) && !sparseInB.isEmpty(i))
 				vectMultWriteB(n,
+					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
+					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
+		}
+	}
+
+	public void runSparseMinusBranchingTest() {
+		for(int i = 0; i < m; i++) {
+			if(!sparseInA.isEmpty(i) && !sparseInB.isEmpty(i))
+				vectMinusWriteB(n,
 					sparseInA.values(i), sparseInB.values(i), sparseInA.indexes(i), sparseInB.indexes(i),
 					sparseInA.pos(i), sparseInB.pos(i), sparseInA.size(i), sparseInB.size(i));
 		}
