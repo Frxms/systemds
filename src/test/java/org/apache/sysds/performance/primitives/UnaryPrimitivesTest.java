@@ -58,12 +58,14 @@ public class UnaryPrimitivesTest {
 	public void sparseTest(UnaryType uType, InputType inputType) {
 		switch(uType) {
 			case VECT_SQRT: runSparseSqrt();
+			case VECT_ABS: runSparseAbs();
 		}
 	}
 
 	public void denseTest(UnaryType uType, InputType inputType) {
 		switch(uType) {
 			case VECT_SQRT: runDenseSqrt();
+			case VECT_ABS: runDenseAbs();
 		}
 	}
 
@@ -73,9 +75,21 @@ public class UnaryPrimitivesTest {
 		}
 	}
 
+	public void runSparseAbs() {
+		for(int i = 0; i < m; i++) {
+			vectAbsWrite(n, sparseIn.values(i), sparseIn.indexes(i), sparseIn.pos(i), sparseIn.size(i));
+		}
+	}
+
 	public void runDenseSqrt() {
 		for(int i = 0; i < m; i++) {
 			vectSqrtWrite(sparseIn.values(i), sparseIn.indexes(i), sparseIn.pos(i), sparseIn.size(i), n);
+		}
+	}
+
+	public void runDenseAbs() {
+		for(int i = 0; i < m; i++) {
+			vectAbsWrite(sparseIn.values(i), sparseIn.indexes(i), sparseIn.pos(i), sparseIn.size(i), n);
 		}
 	}
 
