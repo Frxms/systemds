@@ -29,17 +29,17 @@ public class SparseRowAllocPerfTest {
 	static int repetitions;
 	static int warmupRuns;
 	static int[] mVar = {100};
-	static int[] nVar = {10000000, 1000000, 100000, 10000, 1000, 100, 10};
+	static int[] nVar = {100000, 10000, 1000, 100, 10};
 
 	public SparseRowAllocPerfTest() {
 		this.m = 30;
 		this.n = 10000;
 		this.warmupRuns = 100;
-		this.repetitions = 2500;
+		this.repetitions = 10000;
 	}
 
 	public static void main(String[] args) {
-		SparseRowAllocPerfTest.testAlloc(3, 1000);
+		new SparseRowAllocPerfTest().compareInitAndAlloc();
 	}
 
 	public void testDenAndSpaAlloc() {
@@ -48,7 +48,7 @@ public class SparseRowAllocPerfTest {
 			String[] denseRes = new String[nVar.length];
 			for(int i = 0; i < nVar.length; i++) {
 				getMatrices(nVar[i]);
-				results = testAlloc(2000, nVar[i]);
+				results = compareAlloc(2000, nVar[i]);
 				sparseRes[i] = results[0];
 				denseRes[i] = results[1];
 			}
@@ -185,7 +185,7 @@ public class SparseRowAllocPerfTest {
 		writer.printf("Repetitions: %1$2s, rl: %2$2s, cl: %3$2s%n", repetitions, m, n);
 		writer.printf("%1$2s;%2$2s;%3$2s%n", "rows", "cols","time in ms");
 		for(int i = 0; i < nVar.length; i++) {
-			writer.printf("%1$2s;%2$2s;%3$2s;%4$2s%n", m, n, result[i]);
+			writer.printf("%1$2s;%2$2s;%3$2s%n", m, n, result[i]);
 		}
 
 		writer.flush();

@@ -25,8 +25,9 @@ library("Matrix")
 library("matrixStats")
 
 A <- as.matrix(readMM(paste(args[1], "A.mtx", sep="")))
+B <- as.vector(readMM(paste(args[1], "B.mtx", sep="")))
 v <- as.vector(readMM(paste(args[1], "V.mtx", sep="")))
 
-S = rowMaxs(A*v)
+S = B*rowMaxs(A*v)
 
 writeMM(as(S, "CsparseMatrix"), paste(args[2], "S", sep=""));

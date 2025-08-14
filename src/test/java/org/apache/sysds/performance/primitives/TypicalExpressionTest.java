@@ -2,10 +2,12 @@ package org.apache.sysds.performance.primitives;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sysds.api.DMLScript;
+import org.apache.sysds.api.jmlc.Connection;
+import org.apache.sysds.api.jmlc.PreparedScript;
 import org.apache.sysds.common.Types.ExecMode;
 import org.apache.sysds.common.Types.ExecType;
 import org.apache.sysds.hops.OptimizerUtils;
-import org.apache.sysds.hops.codegen.cplan.CNodeBinary;
 import org.apache.sysds.performance.TimingUtils;
 import org.apache.sysds.runtime.matrix.data.MatrixValue;
 import org.apache.sysds.test.AutomatedTestBase;
@@ -90,39 +92,45 @@ public class TypicalExpressionTest extends AutomatedTestBase {
 
 		String[] resultTime = new String[sparsities.length];
 
+		Connection conn = new Connection();
+
 		try {
 
 			getAndLoadTestConfiguration(testname);
-
 			String HOME = SCRIPT_DIR + TEST_DIR;
-			fullDMLScriptName = HOME + testname + ".dml";
-			if(sparseRowVec)
-				programArgs = new String[]{"-explain", "codegen", "-sparseIntermediate", "-args",
-					input("A"), input("B"), input("V"), output("S")};
-			else
-				programArgs = new String[]{"-explain", "codegen", "-args",
-					input("A"), input("B"), input("V"), output("S")};
+			String script = DMLScript.readDMLScript(true, HOME + testname + ".dml");
 
+			String[] inputs = new String[] {"A", "v", "B"};
+			PreparedScript pscript = conn.prepareScript(script, inputs, new String[] {"S"});
 
-			fullRScriptName = HOME + TEST_NAME1 + ".R";
-			rCmd = "Rscript" + " " + fullRScriptName + " " + inputDir() + " " + expectedDir();
+			boolean oldSparse = DMLScript.SPARSE_INTERMEDIATE;
+			DMLScript.SPARSE_INTERMEDIATE = sparseRowVec;
 
 			for(int i = 0; i < sparsities.length; i++) {
-				//get a random matrix of values with
+				//generate random input matrices
 				double[][] A = getRandomMatrix(rows, cols, 1, 31, sparsities[i], 1234);
 				double[][] B = getRandomMatrix(rows, cols, 1, 31, sparsities[i], 5678);
 				double[][] V = getRandomMatrix(rows, 1, 1, 31, sparsities[i], 9876);
-				writeInputMatrixWithMTD("A", A, true);
-				writeInputMatrixWithMTD("B", B, true);
-				writeInputMatrixWithMTD("V", V, true);
 
-				TimingUtils.time(() -> runTest(true, false, null, -1), warmupRuns);
-				double[] result = TimingUtils.time(() -> runTest(true, false, null, -1), repetitions);
+				pscript.setMatrix("A", A);
+				pscript.setMatrix("v", V);
+				pscript.setMatrix("B", B);
+
+				TimingUtils.time(() -> pscript.executeScript(), warmupRuns);
+				double[] result = TimingUtils.time(() -> pscript.executeScript(), repetitions);
 
 				resultTime[i] = TimingUtils.stats(result).split("\\+-")[0];
 
+				System.out.println(TimingUtils.stats(result).split("\\+-")[0]);
+
+				pscript.clearPinnedData();
 			}
 
+			DMLScript.SPARSE_INTERMEDIATE = oldSparse;
+
+		}
+		catch(IOException e) {
+			throw new RuntimeException(e);
 		}
 		finally {
 			resetExecMode(platformOld);

@@ -20,9 +20,11 @@
 #-------------------------------------------------------------
 
 A = read($1);
+B = read($2);
 v = read($3);
+while(FALSE) { }
 
-S = rowMaxs(A*v)
+S = B*rowMaxs(A*v)
 
 write(S, $4);
 
