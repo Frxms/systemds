@@ -7,6 +7,8 @@ import org.apache.sysds.api.jmlc.Connection;
 import org.apache.sysds.api.jmlc.PreparedScript;
 import org.apache.sysds.common.Types.ExecMode;
 import org.apache.sysds.common.Types.ExecType;
+import org.apache.sysds.conf.CompilerConfig;
+import org.apache.sysds.conf.DMLConfig;
 import org.apache.sysds.hops.OptimizerUtils;
 import org.apache.sysds.performance.TimingUtils;
 import org.apache.sysds.runtime.matrix.data.MatrixValue;
@@ -14,6 +16,7 @@ import org.apache.sysds.test.AutomatedTestBase;
 import org.apache.sysds.test.TestConfiguration;
 import org.apache.sysds.test.TestUtils;
 import org.apache.sysds.test.functions.codegen.RowAggTmplTest;
+import org.apache.sysds.utils.Explain;
 import org.junit.Test;
 
 import java.io.File;
@@ -40,11 +43,11 @@ public class TypicalExpressionTest extends AutomatedTestBase {
 	private final static double sparsity1 = 0.9;
 	private final static double sparsity2 = 0.1;
 	private final static double eps = 1e-8;
-	private int rows = 500;
-	private int cols = 1000;
-	double[] sparsities = new double[] {1, 0.3333, 0.1111, 0.0333, 0.0111, 0.0033, 0.0011};
-	int warmupRuns = 1;
-	int repetitions = 2;
+	private int rows = 10;
+	private int cols = 10000;
+	double[] sparsities = new double[] {1, 0.3333333, 0.1111111, 0.0333333, 0.0111111, 0.0033333, 0.0011111, 0.0003333, 0.0001111, 0.0000333, 0.0000111, 0.0000033, 0.0000011, 0.0000003, 0.0000001};
+	int warmupRuns = 10;
+	int repetitions = 500;
 
 	@Override
 	public void setUp() {
@@ -68,14 +71,14 @@ public class TypicalExpressionTest extends AutomatedTestBase {
 	public static void main(String[] args) {
 		TypicalExpressionTest t = new TypicalExpressionTest();
 		t.setUpBase();
-		t.runBenchmark(TEST_NAME2);
+		t.runBenchmark(TEST_NAME1);
 		t.tearDown();
 	}
 
 	public void runBenchmark(String testname) {
-		setUp();
+//		setUp();
 		logResults(runPerfTest(testname,  true, ExecType.CP), true);
-		logResults(runPerfTest(testname, false, ExecType.CP), false);
+//		logResults(runPerfTest(testname, false, ExecType.CP), false);
 	}
 
 	public void runBenchmark(String testname, int rows, int cols) {
@@ -92,29 +95,28 @@ public class TypicalExpressionTest extends AutomatedTestBase {
 
 		String[] resultTime = new String[sparsities.length];
 
-		Connection conn = new Connection();
+		Connection conn = new Connection(new DMLConfig(), CompilerConfig.ConfigType.CODEGEN_ENABLED);
+		DMLScript.EXPLAIN = Explain.ExplainType.CODEGEN;
+		boolean oldSparse = DMLScript.SPARSE_INTERMEDIATE;
+		DMLScript.SPARSE_INTERMEDIATE = sparseRowVec;
 
 		try {
 
-			getAndLoadTestConfiguration(testname);
+//			getAndLoadTestConfiguration(testname);
 			String HOME = SCRIPT_DIR + TEST_DIR;
 			String script = DMLScript.readDMLScript(true, HOME + testname + ".dml");
 
 			String[] inputs = new String[] {"A", "v", "B"};
 			PreparedScript pscript = conn.prepareScript(script, inputs, new String[] {"S"});
 
-			boolean oldSparse = DMLScript.SPARSE_INTERMEDIATE;
-			DMLScript.SPARSE_INTERMEDIATE = sparseRowVec;
-
 			for(int i = 0; i < sparsities.length; i++) {
-				//generate random input matrices
 				double[][] A = getRandomMatrix(rows, cols, 1, 31, sparsities[i], 1234);
 				double[][] B = getRandomMatrix(rows, cols, 1, 31, sparsities[i], 5678);
 				double[][] V = getRandomMatrix(rows, 1, 1, 31, sparsities[i], 9876);
 
-				pscript.setMatrix("A", A);
-				pscript.setMatrix("v", V);
-				pscript.setMatrix("B", B);
+				pscript.setMatrix("A", A, true);
+				pscript.setMatrix("B", B, true);
+				pscript.setMatrix("v", V, true);
 
 				TimingUtils.time(() -> pscript.executeScript(), warmupRuns);
 				double[] result = TimingUtils.time(() -> pscript.executeScript(), repetitions);
@@ -136,6 +138,7 @@ public class TypicalExpressionTest extends AutomatedTestBase {
 			resetExecMode(platformOld);
 			OptimizerUtils.ALLOW_AUTO_VECTORIZATION = true;
 			OptimizerUtils.ALLOW_OPERATOR_FUSION = true;
+			conn.close();
 		}
 		return resultTime;
 	}

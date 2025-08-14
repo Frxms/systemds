@@ -39,7 +39,7 @@ public class SparseRowAllocPerfTest {
 	}
 
 	public static void main(String[] args) {
-		new SparseRowAllocPerfTest().compareInitAndAlloc();
+		new SparseRowAllocPerfTest().testDenAndSpaAlloc();
 	}
 
 	public void testDenAndSpaAlloc() {
