@@ -22,9 +22,9 @@
 A = read($1);
 B = read($2);
 v = read($3);
-while(FALSE) { }
 
-S = B*rowMaxs(A*v)
+# S = B*rowMaxs(A*v)
+S = (A*v)/rowSums(A*v)
 
 write(S, $4);
 

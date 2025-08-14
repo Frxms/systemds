@@ -23,8 +23,7 @@ A = read($1);
 B = read($2);
 v = read($3)
 
-# S = (A!=0) * (B-A)
-S = (A/v)+rowMeans(A-v)
+S = B + (A <= rowMins(A))
 
 write(S, $4);
 

@@ -23,21 +23,43 @@ public class ExpressionTest {
 	private static final String TEST_NAME = "expression";
 	private static final String TEST_NAME1 = TEST_NAME+"1";
 	private static final String TEST_NAME2 = TEST_NAME+"2";
+	private static final String TEST_NAME3 = TEST_NAME+"3";
+	private static final String TEST_NAME4 = TEST_NAME+"4";
+	private static final String TEST_NAME5 = TEST_NAME+"5";
 
 	private static final String TEST_DIR = "./src/test/scripts/performance/primitives/";
 
 	private final static double sparsity1 = 0.9;
 	private final static double sparsity2 = 0.1;
 	private final static double eps = 1e-8;
-	private int rows = 2000;
-	private int cols = 10000;
-	double[] sparsities = new double[] {1, 0.3333333, 0.1111111, 0.0333333, 0.0111111, 0.0033333, 0.0011111, 0.0003333, 0.0001111, 0.0000333, 0.0000111, 0.0000033, 0.0000011, 0.0000003, 0.0000001};
-	int warmupRuns = 100;
-	int repetitions = 2500;
+	private int rows = 100;
+	private int cols = 100;
+//	double[] sparsities = new double[] {1, 0.3333333, 0.1111111, 0.0333333, 0.0111111, 0.0033333, 0.0011111, 0.0003333, 0.0001111, 0.0000333, 0.0000111, 0.0000033, 0.0000011, 0.0000003, 0.0000001};
+	double[] sparsities = new double[] {0.01, 0.3333};
+	int warmupRuns = 10;
+	int repetitions = 10;
 
 	public static void main(String[] args) {
+		System.out.println("First------------------------------------------------");
+		new ExpressionTest().runSparseBenchmark(TEST_NAME1);
+		System.out.println("Second------------------------------------------------");
+		new ExpressionTest().runSparseBenchmark(TEST_NAME2);
+		System.out.println("Third------------------------------------------------");
+		new ExpressionTest().runSparseBenchmark(TEST_NAME3);
+		System.out.println("Fourth------------------------------------------------");
+		new ExpressionTest().runSparseBenchmark(TEST_NAME4);
+		System.out.println("Fifth------------------------------------------------");
+		new ExpressionTest().runSparseBenchmark(TEST_NAME5);
+//		System.out.println("First------------------------------------------------");
 //		new ExpressionTest().runSparseBenchmark(TEST_NAME1);
-		new ExpressionTest().runDenseBenchmark(TEST_NAME1);
+//		System.out.println("Second------------------------------------------------");
+//		new ExpressionTest().runSparseBenchmark(TEST_NAME2);
+//		System.out.println("Third------------------------------------------------");
+//		new ExpressionTest().runSparseBenchmark(TEST_NAME3);
+//		System.out.println("Fourth------------------------------------------------");
+//		new ExpressionTest().runSparseBenchmark(TEST_NAME4);
+//		System.out.println("Fifth------------------------------------------------");
+//		new ExpressionTest().runSparseBenchmark(TEST_NAME5);
 	}
 
 	public void runSparseBenchmark(String testname) {
@@ -92,12 +114,12 @@ public class ExpressionTest {
 			}
 
 			DMLScript.SPARSE_INTERMEDIATE = oldSparse;
-			conn.close();
 		}
 		catch(IOException e) {
 			throw new RuntimeException(e);
 		}
 		finally {
+			conn.close();
 			OptimizerUtils.ALLOW_AUTO_VECTORIZATION = true;
 			OptimizerUtils.ALLOW_OPERATOR_FUSION = true;
 		}

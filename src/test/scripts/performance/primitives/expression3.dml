@@ -20,11 +20,8 @@
 #-------------------------------------------------------------
 
 A = read($1);
-B = read($2);
-v = read($3)
 
-# S = (A!=0) * (B-A)
-S = (A/v)+rowMeans(A-v)
+S = as.matrix(sum(rowMins(A)))
 
 write(S, $4);
 
