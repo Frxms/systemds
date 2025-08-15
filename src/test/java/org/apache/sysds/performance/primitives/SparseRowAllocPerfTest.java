@@ -39,7 +39,8 @@ public class SparseRowAllocPerfTest {
 	}
 
 	public static void main(String[] args) {
-		new SparseRowAllocPerfTest().testDenAndSpaAlloc();
+//		new SparseRowAllocPerfTest().testDenAndSpaAlloc();
+		new SparseRowAllocPerfTest().runComparison();
 	}
 
 	public void testDenAndSpaAlloc() {
@@ -68,6 +69,17 @@ public class SparseRowAllocPerfTest {
 		}
 		logResults(sparseRes, true);
 		logResults(denseRes, false);
+	}
+
+	public void runComparison() {
+		TimingUtils.time(() -> new SparseRowVector(10000), 100);
+		double[] initTime = TimingUtils.time(() -> new SparseRowVector(10000), 1000000);
+		LibSpoofPrimitives.setupThreadLocalMemory(20, 10000);
+		TimingUtils.time(() -> LibSpoofPrimitives.allocSparseVector(10000), 100);
+		double[] ringTime = TimingUtils.time(() -> LibSpoofPrimitives.allocSparseVector(10000),1000000);
+		LibSpoofPrimitives.cleanupSparseThreadLocalMemory();
+		System.out.println("Allocation test: " + TimingUtils.stats(ringTime));
+		System.out.println("Initialization test: " + TimingUtils.stats(initTime));
 	}
 
 	public static String[] compareAlloc(int numVectors, int len) {
