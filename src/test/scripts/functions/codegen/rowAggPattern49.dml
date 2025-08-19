@@ -41,7 +41,7 @@ while(FALSE) { }
 # S = X*rowSums(K*v)*X
 # S = (X*v)/rowSums(X*v)
 # S = abs((X*v)/rowSums(X*v))
-# S = (X/v)+rowMeans(X-v)
+S = (X/v)+rowMeans(X-v)
 # S = (X*v)+rowSums(X*v)
 # S = (X*rowSums(X*v))/(X*v)
 

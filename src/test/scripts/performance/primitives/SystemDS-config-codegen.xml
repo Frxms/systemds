@@ -22,6 +22,7 @@
    <sysds.scratch>scratch_space</sysds.scratch>
    <sysds.optlevel>7</sysds.optlevel>
    <sysds.codegen.enabled>true</sysds.codegen.enabled>
+<!--    <sysds.codegen.optimizer>fuse_all</sysds.codegen.optimizer>-->
    <sysds.codegen.plancache>true</sysds.codegen.plancache>
    <sysds.codegen.literals>1</sysds.codegen.literals>
 

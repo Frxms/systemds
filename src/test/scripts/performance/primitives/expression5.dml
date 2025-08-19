@@ -23,7 +23,10 @@ A = read($1);
 B = read($2);
 v = read($3)
 
-S = B + (A <= rowMins(A))
+while(FALSE) { }
+
+# S = B + (A <= rowMins(A))
+S = (((A/v)+A*rowMins(A/v))/A)/v
 
 write(S, $4);
 

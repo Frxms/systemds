@@ -2191,6 +2191,19 @@ public class LibSpoofPrimitives
 		return c;
 	}
 
+	public static SparseRowVector vectMultWriteInit(int len, double[] a, double bval, int[] aix, int ai, int alen) {
+		SparseRowVector c = new SparseRowVector(alen);
+		if( a == null ) return c;
+		int[] indexes = c.indexes();
+		double[] values = c.values();
+		for(int j = 0; j < alen; j++) {
+			indexes[j] = aix[ai+j];
+			values[j] = a[ai+j]*bval;
+		}
+		c.setSize(alen);
+		return c;
+	}
+
 	public static SparseRowVector vectMultWrite(int len, double bval, double[] a, int[] aix, int ai, int alen) {
 		return vectMultWrite(len, a, bval, aix, ai, alen);
 	}

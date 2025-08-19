@@ -8,6 +8,8 @@ import org.apache.sysds.conf.CompilerConfig;
 import org.apache.sysds.conf.DMLConfig;
 import org.apache.sysds.hops.OptimizerUtils;
 import org.apache.sysds.performance.TimingUtils;
+import org.apache.sysds.runtime.matrix.data.MatrixBlock;
+import org.apache.sysds.runtime.util.DataConverter;
 import org.apache.sysds.test.TestUtils;
 import org.apache.sysds.utils.Explain;
 
@@ -32,12 +34,13 @@ public class ExpressionTest {
 	private final static double sparsity1 = 0.9;
 	private final static double sparsity2 = 0.1;
 	private final static double eps = 1e-8;
-	private int rows = 2000;
-	private int cols = 10000;
-	double[] sparsities = new double[] {1, 0.3333333, 0.1111111, 0.0333333, 0.0111111, 0.0033333, 0.0011111, 0.0003333, 0.0001111, 0.0000333, 0.0000111, 0.0000033, 0.0000011, 0.0000003, 0.0000001};
-//	double[] sparsities = new double[] {0.01};
-	int warmupRuns = 100;
-	int repetitions = 2500;
+	private int rows = 1;
+	private int cols = 100;
+//	double[] sparsities = new double[] {1, 0.3333333, 0.1111111, 0.0333333, 0.0111111, 0.0033333, 0.0011111, 0.0003333, 0.0001111, 0.0000333, 0.0000111, 0.0000033, 0.0000011, 0.0000003, 0.0000001};
+//	double[] sparsities = new double[] {1, 0.3333333, 0.1111111, 0.0333333, 0.0111111, 0.0033333, 0.0011111};
+	double[] sparsities = new double[] {0.0111111};
+	int warmupRuns = 20;
+	int repetitions = 200;
 
 	public ExpressionTest() {
 	}
@@ -48,37 +51,19 @@ public class ExpressionTest {
 	}
 
 	public static void main(String[] args) {
-		new ExpressionTest(2000, 10000).runSparseBenchmark(TEST_NAME1);
-		new ExpressionTest(10000, 2000).runSparseBenchmark(TEST_NAME1);
-		new ExpressionTest(2000, 40000).runSparseBenchmark(TEST_NAME1);
-		new ExpressionTest(2000, 10000).runSparseBenchmark(TEST_NAME2);
-		new ExpressionTest(2000, 10000).runSparseBenchmark(TEST_NAME3);
-		new ExpressionTest(2000, 10000).runSparseBenchmark(TEST_NAME4);
-		new ExpressionTest(2000, 10000).runSparseBenchmark(TEST_NAME5);
-		new ExpressionTest(2000, 20000).runSparseBenchmark(TEST_NAME2);
-		new ExpressionTest(2000, 20000).runSparseBenchmark(TEST_NAME3);
-		new ExpressionTest(2000, 20000).runSparseBenchmark(TEST_NAME4);
-		new ExpressionTest(2000, 20000).runSparseBenchmark(TEST_NAME5);
-//		System.out.println("First------------------------------------------------");
-//		new ExpressionTest().runSparseBenchmark(TEST_NAME1);
-//		System.out.println("Second------------------------------------------------");
-//		new ExpressionTest().runSparseBenchmark(TEST_NAME2);
-//		System.out.println("Third------------------------------------------------");
-//		new ExpressionTest().runSparseBenchmark(TEST_NAME3);
-//		System.out.println("Fourth------------------------------------------------");
-//		new ExpressionTest().runSparseBenchmark(TEST_NAME4);
-//		System.out.println("Fifth------------------------------------------------");
-//		new ExpressionTest().runSparseBenchmark(TEST_NAME5);
-//		System.out.println("First------------------------------------------------");
-//		new ExpressionTest().runSparseBenchmark(TEST_NAME1);
-//		System.out.println("Second------------------------------------------------");
-//		new ExpressionTest().runSparseBenchmark(TEST_NAME2);
-//		System.out.println("Third------------------------------------------------");
-//		new ExpressionTest().runSparseBenchmark(TEST_NAME3);
-//		System.out.println("Fourth------------------------------------------------");
-//		new ExpressionTest().runSparseBenchmark(TEST_NAME4);
-//		System.out.println("Fifth------------------------------------------------");
-//		new ExpressionTest().runSparseBenchmark(TEST_NAME5);
+//		new ExpressionTest(2000, 100000).runSparseBenchmark(TEST_NAME1);
+//		new ExpressionTest(100000, 2000).runSparseBenchmark(TEST_NAME1);
+//		new ExpressionTest(2000, 100000).runSparseBenchmark(TEST_NAME2);
+//		new ExpressionTest(2000, 100000).runSparseBenchmark(TEST_NAME3);
+//		new ExpressionTest(2000, 100000).runSparseBenchmark(TEST_NAME4);
+//		new ExpressionTest(2000, 100000).runSparseBenchmark(TEST_NAME5);
+
+		new ExpressionTest(2000, 100000).runDenseBenchmark(TEST_NAME1);
+//		new ExpressionTest(100000, 2000).runDenseBenchmark(TEST_NAME1);
+//		new ExpressionTest(2000, 100000).runDenseBenchmark(TEST_NAME2);
+//		new ExpressionTest(2000, 100000).runDenseBenchmark(TEST_NAME3);
+//		new ExpressionTest(2000, 100000).runDenseBenchmark(TEST_NAME4);
+//		new ExpressionTest(10, 100 ).runDenseBenchmark(TEST_NAME5);
 	}
 
 	public void runSparseBenchmark(String testname) {
@@ -97,11 +82,15 @@ public class ExpressionTest {
 	}
 
 	private String[] runPerfTest(String testname, boolean sparseRowVec, Types.ExecType et) {
-
+		System.out.println("Dimensions: " + rows + "x" + cols);
 		String[] resultTime = new String[sparsities.length];
 
-		Connection conn = new Connection(new DMLConfig(), CompilerConfig.ConfigType.CODEGEN_ENABLED);
-//		DMLScript.EXPLAIN = Explain.ExplainType.CODEGEN;
+		DMLConfig cfg = new DMLConfig();
+		cfg.setTextValue(DMLConfig.CODEGEN, "true");
+		cfg.setTextValue(DMLConfig.CODEGEN_OPTIMIZER, "fuse_all");
+		Connection conn = new Connection(cfg, CompilerConfig.ConfigType.CODEGEN_ENABLED);
+//		Connection conn = new Connection(new DMLConfig(), CompilerConfig.ConfigType.CODEGEN_ENABLED);
+		DMLScript.EXPLAIN = Explain.ExplainType.CODEGEN;
 		boolean oldSparse = DMLScript.SPARSE_INTERMEDIATE;
 		DMLScript.SPARSE_INTERMEDIATE = sparseRowVec;
 
@@ -118,9 +107,17 @@ public class ExpressionTest {
 				double[][] B = TestUtils.generateTestMatrix(rows, cols, 1, 31, sparsities[i], 5678);
 				double[][] V = TestUtils.generateTestMatrix(rows, 1, 1, 31, sparsities[i], 9876);
 
-				pscript.setMatrix("A", A, true);
-				pscript.setMatrix("B", B, true);
-				pscript.setMatrix("v", V, true);
+				MatrixBlock AM = DataConverter.convertToMatrixBlock(A);
+				MatrixBlock BM = DataConverter.convertToMatrixBlock(B);
+				MatrixBlock vM = DataConverter.convertToMatrixBlock(V);
+
+//				AM.denseToSparse();
+//				BM.denseToSparse();
+//				vM.denseToSparse();
+
+				pscript.setMatrix("A", AM, true);
+				pscript.setMatrix("B", BM, true);
+				pscript.setMatrix("v", vM, true);
 
 				TimingUtils.time(() -> pscript.executeScript(), warmupRuns);
 				double[] result = TimingUtils.time(() -> pscript.executeScript(), repetitions);

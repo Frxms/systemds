@@ -189,7 +189,7 @@ public abstract class SpoofRowwise extends SpoofOperator
 		//setup thread-local memory if necessary
 		if( allocTmp &&_reqVectMem > 0 )
 			if(inputs.get(0).isInSparseFormat() && DMLScript.SPARSE_INTERMEDIATE) {
-				LibSpoofPrimitives.setupSparseThreadLocalMemory(_reqVectMem, n/2, n2);
+				LibSpoofPrimitives.setupSparseThreadLocalMemory(_reqVectMem, n, n2);
 				LibSpoofPrimitives.setupThreadLocalMemory(_reqVectMem, n, n2);
 			} else {
 				LibSpoofPrimitives.setupThreadLocalMemory(_reqVectMem, n, n2);
@@ -485,7 +485,12 @@ public abstract class SpoofRowwise extends SpoofOperator
 		public Long call() {
 			//allocate vector intermediates
 			if( _reqVectMem > 0 )
-				LibSpoofPrimitives.setupThreadLocalMemory(_reqVectMem, _clen, _clen2);
+				if(_a.isInSparseFormat() && DMLScript.SPARSE_INTERMEDIATE) {
+					LibSpoofPrimitives.setupSparseThreadLocalMemory(_reqVectMem, _clen, _clen2);
+					LibSpoofPrimitives.setupThreadLocalMemory(_reqVectMem, _clen, _clen2);
+				} else {
+					LibSpoofPrimitives.setupThreadLocalMemory(_reqVectMem, _clen, _clen2);
+				}
 			
 			if( !_a.isInSparseFormat() )
 				executeDense(_a.getDenseBlock(), _b, _scalars, _c.getDenseBlock(), _clen, _rl, _ru, 0);
@@ -493,7 +498,12 @@ public abstract class SpoofRowwise extends SpoofOperator
 				executeSparse(_a.getSparseBlock(), _b, _scalars, _c.getDenseBlock(), _clen, _rl, _ru, 0);
 			
 			if( _reqVectMem > 0 )
-				LibSpoofPrimitives.cleanupThreadLocalMemory();
+				if(_a.isInSparseFormat() && DMLScript.SPARSE_INTERMEDIATE) {
+					LibSpoofPrimitives.cleanupSparseThreadLocalMemory();
+					LibSpoofPrimitives.cleanupThreadLocalMemory();
+				} else {
+					LibSpoofPrimitives.cleanupThreadLocalMemory();
+				}
 			
 			//maintain nnz for row partition
 			return _c.recomputeNonZeros(_rl, _ru-1, 0, _c.getNumColumns()-1);

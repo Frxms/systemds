@@ -143,8 +143,8 @@ public class CNodeUnary extends CNode
 	}
 
 	public boolean getTemplateType(double sparsity) {
-		if(DMLScript.SPARSE_INTERMEDIATE)
-			return true;
+		if(!DMLScript.SPARSE_INTERMEDIATE)
+			return false;
 		else {
 			switch(_type) {
 				case VECT_SQRT:

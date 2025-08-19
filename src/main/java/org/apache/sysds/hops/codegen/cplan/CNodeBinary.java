@@ -208,7 +208,7 @@ public class CNodeBinary extends CNode {
 						(_type == BinType.VECT_MATRIXMULT ? varj : varj + ".vals(0)")) :
 						_inputs.get(j).getDataType() == DataType.MATRIX ? (api == GeneratorAPI.JAVA ? varj : varj + ".vals(0)") : varj);
 
-				tmp = tmp.replace("%SLEN"+(j+1)+"%", varj.startsWith("STMP") ? varj+".size()" : j ==  0 ? "alen" : "blen");
+				tmp = tmp.replace("%SLEN"+(j+1)+"%", varj.startsWith("STMP") ? varj+".size()" : varj.startsWith("a") ? "alen" : "blen");
 
 			//replace start position of main input
 			tmp = tmp.replace("%POS"+(j+1)+"%", (_inputs.get(j) instanceof CNodeData
@@ -244,8 +244,8 @@ public class CNodeBinary extends CNode {
 	}
 
 	private boolean getTemplateType(double sparsityEst, double scalarVal) {
-		if(DMLScript.SPARSE_INTERMEDIATE)
-			return true;
+		if(!DMLScript.SPARSE_INTERMEDIATE)
+			return false;
 		else {
 			switch(_type) {
 				case VECT_MULT:

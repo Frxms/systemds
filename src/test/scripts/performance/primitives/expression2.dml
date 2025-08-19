@@ -23,8 +23,10 @@ A = read($1);
 B = read($2);
 v = read($3)
 
-# S = (A!=0) * (B-A)
-S = (A/v)+rowMeans(A-v)
+while(FALSE) { }
+
+# S = (A!=0) * (B-rowSums(A))
+S = abs(A/rowSums(A))
 
 write(S, $4);
 

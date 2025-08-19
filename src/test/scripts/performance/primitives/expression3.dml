@@ -20,8 +20,12 @@
 #-------------------------------------------------------------
 
 A = read($1);
+B = read($2);
+v = read($3)
 
-S = as.matrix(sum(rowMins(A)))
+while(FALSE) { }
+
+S = A/rowSums(abs(A/rowSums(A)))
 
 write(S, $4);
 

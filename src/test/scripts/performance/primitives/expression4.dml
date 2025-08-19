@@ -23,7 +23,9 @@ A = read($1);
 B = read($2);
 v = read($3)
 
-S = colSums(A / rowSums(B*v))
+while(FALSE) { }
+
+S = ((A/v)+A*rowMins(A/v))
 
 write(S, $4);
 
